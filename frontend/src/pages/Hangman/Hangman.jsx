@@ -2,19 +2,24 @@ import { useState, useEffect, useCallback } from "react";
 import "./Hangman.css";
 
 const WORDS = ["REACT", "FRONTEND", "COMPONENT", "ROUTER", "JAVASCRIPT"];
+const getRandomWord = () => WORDS[Math.floor(Math.random() * WORDS.length)];
 
 function Hangman() {
-  // Kelimeyi başlangıçta bir kez seçiyoruz
-  const [word] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * WORDS.length);
-    return WORDS[randomIndex];
-  });
-  
+  // 1. setWord fonksiyonunu da ekledik
+  const [word, setWord] = useState(getRandomWord); 
   const [guessedLetters, setGuessedLetters] = useState([]);
   const [mistakes, setMistakes] = useState(0);
-
   const [flashState, setFlashState] = useState('none');
 
+  // 2. Oyunu sıfırlayan fonksiyon
+  const resetGame = () => {
+    setWord(getRandomWord()); // Yeni kelime seç
+    setGuessedLetters([]);     // Harfleri temizle
+    setMistakes(0);           // Hataları sıfırla
+    setFlashState('none');    // Efektleri kaldır
+  };
+
+  // Oyunun kazanılıp kazanılmadığını veya kaybedilip kaybedilmediğini kontrol et
   const isWinner = word.split("").every((l) => guessedLetters.includes(l));
   const isLoser = mistakes >= 6;
 
@@ -128,7 +133,7 @@ function Hangman() {
       {isWinner && <h2 className="win-msg">🎉 Kazandın!</h2>}
       {isLoser && <h2 className="lose-msg">💀 Kaybettin! Kelime: {word}</h2>}
 
-      <button className="reset-btn" onClick={() => window.location.reload()}>
+      <button className="reset-btn" onClick={resetGame}>
         Tekrar Dene
       </button>
     </div>
