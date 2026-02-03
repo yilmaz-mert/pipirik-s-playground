@@ -1,19 +1,32 @@
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import TodoList from "./pages/TodoList/TodoList";
-import Hangman from "./pages/Hangman/Hangman";
-import "./App.css";
+// src/App.jsx
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Home from './pages/Home';
+import About from './pages/About';
+import Hangman from './pages/Projects/Hangman/Hangman';
+import TodoList from './pages/Projects/TodoList/TodoList'; 
+import Projects from './pages/Projects/Projects';
+import './App.css';
 
 function App() {
   return (
     <Router>
-      <nav className="navbar">
-        <Link to="/" className="nav-link">📝 To-Do List</Link>
-        <Link to="/hangman" className="nav-link">🎮 Adam Asmaca</Link>
-      </nav>
-
+      <Navbar />
+      <div className="bg-animation"> {/* Animasyon burada tek bir yerde dursun */}
+        <div className="blob"></div>
+        <div className="blob"></div>
+        <div className="blob"></div>
+      </div>
       <Routes>
-        <Route path="/" element={<TodoList />} />
-        <Route path="/hangman" element={<Hangman />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/projects" element={<Projects />} />
+        
+        {/* Projeler Nested Route Yapısı */}
+        <Route path="/projects" element={<Projects />}>
+          <Route path="hangman" element={<Hangman />} />
+          <Route path="todolist" element={<TodoList />} />
+        </Route>
       </Routes>
     </Router>
   );

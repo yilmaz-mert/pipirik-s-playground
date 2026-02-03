@@ -1,16 +1,19 @@
-import { Link, NavLink } from "react-router-dom";
-import "./Navbar.css";
+import { NavLink } from 'react-router-dom';
+import './Navbar.css';
 
 function Navbar() {
   return (
     <nav className="navbar">
-      <Link to="/" className="nav-logo">Portfolio</Link>
-      <ul className="nav-menu">
-        <li><NavLink to="/">Ana Sayfa</NavLink></li>
-        <li><NavLink to="/hakkimda">Hakkımda</NavLink></li>
-        <li><NavLink to="/projeler">Projeler</NavLink></li>
-        <li><NavLink to="/iletisim">İletişim</NavLink></li>
-      </ul>
+      <div className="navbar-container">
+        <NavLink to="/" className="navbar-logo">
+          Pipirik's <span>Playground</span>
+        </NavLink>
+        <div className="nav-links">
+          <NavLink to="/" className="nav-item" data-text="Home">Home</NavLink>
+          <NavLink to="/about" className="nav-item" data-text="About">About</NavLink>
+          <NavLink to="/projects" className="nav-item" data-text="Projects">Projects</NavLink>
+        </div>
+      </div>
     </nav>
   );
 }

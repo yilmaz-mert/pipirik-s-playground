@@ -1,45 +1,91 @@
 .navbar {
+  background-color: rgba(15, 23, 42, 0.8); 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.8rem 0;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
   position: sticky;
   top: 0;
-  width: 100%;
-  background: rgba(26, 26, 26, 0.95);
-  backdrop-filter: blur(10px);
-  padding: 1rem 5%;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.navbar-container {
+  max-width: 1200px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  z-index: 1000;
-  border-bottom: 1px solid #333;
+  padding: 0 2rem;
 }
 
-.nav-logo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #646cff; /* Senin Hangman buton renginle uyumlu */
+/* Logo Stili */
+.navbar-logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #f8fafc;
   text-decoration: none;
+  letter-spacing: -1px;
 }
 
-.nav-menu {
-  list-style: none;
+.navbar-logo span {
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+  background-clip: text; /* Standart özelliği ekledik */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.nav-links {
   display: flex;
-  gap: 2rem;
-  margin: 0;
-  padding: 0;
+  gap: 1.5rem;
 }
 
-.nav-menu li a {
-  color: #eee;
+.nav-item {
   text-decoration: none;
+  color: #94a3b8;
   font-weight: 500;
+  font-size: 1rem;
+  padding: 8px 0;
+  position: relative;
   transition: color 0.3s ease;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.01em; /* Harfler arası çok küçük bir boşluk bırakır */
+  transition: color 0.3s ease, letter-spacing 0.3s ease;
 }
 
-.nav-menu li a:hover {
-  color: #646cff;
+.nav-item::before {
+  display: block;
+  content: attr(data-text); 
+  font-weight: 600; 
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
 }
 
-/* Aktif sayfa linki için (Opsiyonel: NavLink kullanırsan) */
-.nav-menu li a.active {
-  color: #646cff;
-  border-bottom: 2px solid #646cff;
+.nav-item::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.nav-item:hover {
+  color: #f8fafc;
+}
+
+.nav-item:hover::after, 
+.nav-item.active::after {
+  width: 100%; 
+}
+
+.nav-item.active {
+  color: #06b6d4;
+  font-weight: 600;
 }

@@ -1,0 +1,89 @@
+/* Home.css içinde bu kısımları güncelle */
+
+.home-wrapper {
+  position: relative;
+  z-index: 1; 
+  overflow: hidden;
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important; 
+}
+
+/* Layout */
+.hero-content {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  max-width: 1100px;
+  padding: 2rem;
+  z-index: 1;
+}
+
+.profile-frame {
+  width: 280px; height: 280px;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; /* Trendy blob shape */
+  overflow: hidden;
+  border: 4px solid #1e293b;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  background: #1e293b;
+}
+
+.profile-frame img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+  font-size: 1.8rem;
+}
+
+.social-links a { color: #94a3b8; transition: 0.3s; }
+.social-links a:hover { color: #06b6d4; transform: scale(1.1); }
+
+/* Text Aside */
+.text-aside { text-align: left; max-width: 600px; }
+.hero-title { font-size: 4.5rem; margin: 0; }
+.hero-title span {
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+  background-clip: text; /* Standart özellik eklendi */
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-subtitle { font-size: 1.8rem; color: #06b6d4; margin-bottom: 1rem; }
+.hero-description { color: #94a3b8; line-height: 1.6; font-size: 1.1rem; }
+
+.skill-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2rem;
+}
+
+.skill-tags span {
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid #334155;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #8b5cf6;
+  font-weight: 600;
+}
+
+.cta-group { display: flex; gap: 15px; margin-top: 2rem; }
+.cta-button { padding: 12px 30px; border-radius: 12px; font-weight: 600; text-decoration: none; transition: 0.3s; }
+.cta-button.primary { background: #06b6d4; color: #0f172a; }
+.cta-button.secondary { border: 1px solid #334155; color: white; }
+.cta-button:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .hero-content { flex-direction: column; text-align: center; }
+  .text-aside { text-align: center; }
+  .skill-tags { justify-content: center; }
+  .cta-group { justify-content: center; }
+}
