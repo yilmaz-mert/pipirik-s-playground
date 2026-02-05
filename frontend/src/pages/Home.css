@@ -1,4 +1,4 @@
-/* Home.css içinde bu kısımları güncelle */
+/* Home.css - Updated for Performance and Accessibility */
 
 .home-wrapper {
   position: relative;
@@ -8,7 +8,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent !important; 
+  /* Remove !important if possible to follow CSS specificity rules */
+  background: transparent; 
 }
 
 /* Layout */
@@ -19,19 +20,25 @@
   max-width: 1100px;
   padding: 2rem;
   z-index: 1;
+  /* contain: content; -> Potential optimization for modern browsers */
 }
 
 .profile-frame {
-  width: 280px; height: 280px;
-  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; /* Trendy blob shape */
+  width: 280px; 
+  height: 280px;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   overflow: hidden;
   border: 4px solid #1e293b;
   box-shadow: 0 20px 50px rgba(0,0,0,0.3);
   background: #1e293b;
+  /* Use will-change for heavy shapes if they animate */
 }
 
 .profile-frame img {
-  width: 100%; height: 100%; object-fit: cover;
+  width: 100%; 
+  height: 100%; 
+  object-fit: cover;
+  display: block; /* Removes unwanted whitespace below images */
 }
 
 .social-links {
@@ -42,20 +49,49 @@
   font-size: 1.8rem;
 }
 
-.social-links a { color: #94a3b8; transition: 0.3s; }
-.social-links a:hover { color: #06b6d4; transform: scale(1.1); }
+.social-links a { 
+  color: #94a3b8; 
+  /* transition only transform and color for performance (prevents layout recalc) */
+  transition: transform 0.3s ease, color 0.3s ease; 
+}
+
+.social-links a:hover { 
+  color: #06b6d4; 
+  transform: scale(1.1); 
+}
 
 /* Text Aside */
-.text-aside { text-align: left; max-width: 600px; }
-.hero-title { font-size: 4.5rem; margin: 0; }
+.text-aside { 
+  text-align: left; 
+  max-width: 600px; 
+}
+
+.hero-title { 
+  font-size: 4.5rem; 
+  margin: 0; 
+  line-height: 1.1;
+}
+
 .hero-title span {
   background: linear-gradient(90deg, #06b6d4, #8b5cf6);
-  background-clip: text; /* Standart özellik eklendi */
+  background-clip: text; 
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.hero-subtitle { font-size: 1.8rem; color: #06b6d4; margin-bottom: 1rem; }
-.hero-description { color: #94a3b8; line-height: 1.6; font-size: 1.1rem; }
+
+.hero-subtitle { 
+  font-size: 1.8rem; 
+  color: #06b6d4; 
+  margin-bottom: 1rem; 
+  font-weight: 500;
+}
+
+/* Increased brightness of color for better contrast/accessibility */
+.hero-description { 
+  color: #cbd5e1; /* Changed from #94a3b8 for better contrast */
+  line-height: 1.6; 
+  font-size: 1.15rem; 
+}
 
 .skill-tags {
   display: flex;
@@ -65,63 +101,47 @@
 }
 
 .skill-tags span {
-  background: rgba(30, 41, 59, 0.5);
+  background: rgba(30, 41, 59, 0.6);
   border: 1px solid #334155;
-  padding: 5px 15px;
+  padding: 6px 16px;
   border-radius: 20px;
   font-size: 0.9rem;
-  color: #8b5cf6;
+  color: #a78bfa; /* Slightly lighter purple for visibility */
   font-weight: 600;
 }
 
-/* Responsive */
+/* Responsive - Media Queries */
 @media (max-width: 900px) {
-  .hero-content { flex-direction: column; text-align: center; }
+  .hero-content { 
+    flex-direction: column; 
+    text-align: center; 
+    gap: 40px;
+  }
   .text-aside { text-align: center; }
   .skill-tags { justify-content: center; }
-  .cta-group { justify-content: center; }
 }
 
-/* --- Mobile --- */
 @media (max-width: 600px) {
   .home-wrapper {
-    padding: 20px 0; 
+    padding: 40px 0; 
     min-height: auto; 
     align-items: flex-start; 
   }
 
-  .hero-content {
-    gap: 25px; 
-    padding: 1rem;
-  }
-
   .profile-frame {
-    width: 180px; 
-    height: 180px;
-    border-width: 3px; 
+    width: 200px; 
+    height: 200px;
   }
 
   .hero-title {
-    font-size: 2.5rem; 
-    line-height: 1.2;
+    font-size: 3rem; 
   }
 
   .hero-subtitle {
-    font-size: 1.2rem;
-    margin-top: 0.5rem;
+    font-size: 1.3rem;
   }
 
   .hero-description {
-    font-size: 0.95rem; 
-    padding: 0 10px;
-  }
-
-  .skill-tags {
-    gap: 8px;
-  }
-
-  .skill-tags span {
-    font-size: 0.8rem;
-    padding: 4px 10px;
+    font-size: 1rem;
   }
 }

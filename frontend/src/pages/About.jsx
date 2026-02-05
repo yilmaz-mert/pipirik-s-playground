@@ -5,8 +5,9 @@ import '../App.css';
 
 const About = () => {
   return (
-    <div className="home-wrapper">
-      <div className="bg-animation">
+    <main className="home-wrapper">
+      {/* Background animations with optimized blobs */}
+      <div className="bg-animation" aria-hidden="true">
         <div className="blob"></div>
         <div className="blob"></div>
       </div>
@@ -15,59 +16,57 @@ const About = () => {
         <header className="about-header">
           <h1 className="about-title">Beyond the <span>Code</span></h1>
           <p className="hero-description">
-            Electrical-Electronics Engineer & <span>Software Develoment</span> Enthusiast.
+            Electrical-Electronics Engineer & <span>Software Development</span> Enthusiast.
           </p>
         </header>
 
         <div className="about-grid">
           {/* Main Story Card */}
-          <div className="about-card">
-            <h3>My Engineering DNA</h3>
+          <section className="about-card" aria-labelledby="dna-title">
+            <h3 id="dna-title">My Engineering DNA</h3>
             <p className="about-text">
               I am an <strong>Electrical-Electronics Engineer</strong>  
               who believes that software is the most powerful tool for solving modern engineering 
               challenges. My background isn't just limited to code; I am passionate 
               about <strong>metalworking, welding,</strong> and <strong>3D printing</strong>.
             </p>
-            <p className="about-text" style={{ marginTop: '1rem' }}>
+            <p className="about-text about-text-secondary">
               From developing real-time <strong>Facial Recognition</strong> systems on Raspberry Pi 
               to optimizing <strong>Machine Learning</strong> models like LightGBM, I focus 
               on building practical, data-driven solutions.
             </p>
-          </div>
+          </section>
 
           {/* Technical Specs Card */}
-          <div className="about-card">
-            <h3>Core Competencies</h3>
+          <section className="about-card" aria-labelledby="competencies-title">
+            <h3 id="competencies-title">Core Competencies</h3>
             
-            <div className="experience-item">
-              <h4>AI & Data Science</h4>
-              <span>Python, ML, Computer Vision</span>
-            </div>
+            <ul className="experience-list" role="list">
+              <li className="experience-item">
+                <h4>AI & Data Science</h4>
+                <p>Python, ML, Computer Vision</p>
+              </li>
 
-            <div className="experience-item">
-              <h4>Engineering Tools</h4>
-              <span>3D Modeling (CATIA, Solidworks), SQL, Git</span>
-            </div>
+              <li className="experience-item">
+                <h4>Engineering Tools</h4>
+                <p>3D Modeling (CATIA, Solidworks), SQL, Git</p>
+              </li>
 
-            <div className="experience-item">
-              <h4>International Experience</h4>
-              <span>Work and Travel (TN, USA) - English Proficiency</span>
-            </div>
+              <li className="experience-item">
+                <h4>International Experience</h4>
+                <p>Work and Travel (TN, USA) - English Proficiency</p>
+              </li>
+            </ul>
 
-            <div className="skill-tag-group" style={{ marginTop: '1.5rem' }}>
-              <span className="skill-badge-pro">Python</span>
-              <span className="skill-badge-pro">PyTorch</span>
-              <span className="skill-badge-pro">LightGBM</span>
-              <span className="skill-badge-pro">Raspberry Pi</span>
-              <span className="skill-badge-pro">React</span>
-              <span className="skill-badge-pro">YOLO</span>
-              <span className="skill-badge-pro">OpenCV</span>
+            <div className="skill-tag-group">
+              {["Python", "PyTorch", "LightGBM", "Raspberry Pi", "React", "YOLO", "OpenCV"].map((skill) => (
+                <span key={skill} className="skill-badge-pro">{skill}</span>
+              ))}
             </div>
-          </div>
+          </section>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

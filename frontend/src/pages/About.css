@@ -1,12 +1,17 @@
 /* src/pages/About.css */
+
 .about-container {
   max-width: 1100px;
   margin: 0 auto;
   padding: 2rem;
   z-index: 2;
+  position: relative;
 }
 
-.about-header { margin-bottom: 2rem; text-align: left; }
+.about-header { 
+  margin-bottom: 2rem; 
+  text-align: left; 
+}
 
 .about-grid {
   display: grid;
@@ -21,6 +26,7 @@
   border-radius: 20px;
   backdrop-filter: blur(10px);
   text-align: left;
+  transition: transform 0.3s ease;
 }
 
 .about-card h3 {
@@ -31,77 +37,91 @@
   padding-bottom: 10px;
 }
 
-.about-text { color: #94a3b8; line-height: 1.7; font-size: 1.05rem; }
+/* Contrast improved for Accessibility */
+.about-text { 
+  color: #cbd5e1; 
+  line-height: 1.7; 
+  font-size: 1.05rem; 
+}
 
-.experience-item { margin-bottom: 1.2rem; }
-.experience-item h4 { color: #f8fafc; margin: 0; font-size: 1rem; }
-.experience-item span { color: #8b5cf6; font-size: 0.85rem; font-weight: 600; }
+.about-text-secondary {
+  margin-top: 1rem;
+}
 
-.skill-tag-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.experience-list {
+  list-style: none;
+  padding: 0;
+}
+
+.experience-item {
+  margin-bottom: 1.2rem;
+}
+
+.experience-item h4 {
+  color: #f8fafc;
+  margin-bottom: 4px;
+  font-size: 1.1rem;
+}
+
+.experience-item p {
+  color: #94a3b8;
+  font-size: 0.95rem;
+}
+
+.skill-tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 1.5rem;
+}
+
 .skill-badge-pro {
   background: rgba(139, 92, 246, 0.1);
   color: #a78bfa;
   border: 1px solid rgba(139, 92, 246, 0.3);
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 6px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
-@media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+/* Optimization for animations */
+.blob {
+  will-change: transform;
+}
 
-/* --- About Sayfası Mobil Düzenleme (Max 600px) --- */
+/* Performance: Disable animations if user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none;
+  }
+}
+
+/* --- Responsive Updates --- */
+@media (max-width: 900px) { 
+  .about-grid { grid-template-columns: 1fr; } 
+}
+
 @media (max-width: 600px) {
   .about-container {
-    padding: 1rem; /* Kenar boşluklarını daralttık ki içerik yayılsın */
-    margin-top: 20px;
+    padding: 1.5rem 1rem;
+    margin-top: 10px;
   }
 
   .about-header {
-    text-align: center; /* Mobilde merkezleme daha profesyonel durur */
+    text-align: center;
     margin-bottom: 1.5rem;
   }
 
   .about-title {
-    font-size: 2.2rem; /* Başlığı küçülttük */
+    font-size: 2.2rem;
   }
 
   .about-grid {
-    grid-template-columns: 1fr; /* Kartları kesin olarak tek sütun yaptık */
-    gap: 1.5rem; /* Kartlar arasındaki boşluğu azalttık */
+    gap: 1.5rem;
   }
 
   .about-card {
-    padding: 1.2rem; /* Kart içindeki iç boşluğu (padding) daralttık */
-    border-radius: 15px; /* Daha yumuşak bir köşeli yapı */
-  }
-
-  .about-card h3 {
-    font-size: 1.25rem; /* Kart başlıklarını küçülttük */
-    margin-bottom: 1rem;
-  }
-
-  .about-text {
-    font-size: 0.95rem; /* Metin boyutunu okunaklı seviyeye çektik */
-    line-height: 1.6;
-  }
-
-  .experience-item h4 {
-    font-size: 0.9rem;
-  }
-
-  .experience-item span {
-    font-size: 0.8rem;
-  }
-
-  /* Skill badgelerini mobilde daha derli toplu yapalım */
-  .skill-tag-group {
-    justify-content: flex-start;
-    gap: 6px;
-  }
-
-  .skill-badge-pro {
-    font-size: 0.75rem;
-    padding: 3px 8px;
+    padding: 1.5rem;
   }
 }
