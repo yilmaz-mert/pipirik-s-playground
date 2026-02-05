@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin } from 'react-icons/fa'; // npm install react-icons
+import mertProfile from "../assets/mert-profile.png";
 import './Home.css';
 
 const Home = () => {
@@ -11,7 +12,7 @@ const Home = () => {
         <section className="hero-content">
           <div className="profile-aside">
             <div className="profile-frame">
-              <img src="/src/assets/mert-profile.png" alt="Mert Yılmaz" />
+              <img src={mertProfile} alt="Mert Profile" />
             </div>
             <div className="social-links">
               <a href="https://github.com/yilmaz-mert" target="_blank" rel="noreferrer"><FaGithub /></a>

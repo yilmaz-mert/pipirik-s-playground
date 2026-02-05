@@ -1,14 +1,16 @@
 /* src/App.css */
+/* Import Inter font from Google Fonts for a modern UI look */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
 
 body {
   margin: 0;
-  background-color: #0f172a; /* Deep Slate Background */
+  background-color: #0f172a; /* Deep Slate Background - Primary theme color */
   color: #f8fafc;
   font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: antialiased; /* Smoother font rendering on macOS/iOS */
 }
 
+/* Global container for page layouts */
 .container {
   display: flex;
   flex-direction: column;
@@ -19,24 +21,25 @@ body {
   padding: 0 20px;
 }
 
+/* Primary heading style with a signature gradient */
 h1 { 
   font-size: 3.5rem; 
   margin-bottom: 1rem;
-  background: linear-gradient(90deg, #06b6d4, #8b5cf6); /* Cyan to Purple Gradient */
+  background: linear-gradient(90deg, #06b6d4, #8b5cf6); /* Cyan to Purple */
   background-clip: text;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  -webkit-text-fill-color: transparent; /* Makes the gradient fill the text */
   font-weight: 700;
 }
 
 p { 
   font-size: 1.25rem; 
-  color: #94a3b8; /* Soft Slate Text */
+  color: #94a3b8; /* Soft Slate for secondary text */
   max-width: 600px;
   line-height: 1.6;
 }
 
-/* Project Selection Cards */
+/* --- Project Selection Cards --- */
 .project-grid {
   display: flex;
   gap: 25px;
@@ -46,57 +49,53 @@ p {
 }
 
 .project-card {
-  background: #1e293b; /* Lighter Slate Card */
+  background: #1e293b; 
   border: 1px solid #334155;
   padding: 40px 30px;
   border-radius: 16px;
   text-decoration: none;
   color: white;
+  /* Use cubic-bezier for a 'pop-out' feel on hover */
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   width: 240px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
 .project-card:hover {
-  transform: translateY(-12px);
-  border-color: #06b6d4; /* Cyan border on hover */
+  transform: translateY(-12px); /* Lift effect */
+  border-color: #06b6d4; 
   background: #232f45;
-  box-shadow: 0 20px 25px -5px rgba(6, 182, 212, 0.2); /* Cyan Glow */
+  box-shadow: 0 20px 25px -5px rgba(6, 182, 212, 0.2); /* Cyan Glow effect */
 }
 
 .project-card h3 {
   margin-top: 0;
-  color: #06b6d4; /* Cyan Heading */
+  color: #06b6d4; 
   font-size: 1.5rem;
 }
 
-.project-card p {
-  font-size: 1rem;
-  color: #94a3b8;
-  margin-bottom: 0;
-}
-
+/* --- Background Animation (Blobs) --- */
 .bg-animation {
-  position: fixed;
+  position: fixed; /* Keeps animation in background during scroll */
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1;
-  background: #0f172a; /* Ana Slate rengi */
+  z-index: -1; /* Place behind all content */
+  background: #0f172a; 
   overflow: hidden;
 }
 
 .blob {
   position: absolute;
   border-radius: 50%;
-  /* Daha yumuşak bir ışık için radial-gradient */
+  /* Radial gradient for a soft, glowing light effect */
   background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
-  filter: blur(100px);
+  filter: blur(100px); /* Creates the blurred/foggy look */
   animation: organic-move 15s infinite alternate ease-in-out;
 }
 
-/* Her blob için farklı boyut ve konum */
+/* Distinct positioning and sizes for each blob to create depth */
 .blob:nth-child(1) { width: 450px; height: 450px; top: -10%; left: 10%; }
 .blob:nth-child(2) { 
   width: 600px; height: 600px; top: 40%; left: 50%; 
@@ -104,25 +103,15 @@ p {
   animation-duration: 20s;
   animation-delay: -5s;
 }
-.blob:nth-child(3) { width: 350px; height: 350px; top: 70%; left: 10%; animation-duration: 18s; animation-delay: -2s; }
-.blob:nth-child(4) { width: 500px; height: 500px; top: 10%; left: 70%; animation-duration: 25s; animation-delay: -10s; }
 
+/* Animation keyframes for floating movement */
 @keyframes organic-move {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
-  }
-  33% {
-    transform: translate(10%, 15%) scale(1.1) rotate(10deg);
-  }
-  66% {
-    transform: translate(-5%, 20%) scale(0.9) rotate(-10deg);
-  }
-  100% {
-    transform: translate(15%, -10%) scale(1.05) rotate(5deg);
-  }
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33%  { transform: translate(10%, 15%) scale(1.1) rotate(10deg); }
+  66%  { transform: translate(-5%, 20%) scale(0.9) rotate(-10deg); }
+  100% { transform: translate(15%, -10%) scale(1.05) rotate(5deg); }
 }
 
+/* Flash feedback classes for games (triggered via JavaScript) */
 body.flash-correct { background-color: rgba(34, 197, 94, 0.15) !important; transition: 0.3s; }
 body.flash-incorrect { background-color: rgba(239, 68, 68, 0.15) !important; transition: 0.3s; }
-body.final-win { background-color: rgba(34, 197, 94, 0.2) !important; }
-body.final-lose { background-color: rgba(239, 68, 68, 0.2) !important; }

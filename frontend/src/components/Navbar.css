@@ -1,15 +1,17 @@
+/* Navbar main container styling */
 .navbar {
-  background-color: rgba(15, 23, 42, 0.8); 
-  backdrop-filter: blur(10px); 
-  -webkit-backdrop-filter: blur(10px);
+  background-color: rgba(15, 23, 42, 0.8); /* Semi-transparent dark background */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
+  -webkit-backdrop-filter: blur(10px); /* Safari support for blur */
   padding: 0.8rem 0;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-  position: sticky;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5); /* Subtle bottom divider */
+  position: sticky; /* Stays at the top while scrolling */
   top: 0;
-  z-index: 1000;
+  z-index: 1000; /* Ensures navbar stays above other content */
   transition: all 0.3s ease;
 }
 
+/* Centers the content within the navbar */
 .navbar-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -19,7 +21,7 @@
   padding: 0 2rem;
 }
 
-/* Logo Stili */
+/* Logo styling */
 .navbar-logo {
   font-size: 1.4rem;
   font-weight: 700;
@@ -28,18 +30,21 @@
   letter-spacing: -1px;
 }
 
+/* Gradient effect for the logo span */
 .navbar-logo span {
   background: linear-gradient(90deg, #06b6d4, #8b5cf6);
-  background-clip: text; /* Standart özelliği ekledik */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background-clip: text; /* Standard property */
+  -webkit-background-clip: text; /* Vendor prefix for text clipping */
+  -webkit-text-fill-color: transparent; /* Makes the gradient visible through text */
 }
 
+/* Navigation links wrapper */
 .nav-links {
   display: flex;
   gap: 1.5rem;
 }
 
+/* Individual navigation link styling */
 .nav-item {
   text-decoration: none;
   color: #94a3b8;
@@ -52,19 +57,24 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  letter-spacing: 0.01em; /* Harfler arası çok küçük bir boşluk bırakır */
+  letter-spacing: 0.01em; 
   transition: color 0.3s ease, letter-spacing 0.3s ease;
 }
 
+/* Invisible placeholder to prevent layout shifting on hover.
+   When font-weight changes, it usually pushes other elements. 
+   This trick reserves the necessary width in advance.
+*/
 .nav-item::before {
   display: block;
-  content: attr(data-text); 
+  content: attr(data-text); /* Gets text from the HTML data-text attribute */
   font-weight: 600; 
   height: 0;
   overflow: hidden;
   visibility: hidden;
 }
 
+/* Animated underline effect */
 .nav-item::after {
   content: '';
   position: absolute;
@@ -73,18 +83,20 @@
   bottom: 0;
   left: 0;
   background: linear-gradient(90deg, #06b6d4, #8b5cf6);
-  transition: width 0.3s ease;
+  transition: width 0.3s ease; /* Expands from left to right */
 }
 
 .nav-item:hover {
   color: #f8fafc;
 }
 
+/* Reveal underline on hover or if the link is active */
 .nav-item:hover::after, 
 .nav-item.active::after {
   width: 100%; 
 }
 
+/* Active link color and weight */
 .nav-item.active {
   color: #06b6d4;
   font-weight: 600;
