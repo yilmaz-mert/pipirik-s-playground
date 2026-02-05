@@ -74,16 +74,54 @@
   font-weight: 600;
 }
 
-.cta-group { display: flex; gap: 15px; margin-top: 2rem; }
-.cta-button { padding: 12px 30px; border-radius: 12px; font-weight: 600; text-decoration: none; transition: 0.3s; }
-.cta-button.primary { background: #06b6d4; color: #0f172a; }
-.cta-button.secondary { border: 1px solid #334155; color: white; }
-.cta-button:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(6, 182, 212, 0.3); }
-
 /* Responsive */
 @media (max-width: 900px) {
   .hero-content { flex-direction: column; text-align: center; }
   .text-aside { text-align: center; }
   .skill-tags { justify-content: center; }
   .cta-group { justify-content: center; }
+}
+
+/* --- Mobile --- */
+@media (max-width: 600px) {
+  .home-wrapper {
+    padding: 20px 0; 
+    min-height: auto; 
+    align-items: flex-start; 
+  }
+
+  .hero-content {
+    gap: 25px; 
+    padding: 1rem;
+  }
+
+  .profile-frame {
+    width: 180px; 
+    height: 180px;
+    border-width: 3px; 
+  }
+
+  .hero-title {
+    font-size: 2.5rem; 
+    line-height: 1.2;
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    margin-top: 0.5rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem; 
+    padding: 0 10px;
+  }
+
+  .skill-tags {
+    gap: 8px;
+  }
+
+  .skill-tags span {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
 }

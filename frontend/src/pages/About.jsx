@@ -15,7 +15,7 @@ const About = () => {
         <header className="about-header">
           <h1 className="about-title">Beyond the <span>Code</span></h1>
           <p className="hero-description">
-            Electrical-Electronics Engineer & Machine Learning Enthusiast.
+            Electrical-Electronics Engineer & <span>Software Develoment</span> Enthusiast.
           </p>
         </header>
 
@@ -24,7 +24,7 @@ const About = () => {
           <div className="about-card">
             <h3>My Engineering DNA</h3>
             <p className="about-text">
-              I am an <strong>Electrical-Electronics Engineer</strong> (Uludag University) 
+              I am an <strong>Electrical-Electronics Engineer</strong>  
               who believes that software is the most powerful tool for solving modern engineering 
               challenges. My background isn't just limited to code; I am passionate 
               about <strong>metalworking, welding,</strong> and <strong>3D printing</strong>.
@@ -42,7 +42,7 @@ const About = () => {
             
             <div className="experience-item">
               <h4>AI & Data Science</h4>
-              <span>Python, ML, Computer Vision (YOLO, OpenCV)</span>
+              <span>Python, ML, Computer Vision</span>
             </div>
 
             <div className="experience-item">
@@ -61,6 +61,8 @@ const About = () => {
               <span className="skill-badge-pro">LightGBM</span>
               <span className="skill-badge-pro">Raspberry Pi</span>
               <span className="skill-badge-pro">React</span>
+              <span className="skill-badge-pro">YOLO</span>
+              <span className="skill-badge-pro">OpenCV</span>
             </div>
           </div>
         </div>

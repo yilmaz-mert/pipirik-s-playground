@@ -27,14 +27,9 @@ const Home = () => {
               Specialized in <strong>Machine Learning</strong> and <strong>Computer Vision</strong>. 
               Bridging the gap between engineering and modern web technologies.
             </p>
-            
-            <div className="cta-group">
-              <Link to="/projects" className="cta-button primary">View Projects</Link>
-              <Link to="/about" className="cta-button secondary">About Me</Link>
-            </div>
 
             <div className="skill-tags">
-              <span>Python</span>
+              <span>Web Development</span>
               <span>Machine Learning</span>
               <span>Data Science</span>
               <span>Computer Vision</span>

@@ -49,3 +49,59 @@
 }
 
 @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+
+/* --- About Sayfası Mobil Düzenleme (Max 600px) --- */
+@media (max-width: 600px) {
+  .about-container {
+    padding: 1rem; /* Kenar boşluklarını daralttık ki içerik yayılsın */
+    margin-top: 20px;
+  }
+
+  .about-header {
+    text-align: center; /* Mobilde merkezleme daha profesyonel durur */
+    margin-bottom: 1.5rem;
+  }
+
+  .about-title {
+    font-size: 2.2rem; /* Başlığı küçülttük */
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr; /* Kartları kesin olarak tek sütun yaptık */
+    gap: 1.5rem; /* Kartlar arasındaki boşluğu azalttık */
+  }
+
+  .about-card {
+    padding: 1.2rem; /* Kart içindeki iç boşluğu (padding) daralttık */
+    border-radius: 15px; /* Daha yumuşak bir köşeli yapı */
+  }
+
+  .about-card h3 {
+    font-size: 1.25rem; /* Kart başlıklarını küçülttük */
+    margin-bottom: 1rem;
+  }
+
+  .about-text {
+    font-size: 0.95rem; /* Metin boyutunu okunaklı seviyeye çektik */
+    line-height: 1.6;
+  }
+
+  .experience-item h4 {
+    font-size: 0.9rem;
+  }
+
+  .experience-item span {
+    font-size: 0.8rem;
+  }
+
+  /* Skill badgelerini mobilde daha derli toplu yapalım */
+  .skill-tag-group {
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .skill-badge-pro {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+}

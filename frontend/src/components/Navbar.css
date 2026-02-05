@@ -41,7 +41,8 @@
 /* Navigation links wrapper */
 .nav-links {
   display: flex;
-  gap: 1.5rem;
+  gap: 30px; 
+  align-items: center;
 }
 
 /* Individual navigation link styling */
@@ -100,4 +101,16 @@
 .nav-item.active {
   color: #06b6d4;
   font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .nav-links {
+    gap: 12px; 
+  }
+
+  .nav-links a {
+    font-size: 0.85rem; 
+    padding: 8px 4px; 
+  }
+
 }
