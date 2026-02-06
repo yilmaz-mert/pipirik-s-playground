@@ -10,7 +10,10 @@ function Exam() {
   const [loading, setLoading] = useState(true);    // Loading state for API fetch
   const [timeLeft, setTimeLeft] = useState(600);   // 10-minute countdown timer (600 seconds)
   const [isFinished, setIsFinished] = useState(false); // Controls the result screen visibility
-
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const answeredCount = Object.keys(answers).length;
+  const isAllAnswered = questions.length > 0 && answeredCount === questions.length;
+  
   // --- FETCH QUESTIONS FROM API ---
   useEffect(() => {
     // Fetching 10 multiple-choice questions from OpenTDB
@@ -64,6 +67,11 @@ function Exam() {
       if (userAnsLetter === correctLetter) correct++;
     });
     return correct;
+  };
+
+  const handleJumpToQuestion = (idx) => {
+    setCurrentIdx(idx);
+    setIsDrawerOpen(false); // Mobil kullanıcı bir soru seçince drawer kapansın
   };
 
   // --- CONDITIONAL RENDERING: LOADING ---
@@ -144,14 +152,15 @@ function Exam() {
   // --- MAIN EXAM UI ---
   return (
     <div className="exam-page-wrapper">
-      {/* Background visual effects */}
       <div className="bg-animation">
         <div className="blob"></div>
         <div className="blob"></div>
       </div>
 
       <div className="exam-content-area">
-        {/* TOP BAR: Timer and Finish Button */}
+        {/* 1. DEĞİŞİKLİK: Overlay artık burada, içerik alanının içinde */}
+        {isDrawerOpen && <div className="drawer-overlay" onClick={() => setIsDrawerOpen(false)}></div>}
+
         <div className="exam-header-bar">
           <div className="timer-display">
             Time Left: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
@@ -160,40 +169,39 @@ function Exam() {
         </div>
 
         <div className="exam-main-layout">
-          {/* LEFT SECTION: Question and Choices */}
           <div className="question-area">
             <div className="q-card">
               <span className="q-label">Question {currentIdx + 1}</span>
               <h2 dangerouslySetInnerHTML={{ __html: currentQ.question }}></h2>
               <div className="choices-list">
+                {/* Not: API 4 şık döndürdüğü için diziyi 4 elemanlı (A-D) tutmak daha sağlıklı */}
                 {currentQ.choices.map((choice, i) => (
                   <button
                     key={i}
-                    className={`choice-item ${answers[currentIdx] === ["A", "B", "C", "D", "E"][i] ? "active" : ""}`}
+                    className={`choice-item ${answers[currentIdx] === ["A", "B", "C", "D"][i] ? "active" : ""}`}
                     onClick={() => handleSelect(i)}
-                    dangerouslySetInnerHTML={{ __html: `${["A", "B", "C", "D", "E"][i]}) ${choice}` }}
+                    dangerouslySetInnerHTML={{ __html: `${["A", "B", "C", "D"][i]}) ${choice}` }}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Pagination Controls */}
             <div className="nav-btns">
               <button disabled={currentIdx === 0} onClick={() => setCurrentIdx(currentIdx - 1)}>Back</button>
               <button disabled={currentIdx === questions.length - 1} onClick={() => setCurrentIdx(currentIdx + 1)}>Next</button>
             </div>
           </div>
 
-          {/* RIGHT SECTION: Optical Form Sidebar */}
-          <div className="optical-sidebar">
+          <div className={`optical-sidebar ${isDrawerOpen ? "drawer-open" : ""}`}>
             <div className="optical-card">
+              <button className="close-drawer-btn" onClick={() => setIsDrawerOpen(false)}>✕</button>
               <h3>Optical Form</h3>
               <div className="optical-grid-scroll">
                 {questions.map((_, i) => (
                   <div 
                     key={i} 
                     className={`opt-row ${currentIdx === i ? "current" : ""}`}
-                    onClick={() => setCurrentIdx(i)}
+                    onClick={() => handleJumpToQuestion(i)} // SATIRA TIKLAYINCA: Soruya gider ve Kapanır
                   >
                     <span className="opt-num">{i + 1}</span>
                     
@@ -202,8 +210,8 @@ function Exam() {
                         key={letter}
                         className={`opt-bubble ${answers[i] === letter ? "checked" : ""}`}
                         onClick={(e) => {
-                          e.stopPropagation(); // Prevent row click from triggering twice
-                          setCurrentIdx(i);
+                          e.stopPropagation(); // Satırın tıklanma olayını engeller
+                          // 2. DEĞİŞİKLİK: Burada handleJump... kaldırıldı, sadece işaretleme yapılır
                           setAnswers({ ...answers, [i]: letter });
                         }}
                       >
@@ -215,6 +223,21 @@ function Exam() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div 
+        className={`floating-hub ${isDrawerOpen ? "active" : (isAllAnswered ? "completed" : "")}`} 
+        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+      >
+        <div className="hub-content">
+          {/* İkonu duruma göre değiştiriyoruz: Açıksa X, Kapalıysa Liste */}
+          <span className="hub-icon">
+            {isDrawerOpen ? "✕" : "📋"}
+          </span>
+          
+          {!isDrawerOpen && (
+            <span className="hub-status">{answeredCount}/{questions.length}</span>
+          )}
         </div>
       </div>
     </div>

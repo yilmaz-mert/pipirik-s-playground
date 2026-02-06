@@ -17,7 +17,8 @@
   margin: 0 auto;
   padding: 20px;
   box-sizing: border-box;
-  z-index: 10;
+  z-index: 1; 
+  position: relative; /
 }
 
 /* 2. HEADER AND TIMER */
@@ -376,24 +377,116 @@
 
 .restart-btn:hover { background: #22d3ee; transform: scale(1.05); }
 
+/* --- DRAWER OVERLAY --- */
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 998;
+  transition: opacity 0.3s ease;
+}
+
+/* --- FLOATING HUB BUTTON --- */
+.floating-hub {
+  display: none;
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #06b6d4;
+  color: #0f172a;
+  padding: 12px 20px;
+  border-radius: 50px;
+  box-shadow: 0 10px 25px rgba(6, 182, 212, 0.4);
+  z-index: 2000;
+  cursor: pointer;
+  overflow: hidden; 
+  -webkit-tap-highlight-color: transparent; 
+  outline: none;
+  backface-visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: rotate(0deg); 
+}
+
+.floating-hub.completed {
+  background: #22c55e; /* Canlı bir yeşil */
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.5); /* Yeşil gölge */
+  animation: pulse-green 2s infinite; /* Opsiyonel: Hafif nabız efekti */
+}
+
+.floating-hub.active {
+  background: #ef4444; 
+  transform: rotate(90deg); 
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+  padding: 12px; 
+  width: 30px; 
+  height: 30px; 
+  display: flex;     
+  align-items: center;
+  justify-content: center;
+}
+
+.floating-hub.active .hub-content {
+  transform: rotate(-90deg);
+  transition: transform 0.4s;
+}
+
+.hub-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
 /* 8. MOBILE RESPONSIVENESS */
+@media (min-width: 993px) {
+  .close-drawer-btn { display: none; }
+}
+
 @media (max-width: 992px) {
+  .floating-hub { display: block; } /* Mobilde göster */
+
   .exam-main-layout { 
     flex-direction: column; 
     align-items: stretch;
   }
   
-  .optical-sidebar { 
-    width: 100%; 
-    position: static; 
-    display: block; /* Disable equal height logic on mobile */
+  .optical-sidebar {
+    position: fixed !important;
+    top: 0;
+    right: -100%;
+    width: 320px !important;
+    height: 100vh;
+    z-index: 1001;
+    background: #0f172a;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .optical-sidebar.drawer-open {
+    right: 0; 
   }
 
   .question-area {
     display: block;
   }
 
-  .q-card, .optical-card {
+  .optical-card {
+    height: 100%;
+    border-radius: 0; 
+    border-left: 1px solid rgba(6, 182, 212, 0.3);
+  }
+
+  .q-card{
     flex: none; 
     min-height: auto;
   }
@@ -402,28 +495,48 @@
     margin-top: 25px;
   }
 
+  .close-drawer-btn {
+    display: block;
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.5rem;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+  }
+
   .review-details { grid-template-columns: 1fr; }
 }
 
 /* --- Optimized Mobile Styles for Exam --- */
 @media (max-width: 600px) {
-  /* 1. Header Fix: Stack Timer and Button */
   .exam-header-bar {
-    flex-direction: column; /* Stack vertically */
-    gap: 15px;
+    display: flex;
+    flex-direction: row;
+    /* justify-content: space-between; <--- Elemanları iki uca yaslar, aradaki boşluk esnek olur */
+    justify-content: center; /* Ortada toplar, boşluk tam olarak 'gap' kadar olur */
+    gap: 40px; /* Aradaki boşluğu buradan istediğin kadar artırabilirsin */
+    width: 100%;
     margin-bottom: 25px;
   }
 
   .timer-display {
-    width: 50%; /* Make timer full width */
-    text-align: center;
+    flex: 1;
+    max-width: 150px; /* Sayacın mobilde çıkabileceği maksimum genişlik */
     padding: 10px;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    text-align: center;
+    white-space: nowrap;
   }
 
   .finish-exam-btn {
-    width:50%; /* Make button full width */
+    flex: 1;
+    max-width: 110px; /* Butonun mobilde çıkabileceği maksimum genişlik */
     padding: 10px;
+    font-size: 0.75rem;
+    text-align: center;
   }
 
   /* 2. Result Screen Fix: Maximize visible space */
@@ -483,3 +596,4 @@
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Better fit for small rows */
   }
 }
+
