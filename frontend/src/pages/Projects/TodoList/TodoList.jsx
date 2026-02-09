@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import "./TodoList.css";
 import "../../../App.css";
-import 'drag-drop-touch'; // Polyfill for mobile drag and drop support
+import 'drag-drop-touch';
+
+const getNow = () => Date.now();
 
 function TodoList() {
   /* --- STATE MANAGEMENT --- */
@@ -17,8 +19,11 @@ function TodoList() {
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
   
-  // Ref to track double-tap timing on mobile devices
-  const lastTap = useRef(0);
+  // Refs to track taps and touch duration per-item on mobile devices
+  const touchStart = useRef({});
+  const lastToggle = useRef({});
+  const lastGlobalTap = useRef({ id: null, time: 0 });
+  const lastTouchAt = useRef(0);
 
   /* --- EFFECTS --- */
 
@@ -27,88 +32,94 @@ function TodoList() {
     localStorage.setItem("pipirik-todos", JSON.stringify(todos));
   }, [todos]);
 
-  /* --- HANDLERS (LOGIC) --- */
-
   // Toggle the completion status of a task
-  const toggleComplete = (id) => {
-    setTodos(prevTodos => 
-      prevTodos.map(t => t.id === id ? { ...t, completed: !t.completed } : t)
-    );
-  };
+  const toggleComplete = useCallback((id, timeStamp) => {
+    if (timeStamp == null) return;
+    const now = timeStamp;
+    const last = lastToggle.current[id] || 0;
+    if (now - last < 400) return;
+    lastToggle.current[id] = now;
+
+    setTodos(prevTodos => prevTodos.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  }, [setTodos]);
 
   // Special double-tap handler for mobile users to toggle completion
-  const handleTouchComplete = useCallback((id) => {
-    const now = Date.now();
-    const DOUBLE_PRESS_DELAY = 300; // milliseconds
-    
-    if (now - lastTap.current < DOUBLE_PRESS_DELAY) {
-      toggleComplete(id);
-    }
-    lastTap.current = now;
-  }, []);
+  const handleTouchComplete = useCallback((e, id) => {
+    const now = e.timeStamp ?? getNow();
+    const start = (touchStart.current && touchStart.current[id]) || 0;
+    const duration = now - start;
+    const LONG_PRESS_THRESHOLD = 250;
+    const DOUBLE_PRESS_DELAY = 300;
 
-  // Add new task on Enter key press
-  const handleKeyDown = (event) => {
+    if (duration > LONG_PRESS_THRESHOLD) {
+      if (touchStart.current) touchStart.current[id] = 0;
+      return;
+    }
+
+    const last = lastGlobalTap.current || { id: null, time: 0 };
+    if (last.id === id && now - last.time < DOUBLE_PRESS_DELAY) {
+      toggleComplete(id, now);
+      lastGlobalTap.current = { id: null, time: 0 };
+    } else {
+      lastGlobalTap.current = { id, time: now };
+    }
+
+    if (touchStart.current) touchStart.current[id] = 0;
+    lastTouchAt.current = now;
+  }, [toggleComplete]);
+
+  const handleKeyDown = useCallback((event) => {
     const val = event.target.value;
     if (event.key === "Enter" && val.trim() !== "") {
-      const newTodo = { 
-        id: Date.now(), 
-        text: val.trim(), 
-        completed: false 
-      };
-      setTodos([...todos, newTodo]);
+      const newTodo = { id: getNow(), text: val.trim(), completed: false };
+      setTodos(prev => [...prev, newTodo]);
       event.target.value = "";
     }
-  };
+  }, [setTodos]);
 
-  // Remove all tasks after confirmation
-  const clearAll = () => {
-    if (window.confirm("Are you sure you want to delete all tasks, Pipirik?")) {
-      setTodos([]);
-    }
-  };
+  // clearAll functionality removed
 
   // Trigger delete animation and then remove the item
-  const deleteTodo = (id) => {
+  const deleteTodo = useCallback((id) => {
     setDeletingId(id);
     setTimeout(() => {
       setTodos(prevTodos => prevTodos.filter((t) => t.id !== id));
       setDeletingId(null);
     }, 400);
-  };
+  }, [setTodos]);
 
   // Enter edit mode for a specific task
-  const startEditing = (todo) => {
+  const startEditing = useCallback((todo) => {
     setEditingId(todo.id);
     setEditText(todo.text);
-  };
+  }, []);
 
   // Save changes and exit edit mode
-  const saveEdit = (id) => {
+  const saveEdit = useCallback((id) => {
     setTodos(prevTodos => prevTodos.map((t) => (t.id === id ? { ...t, text: editText } : t)));
     setEditingId(null);
-  };
+  }, [editText, setTodos]);
 
   /* --- DRAG AND DROP LOGIC --- */
 
-  const handleDragStart = (e, id) => {
-    if (editingId) return; // Prevent dragging while editing
+  const handleDragStart = useCallback((e, id) => {
+    if (editingId) return;
     setTimeout(() => setDraggedItemId(id), 0);
-  };
+  }, [editingId]);
 
-  const handleDragEnter = (id) => {
+  const handleDragEnter = useCallback((id) => {
     if (draggedItemId === null || draggedItemId === id) return;
-    
+
     setTodos(prevTodos => {
       const newList = [...prevTodos];
       const oldIdx = newList.findIndex((t) => t.id === draggedItemId);
       const newIdx = newList.findIndex((t) => t.id === id);
-      
+
       const item = newList.splice(oldIdx, 1)[0];
       newList.splice(newIdx, 0, item);
       return newList;
     });
-  };
+  }, [draggedItemId, setTodos]);
 
   return (
     <div className="home-wrapper">
@@ -129,15 +140,20 @@ function TodoList() {
             onKeyDown={handleKeyDown} 
             className="main-input"
           />
-          <button className="clear-all-btn" onClick={clearAll} title="Clear All">✕</button>
         </div>
 
         <ul className="todo-list">
           {todos.map((todo) => (
             <li 
               key={todo.id} 
-              onDoubleClick={() => !editingId && toggleComplete(todo.id)}
-              onTouchStart={() => !editingId && handleTouchComplete(todo.id)}
+              onDoubleClick={(e) => {
+                          const now = e.timeStamp ?? getNow();
+                          if (now - lastTouchAt.current < 700) return;
+                          if (!editingId) toggleComplete(todo.id, now);
+                        }}
+                      onTouchStart={(e) => { if (!editingId) touchStart.current[todo.id] = e.timeStamp ?? getNow(); }}
+                onTouchEnd={(e) => !editingId && handleTouchComplete(e, todo.id)}
+                onTouchCancel={() => { if (touchStart.current) touchStart.current[todo.id] = 0; if (lastGlobalTap.current && lastGlobalTap.current.id === todo.id) lastGlobalTap.current = { id: null, time: 0 }; }}
               draggable={!editingId}
               onDragStart={(e) => handleDragStart(e, todo.id)}
               onDragEnter={() => handleDragEnter(todo.id)}

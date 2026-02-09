@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { createPortal } from 'react-dom';
 import "./Exam.css";
 import "../../../App.css"; // Global animations and layout styles
+import { useModal } from '../../../components/useModal';
 
 function Exam() {
   // --- STATE MANAGEMENT ---
@@ -11,6 +13,8 @@ function Exam() {
   const [timeLeft, setTimeLeft] = useState(600);   // 10-minute countdown timer (600 seconds)
   const [isFinished, setIsFinished] = useState(false); // Controls the result screen visibility
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [showMistakeModal, setShowMistakeModal] = useState(false);
+  const [openWrong, setOpenWrong] = useState({});
   const answeredCount = Object.keys(answers).length;
   const isAllAnswered = questions.length > 0 && answeredCount === questions.length;
   
@@ -52,21 +56,13 @@ function Exam() {
     setAnswers({ ...answers, [currentIdx]: letter });
   };
 
-  const finishExam = () => {
-    if (window.confirm("Are you sure you want to finish the exam?")) {
+  const { showConfirm } = useModal();
+
+  const finishExam = async () => {
+    const confirmed = await showConfirm({ title: 'Finish Exam', message: 'Are you sure you want to finish the exam?' });
+    if (confirmed) {
       setIsFinished(true);
     }
-  };
-
-  const calculateScore = () => {
-    let correct = 0;
-    questions.forEach((q, i) => {
-      const userAnsLetter = answers[i];
-      const correctIdx = q.choices.indexOf(q.correct);
-      const correctLetter = ["A", "B", "C", "D", "E"][correctIdx];
-      if (userAnsLetter === correctLetter) correct++;
-    });
-    return correct;
   };
 
   const handleJumpToQuestion = (idx) => {
@@ -79,68 +75,121 @@ function Exam() {
 
   // --- CONDITIONAL RENDERING: RESULT SCREEN ---
   if (isFinished) {
-    const score = calculateScore();
+    const total = questions.length;
+    let correct = 0;
+    let answered = 0;
+    const wrongList = [];
+
+    questions.forEach((q, i) => {
+      const userAnsLetter = answers[i];
+      if (userAnsLetter) answered++;
+      const correctIdx = q.choices.indexOf(q.correct);
+      const correctLetter = ["A", "B", "C", "D", "E"][correctIdx];
+      if (userAnsLetter === correctLetter) correct++;
+      if (userAnsLetter && userAnsLetter !== correctLetter) {
+        wrongList.push({ index: i, question: q.question, selected: userAnsLetter, correct: correctLetter, correctText: q.correct, choices: q.choices });
+      }
+    });
+
+    const pct = Math.round((correct / total) * 100);
+
     return (
       <div className="home-wrapper">
-        <div className="result-container review-mode">
-          <div className="result-card">
-            <h1>Exam Results</h1>
-            
-            <div className="score-circle">
-              <span>{score} / {questions.length}</span>
+        <div className="result-container">
+          <div className="result-card result-card--modern">
+            <div className="result-header">
+              <h2>Exam Results</h2>
+              <div className="result-actions">
+                <button className="cw-btn cw-btn-primary" onClick={() => window.location.reload()}>Retry</button>
+              </div>
             </div>
 
-            <p className="result-text">
-              {score >= (questions.length / 2) ? "Great Job! 🎉" : "Keep practicing! 📚"}
-            </p>
+            <div className="score-section">
+              <div className="score-circle large">
+                <div className="score-number">{pct}<small>%</small></div>
+                <div className="score-sub">{correct} / {total}</div>
+              </div>
 
-            {/* ERROR ANALYSIS & REVIEW LIST */}
-            <div className="review-list">
-              {questions.map((q, i) => {
-                const userAnsLetter = answers[i];
-                const correctIdx = q.choices.indexOf(q.correct);
-                const correctLetter = ["A", "B", "C", "D", "E"][correctIdx];
-                const isCorrect = userAnsLetter === correctLetter;
+              <div className="score-details">
+                <p className="result-text">{pct >= 60 ? 'Great work — keep it up!' : 'Review the incorrect items and try again.'}</p>
 
-                return (
-                  <div key={i} className={`review-item ${isCorrect ? 'correct' : 'wrong'}`}>
-                    <div className="review-header">
-                      <strong>Question {i + 1}</strong>
-                      <span className={`status-badge ${isCorrect ? 'c-bg' : 'w-bg'}`}>
-                        {isCorrect ? "Correct" : "Wrong"}
-                      </span>
-                    </div>
-                    
-                    <p className="review-q-body" dangerouslySetInnerHTML={{ __html: q.question }}></p>
-                    
-                    <div className="review-details">
-                      <div className="ans-box">
-                        <small>Your Answer:</small>
-                        <span className={isCorrect ? "text-success" : "text-danger"}>
-                          {userAnsLetter ? `${userAnsLetter}) ` : "Not Answered"} 
-                          {userAnsLetter && (
-                            <span dangerouslySetInnerHTML={{ __html: q.choices[["A", "B", "C", "D", "E"].indexOf(userAnsLetter)] }}></span>
-                          )}
-                        </span>
-                      </div>
-                      
-                      {!isCorrect && (
-                        <div className="ans-box">
-                          <small>Correct Answer:</small>
-                          <span className="text-success">
-                            {correctLetter}) <span dangerouslySetInnerHTML={{ __html: q.correct }}></span>
-                          </span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${pct}%` }}></div>
+                </div>
+
+                <div className="breakdown-grid">
+                  <div className="breakdown-item">
+                    <div className="num">{correct}</div>
+                    <div className="label">Correct</div>
+                  </div>
+                  <div className="breakdown-item">
+                    <div className="num">{wrongList.length}</div>
+                    <div className="label">Wrong</div>
+                  </div>
+                  <div className="breakdown-item">
+                    <div className="num">{total - answered}</div>
+                    <div className="label">Unanswered</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {wrongList.length > 0 && (
+              <button className="cw-btn cw-btn-secondary" onClick={() => setShowMistakeModal(true)}>
+                View {wrongList.length} Mistake{wrongList.length > 1 ? 's' : ''}
+              </button>
+            )}
+
+            {showMistakeModal && createPortal(
+              <div className="mistake-modal-overlay" onClick={() => setShowMistakeModal(false)}>
+                <div className="mistake-modal" onClick={(e) => e.stopPropagation()}>
+                  <div className="mistake-modal-header">
+                    <h2>Review Mistakes</h2>
+                    <button className="close-btn" onClick={() => setShowMistakeModal(false)}>✕</button>
+                  </div>
+                  <div className="mistake-modal-body">
+                    <div className="wrong-grid">
+                      {wrongList.map((w) => (
+                        <div key={w.index} className="wrong-card">
+                          <div className="wrong-top">
+                            <div className="wrong-bubble">{w.index + 1}</div>
+                            <div className="wrong-q-text" dangerouslySetInnerHTML={{ __html: w.question }}></div>
+                          </div>
+
+                          <div className="wrong-meta">
+                            <div className="meta-pill wrong-pill">Your: {w.selected}</div>
+                            <div className="meta-pill correct-pill">Correct: {w.correct}</div>
+                          </div>
+
+                          <div className="wrong-actions">
+                            <button className="cw-btn-ghost-full" onClick={() => setOpenWrong(prev => ({ ...prev, [w.index]: !prev[w.index] }))}>
+                              {openWrong[w.index] ? '▼ Hide details' : '▶ Show details'}
+                            </button>
+                          </div>
+
+                          <div className={`wrong-detail ${openWrong[w.index] ? 'open' : ''}`}>
+                            <div className="choices-visual">
+                              {w.choices.map((ch, ci) => {
+                                const letter = ["A","B","C","D","E"][ci];
+                                const isSelected = letter === w.selected;
+                                const isCorrect = letter === w.correct;
+                                return (
+                                  <div key={ci} className={`choice-pill ${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''}`}>
+                                    <strong>{letter})</strong>&nbsp;<span dangerouslySetInnerHTML={{ __html: ch }} />
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
-                      )}
+                      ))}
                     </div>
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              </div>,
+              document.body
+            )}
 
-            <button onClick={() => window.location.reload()} className="restart-btn">
-              Restart Exam
-            </button>
           </div>
         </div>
       </div>

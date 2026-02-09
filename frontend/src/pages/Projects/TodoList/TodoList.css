@@ -1,6 +1,3 @@
-/* src/pages/Projects/TodoList/TodoList.css */
-
-/* Main container for the Todo application */
 .todo-container {
   display: flex;
   flex-direction: column;
@@ -8,7 +5,7 @@
   width: 650px; 
   max-width: 95%; 
   margin: 0 auto;
-  min-height: 80vh;
+  min-height: 80dvh;
   z-index: 10;
   /* Smooth transition for position changes when tasks are added */
   transition: padding-top 0.6s cubic-bezier(0.4, 0, 0.2, 1);
@@ -19,8 +16,20 @@
   margin-bottom: 45px; 
 }
 
+/* Ensure the hero title stays on one line (keep label and span side-by-side) */
+.hero-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap; /* Prevent wrapping */
+}
+
+.hero-title span {
+  white-space: nowrap;
+}
+
 /* Dynamic positioning classes controlled by React state */
-.centered { padding-top: 25vh; } /* Start state */
+.centered { padding-top: 25dvh; } /* Start state */
 .at-top { padding-top: 50px; }    /* Task-active state */
 
 /* Input field container with frosted glass effect */
@@ -163,35 +172,7 @@
 .cancel-btn { color: #ef4444; }
 .cancel-btn:hover { background: rgba(239, 68, 68, 0.1); }
 
-/* 'Clear All' button animations */
-.clear-all-btn {
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  flex-shrink: 0;
-  opacity: 0; 
-  transform: scale(0);
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.2s ease;
-}
-
-/* Only show clear button when items exist */
-.at-top .clear-all-btn {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.clear-all-btn:hover {
-  background-color: #dc2626 !important;
-  transform: scale(1.15) !important; 
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); 
-}
+/* clear-all button removed from markup; related styles cleaned */
 
 /* Animation class for removing items */
 .deleting {
@@ -214,7 +195,7 @@
   }
 
   /* Adjusted initial height for mobile */
-  .centered { padding-top: 10vh; }
+  .centered { padding-top: 10dvh; }
 
   .todo-list li {
     padding: 12px 15px;
@@ -259,6 +240,13 @@
   .edit-input {
     font-size: 0.9rem;
     padding: 6px;
+  }
+}
+
+/* Slightly reduce hero title size between 600px and 768px to avoid overflow */
+@media (min-width: 600px) and (max-width: 768px) {
+  .hero-title {
+    font-size: 3.2rem; /* slightly smaller than desktop */
   }
 }
 

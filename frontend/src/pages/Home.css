@@ -4,7 +4,7 @@
   position: relative;
   z-index: 1; 
   overflow: hidden;
-  min-height: 90vh;
+  min-height: 90dvh;
   display: flex;
   align-items: center;
   justify-content: center;
