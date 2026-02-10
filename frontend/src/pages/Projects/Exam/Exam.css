@@ -1,6 +1,4 @@
 .exam-page-wrapper {
-  min-height: 100dvh;
-  height: 100dvh;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
@@ -116,6 +114,9 @@
   color: #f1f5f9;
   padding: 20px 28px;
   border-radius: 16px;
+  position: relative;
+  overflow: hidden; /* clip any active/tap highlight to the same radius */
+  -webkit-tap-highlight-color: rgba(6, 182, 212, 0.08); /* mobile tap tint */
   cursor: pointer;
   text-align: left;
   font-size: 1.15rem;
@@ -126,6 +127,25 @@
   transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease, color 180ms ease;
   will-change: transform, box-shadow;
   transform-origin: left center;
+}
+
+/* Rounded, clipped press highlight using a pseudo-element so corners match */
+.choice-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: rgba(6, 182, 212, 0.06);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease, transform 160ms ease;
+  transform: scale(1.02);
+}
+
+.choice-item:active::after,
+.choice-item:focus::after {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .choice-item:hover {
@@ -588,19 +608,16 @@
 
 .mistake-modal-body { padding: 20px 24px; overflow-y: auto; -webkit-overflow-scrolling: touch; flex: 1; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 32px); }
 
-@media (min-width: 993px) { .close-drawer-btn { display: none; } }
-
 @media (max-width: 992px) {
   .floating-hub { display: block; }
   .exam-page-wrapper { padding-bottom: 80px; }
   .exam-main-layout { flex-direction: column; align-items: stretch; }
-  .optical-sidebar { position: fixed !important; top: 0; right: -100%; width: 320px !important; height: 100dvh; z-index: 1001; background: #0f172a; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+  .optical-sidebar { position: fixed !important; top: 53.49px; right: -100%; width: 320px !important; height: 100dvh; z-index: 1001; background: #0f172a; transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
   .optical-sidebar.drawer-open { right: 0; }
   .question-area { display: block; }
   .optical-card { height: 100%; border-radius: 0; border-left: 1px solid rgba(6, 182, 212, 0.3); }
   .q-card { flex: none; min-height: auto; }
   .nav-btns { margin-top: 25px; }
-  .close-drawer-btn { display: block; background: none; border: none; color: #64748b; font-size: 1.5rem; position: absolute; top: 15px; right: 15px; cursor: pointer; }
   .review-details { grid-template-columns: 1fr; }
 }
 
@@ -618,14 +635,14 @@
   .q-card h2 { font-size: 1.2rem; margin-bottom: 25px; }
   .choice-item { padding: 14px 18px; font-size: 1rem; }
   .optical-grid-scroll { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
-  .mistake-modal-overlay { position: fixed !important; top: calc(var(--navbar-height, 64px) + 12px) !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 3000 !important; padding: 0 !important; background: rgba(0,0,0,0.6) !important; display:flex !important; align-items:center !important; justify-content:center !important; }
-  .mistake-modal { position: fixed !important; top: calc(var(--navbar-height, 64px) + 12px) !important; left: 0 !important; right: 0 !important; bottom: 0 !important; width: 100% !important; max-width: 100% !important; height: calc(100dvh - calc(var(--navbar-height, 64px) + 12px)) !important; max-height: calc(100dvh - calc(var(--navbar-height, 64px) + 12px)) !important; margin: 0 !important; border-radius: 0 !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
+  .mistake-modal-overlay { position: fixed !important; top: calc(var(--navbar-height, 64px) + env(safe-area-inset-top, 0)) !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 3000 !important; padding: 0 !important; background: rgba(0,0,0,0.6) !important; display:flex !important; align-items:center !important; justify-content:center !important; }
+  .mistake-modal { position: fixed !important; top: calc(var(--navbar-height, 64px) + env(safe-area-inset-top, 0)) !important; left: 0 !important; right: 0 !important; bottom: env(safe-area-inset-bottom, 0) !important; width: 100% !important; max-width: 100% !important; height: calc(100dvh - calc(var(--navbar-height, 64px) + env(safe-area-inset-top, 0)) - env(safe-area-inset-bottom, 0)) !important; max-height: calc(100dvh - calc(var(--navbar-height, 64px) + env(safe-area-inset-top, 0)) - env(safe-area-inset-bottom, 0)) !important; margin: 0 !important; border-radius: 0 !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow: hidden !important; }
   .mistake-modal-body { padding: 16px !important; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 48px) !important; overflow-y: auto !important; -webkit-overflow-scrolling: touch !important; }
-  .mistake-modal-overlay { position: fixed !important; top: calc(var(--navbar-height, 64px) + 12px) !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 3000 !important; background: rgba(0,0,0,0.6) !important; display: flex !important; align-items: center !important; justify-content: center !important; }
+  .mistake-modal-overlay { position: fixed !important; top: calc(var(--navbar-height, 64px) + env(safe-area-inset-top, 0)) !important; left: 0 !important; right: 0 !important; bottom: 0 !important; z-index: 3000 !important; background: rgba(0,0,0,0.6) !important; display: flex !important; align-items: center !important; justify-content: center !important; }
   .mistake-modal { z-index: 2410 !important; }
   .result-container, .result-card, .review-list, .wrong-list { overflow: visible !important; max-height: none !important; height: auto !important; }
   .exam-page-wrapper { overflow-y: auto !important; -webkit-overflow-scrolling: touch; }
-  .mistake-modal { max-height: calc(100dvh - var(--navbar-height, 64px)) !important; overflow: hidden !important; box-sizing: border-box !important; }
+  .mistake-modal { max-height: calc(100dvh - var(--navbar-height, 64px) - env(safe-area-inset-bottom, 0)) !important; overflow: hidden !important; box-sizing: border-box !important; }
   .mistake-modal-header { position: sticky !important; top: 0 !important; z-index: 10 !important; background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important; padding: 10px 20px 10px 24px !important; }
   .mistake-modal-body { overflow-y: auto !important; -webkit-overflow-scrolling: touch; max-height: calc(100dvh - 72px) !important; }
   .home-wrapper > .result-container { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 18px 12px; overflow: auto; -webkit-overflow-scrolling: touch; z-index: 2200; background: rgba(0,0,0,0.0); }

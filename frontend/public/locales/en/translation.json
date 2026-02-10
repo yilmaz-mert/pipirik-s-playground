@@ -1,0 +1,92 @@
+{
+  "nav": {
+    "logoPart1": "Pipirik's",
+    "logoPart2": "Playground",
+    "home": "Home",
+    "about": "About",
+    "projects": "Projects"
+  },
+  "home": {
+    "heroTitle": "Hi, I'm {{name}}",
+    "heroSubtitle": "Electrical-Electronics Engineer",
+    "specializedPrefix": "Specialized in",
+    "skill1": "Machine Learning",
+    "skill2": "Computer Vision",
+    "skills": ["Web Development", "Machine Learning", "Data Science", "Computer Vision"]
+  },
+  "about": {
+    "titlePart1": "Beyond the",
+    "titlePart2": "Code",
+    "subtitle": "Electrical-Electronics Engineer & Software Development Enthusiast.",
+    "dnaTitle": "My Engineering DNA",
+    "competenciesTitle": "Core Competencies"
+    ,
+    "bioParagraph1": "I am an <strong>Electrical-Electronics Engineer</strong> who believes that software is the most powerful tool for solving modern engineering challenges. My background isn't just limited to code; I am passionate about <strong>metalworking, welding</strong>, and <strong>3D printing</strong>.",
+    "bioParagraph2": "From developing real-time <strong>Facial Recognition</strong> systems on Raspberry Pi to optimizing <strong>Machine Learning</strong> models like LightGBM, I focus on building practical, data-driven solutions.",
+    "comp": {
+      "aiTitle": "AI & Data Science",
+      "aiDesc": "Python, ML, Computer Vision",
+      "toolsTitle": "Engineering Tools",
+      "toolsDesc": "3D Modeling (CATIA, Solidworks), SQL, Git",
+      "intlTitle": "International Experience",
+      "intlDesc": "Work and Travel (TN, USA) - English Proficiency"
+    },
+    "skills": ["Python", "PyTorch", "LightGBM", "Raspberry Pi", "React", "YOLO", "OpenCV"]
+  },
+  "projects": {
+    "titlePart1": "My",
+    "titlePart2": "Projects",
+    "hangman": "Hangman Game",
+    "hangmanDesc": "Test your vocabulary!",
+    "todolist": "Todo List",
+    "todolistDesc": "Manage your daily tasks.",
+    "exam": "Exam",
+    "examDesc": "Test your knowledge!"
+  },
+  "hangman": {
+    "loading": "Loading Word...",
+    "title": "Hangman",
+    "winMsg": "🎉 Splendid! You saved him.",
+    "loseMsg": "💀 Mission Failed. Word: {{word}}",
+    "newGame": "New Game"
+  },
+  "todo": {
+    "title": "Pipirik's Tasks",
+    "placeholder": "Type your task and press Enter...",
+    "done": "Done",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "exam": {
+    "preparing": "Preparing questions, please wait...",
+    "resultsTitle": "Exam Results",
+    "retry": "Retry",
+    "resultTextGood": "Great work — keep it up!",
+    "resultTextBad": "Review the incorrect items and try again.",
+    "viewMistakes": "View {{count}} Mistake(s)",
+    "reviewMistakes": "Review Mistakes",
+    "hideDetails": "Hide details",
+    "showDetails": "Show details",
+    "your": "Your",
+    "correct": "Correct",
+    "wrong": "Wrong",
+    "unanswered": "Unanswered",
+    "timeLeft": "Time Left: {{minutes}}:{{seconds}}",
+    "finishExam": "Finish Exam",
+    "finishConfirm": "Are you sure you want to finish the exam?",
+    "questionLabel": "Question {{num}}",
+    "back": "Back",
+    "next": "Next",
+    "opticalForm": "Optical Form",
+    "retryConfirm": "Retry"
+  },
+  "common": {
+    "loading": "Loading...",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "retry": "Retry"
+  }
+}

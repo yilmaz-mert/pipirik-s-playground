@@ -2,6 +2,7 @@
 :root {
   font-family: system-ui, Arial, sans-serif;
   color: white;
+  --navbar-height: 53.59px;
 }
 
 html, body {
@@ -14,9 +15,10 @@ body {
   display: block; /* Removed flex from body to prevent centering */
   height: 100%;
   overflow-x: hidden; /* Prevent accidental horizontal overflow */
-  overflow-y: hidden; /* Disable page-level vertical scroll; use internal wrappers for scrolling */
+  overflow-y: auto; /* Allow page-level vertical scroll when content overflows */
 }
 
 #root {
   width: 100%;
+  min-height: 100vh;
 }

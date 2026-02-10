@@ -1,0 +1,92 @@
+{
+  "nav": {
+    "logoPart1": "Pipirik'in",
+    "logoPart2": "Oyun Alanı",
+    "home": "Ana Sayfa",
+    "about": "Hakkında",
+    "projects": "Projeler"
+  },
+  "home": {
+    "heroTitle": "Merhaba, ben {{name}}",
+    "heroSubtitle": "Elektrik-Elektronik Mühendisi",
+    "specializedPrefix": "Uzmanlık",
+    "skill1": "Makine Öğrenmesi",
+    "skill2": "Bilgisayarlı Görü",
+    "skills": ["Web Geliştirme", "Makine Öğrenmesi", "Veri Bilimi", "Bilgisayarlı Görü"]
+  },
+  "about": {
+    "titlePart1": "Kodu",
+    "titlePart2": "Aşan",
+    "subtitle": "Elektrik-Elektronik Mühendisi ve Yazılım Tutkunu.",
+    "dnaTitle": "Mühendislik DNA'm",
+    "competenciesTitle": "Temel Yetenekler"
+    ,
+    "bioParagraph1": "Ben bir <strong>Elektrik-Elektronik Mühendisiyim</strong> ve yazılımın modern mühendislik sorunlarını çözmede en güçlü araç olduğuna inanıyorum. Arka planım yalnızca kodla sınırlı değil; <strong>metal işleri, kaynak</strong> ve <strong>3B baskı</strong> ile ilgileniyorum.",
+    "bioParagraph2": "Gerçek zamanlı <strong>Yüz Tanıma</strong> sistemleri geliştirmekten Raspberry Pi üzerinde LightGBM gibi <strong>Makine Öğrenmesi</strong> modellerini optimize etmeye kadar, pratik ve veri odaklı çözümler inşa etmeye odaklanıyorum.",
+    "comp": {
+      "aiTitle": "AI ve Veri Bilimi",
+      "aiDesc": "Python, ML, Bilgisayarlı Görü",
+      "toolsTitle": "Mühendislik Araçları",
+      "toolsDesc": "3B Modelleme (CATIA, Solidworks), SQL, Git",
+      "intlTitle": "Uluslararası Deneyim",
+      "intlDesc": "Çalışma ve Seyahat (TN, ABD) - İngilizce Yetkinliği"
+    },
+    "skills": ["Python", "PyTorch", "LightGBM", "Raspberry Pi", "React", "YOLO", "OpenCV"]
+  },
+  "projects": {
+    "titlePart1": "Projelerim",
+    "titlePart2": "",
+    "hangman": "Adam Asmaca",
+    "hangmanDesc": "Kelime bilginizi test edin!",
+    "todolist": "Yapılacaklar Listesi",
+    "todolistDesc": "Günlük görevlerinizi yönetin.",
+    "exam": "Sınav",
+    "examDesc": "Bilginizi test edin!"
+  },
+  "hangman": {
+    "loading": "Kelime Yükleniyor...",
+    "title": "Adam Asmaca",
+    "winMsg": "🎉 Harika! Onu kurtardınız.",
+    "loseMsg": "💀 Başarısız. Kelime: {{word}}",
+    "newGame": "Yeni Oyun"
+  },
+  "todo": {
+    "title": "Pipirik'in Görevleri",
+    "placeholder": "Görev yazın ve Enter'a basın...",
+    "done": "Tamam",
+    "cancel": "İptal",
+    "edit": "Düzenle",
+    "delete": "Sil"
+  },
+  "exam": {
+    "preparing": "Sorular hazırlanıyor, lütfen bekleyin...",
+    "resultsTitle": "Sınav Sonuçları",
+    "retry": "Tekrar",
+    "resultTextGood": "Harika iş — aynen devam!",
+    "resultTextBad": "Yanlışları gözden geçirin ve tekrar deneyin.",
+    "viewMistakes": "{{count}} Hata Görüntüle",
+    "reviewMistakes": "Hataları İncele",
+    "hideDetails": "Detayları Gizle",
+    "showDetails": "Detayları Göster",
+    "your": "Sizin",
+    "correct": "Doğru",
+    "wrong": "Yanlış",
+    "unanswered": "Cevapsız",
+    "timeLeft": "Kalan Süre: {{minutes}}:{{seconds}}",
+    "finishExam": "Sınavı Bitir",
+    "finishConfirm": "Sınavı bitirmek istediğinizden emin misiniz?",
+    "questionLabel": "Soru {{num}}",
+    "back": "Geri",
+    "next": "İleri",
+    "opticalForm": "Optik Form",
+    "retryConfirm": "Tekrar"
+  },
+  "common": {
+    "loading": "Yükleniyor...",
+    "ok": "Tamam",
+    "cancel": "İptal",
+    "back": "Geri",
+    "next": "İleri",
+    "retry": "Tekrar"
+  }
+}

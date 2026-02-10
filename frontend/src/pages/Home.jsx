@@ -1,5 +1,6 @@
 // src/pages/Home.jsx
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { FaGithub, FaLinkedin } from 'react-icons/fa'; 
 // Note: If bundle size is an issue, consider importing only the specific icons
 // to reduce the "Unused JavaScript" score significantly.
@@ -7,8 +8,10 @@ import mertProfile from "../assets/mert-profile.webp";
 import './Home.css';
 
 const Home = () => {
+  const { t } = useTranslation();
+
   return (
-    <main className="home-wrapper">
+    <main className="home-wrapper page-wrapper">
       <div className="home-container">
         <section className="hero-content" aria-label="Introduction">
           <div className="profile-aside">
@@ -45,20 +48,19 @@ const Home = () => {
 
           <div className="text-aside">
             <header>
-              <h1 className="hero-title">Hi, I'm <span>Mert</span></h1>
-              <h2 className="hero-subtitle">Electrical-Electronics Engineer</h2>
+              <h1 className="hero-title">{t('home.heroTitle', { name: 'Mert' })}</h1>
+              <h2 className="hero-subtitle">{t('home.heroSubtitle')}</h2>
             </header>
             
             <p className="hero-description">
-              Specialized in <strong>Machine Learning</strong> and <strong>Computer Vision</strong>. 
+              {t('home.specializedPrefix')} <strong>{t('home.skill1')}</strong> and <strong>{t('home.skill2')}</strong>. 
               Bridging the gap between engineering and modern web technologies.
             </p>
 
             <div className="skill-tags" role="list">
-              <span role="listitem">Web Development</span>
-              <span role="listitem">Machine Learning</span>
-              <span role="listitem">Data Science</span>
-              <span role="listitem">Computer Vision</span>
+              {t('home.skills', { returnObjects: true }).map((s) => (
+                <span key={s} role="listitem">{s}</span>
+              ))}
             </div>
           </div>
         </section>

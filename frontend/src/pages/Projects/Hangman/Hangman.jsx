@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from 'react-i18next';
 import "./Hangman.css";
 
 function Hangman() {
+  const { t } = useTranslation();
   /* --- STATE MANAGEMENT --- */
   
   // The target word to be guessed
@@ -137,7 +139,7 @@ function Hangman() {
   if (isLoading) {
     return (
       <div className="home-wrapper">
-        <h1 className="hero-title">Loading <span>Word...</span></h1>
+        <h1 className="hero-title">{t('hangman.loading')}</h1>
       </div>
     );
   }
@@ -152,12 +154,12 @@ function Hangman() {
 
       {/* Main card with dynamic classes for win/loss flash effects */}
       <div className={`hangman-wrapper ${flashState === 'correct' ? 'flash-green' : ''} ${flashState === 'incorrect' ? 'flash-red' : ''}`}>
-        <h1 className="hero-title"> <span>Hangman</span></h1>
+        <h1 className="hero-title"> <span>{t('hangman.title')}</span></h1>
         
         {/* Status Message Display */}
         <div className="game-message-area">
-          {isWinner && <h2 className="win-msg">🎉 Splendid! You saved him.</h2>}
-          {isLoser && <h2 className="lose-msg">💀 Mission Failed. Word: {word}</h2>}
+          {isWinner && <h2 className="win-msg">{t('hangman.winMsg')}</h2>}
+          {isLoser && <h2 className="lose-msg">{t('hangman.loseMsg', { word })}</h2>}
         </div>
 
         {renderPipirik()}
@@ -187,7 +189,7 @@ function Hangman() {
           ))}
         </div>
 
-        <button className="reset-btn" onClick={resetGame}>New Game</button>
+        <button className="reset-btn" onClick={resetGame}>{t('hangman.newGame')}</button>
       </div>
     </div>
   );

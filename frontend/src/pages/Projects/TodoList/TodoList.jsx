@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslation } from 'react-i18next';
 import "./TodoList.css";
 import "../../../App.css";
 import 'drag-drop-touch';
@@ -6,6 +7,7 @@ import 'drag-drop-touch';
 const getNow = () => Date.now();
 
 function TodoList() {
+  const { t } = useTranslation();
   /* --- STATE MANAGEMENT --- */
   
   // Initialize todos from localStorage or empty array
@@ -131,12 +133,12 @@ function TodoList() {
 
       {/* Main container shifts layout based on list length */}
       <div className={`todo-container ${todos.length > 0 ? "at-top" : "centered"}`}>
-        <h1 className="hero-title">Pipirik's <span>Tasks</span></h1>
+        <h1 className="hero-title">{t('todo.title')}</h1>
         
         <div className="todo-input-wrapper">
           <input 
             type="text" 
-            placeholder="Type your task and press Enter..." 
+            placeholder={t('todo.placeholder')} 
             onKeyDown={handleKeyDown} 
             className="main-input"
           />
@@ -176,8 +178,8 @@ function TodoList() {
                     autoFocus 
                   />
                   <div className="item-actions">
-                    <button className="save-btn" onClick={() => saveEdit(todo.id)}>Done</button>
-                    <button className="cancel-btn" onClick={() => setEditingId(null)}>Cancel</button>
+                    <button className="save-btn" onClick={() => saveEdit(todo.id)}>{t('todo.done')}</button>
+                    <button className="cancel-btn" onClick={() => setEditingId(null)}>{t('todo.cancel')}</button>
                   </div>
                 </div>
               ) : (
@@ -185,8 +187,8 @@ function TodoList() {
                 <>
                   <span className="todo-text">{todo.text}</span>
                   <div className="item-actions">
-                    <button className="edit-btn" onClick={() => startEditing(todo)}>Edit</button>
-                    <button className="delete-btn" onClick={() => deleteTodo(todo.id)}>Delete</button>
+                    <button className="edit-btn" onClick={() => startEditing(todo)}>{t('todo.edit')}</button>
+                    <button className="delete-btn" onClick={() => deleteTodo(todo.id)}>{t('todo.delete')}</button>
                   </div>
                 </>
               )}

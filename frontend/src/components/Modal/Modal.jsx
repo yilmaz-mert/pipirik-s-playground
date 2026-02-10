@@ -1,5 +1,6 @@
 import React from 'react';
 import './Modal.css';
+import { useTranslation } from 'react-i18next';
 
 export default function Modal({ 
   open = false, 
@@ -11,6 +12,7 @@ export default function Modal({
   onClose = () => {} 
 }) {
   if (!open) return null;
+  const { t } = useTranslation();
 
   return (
     <div className="cw-modal-overlay">
@@ -21,15 +23,15 @@ export default function Modal({
           {type === 'confirm' ? (
             <>
               <button className="cw-btn cw-btn-ghost" onClick={onCancel}>
-                Cancel
+                {t('common.cancel')}
               </button>
               <button className="cw-btn cw-btn-primary" onClick={onConfirm}>
-                OK
+                {t('common.ok')}
               </button>
             </>
           ) : (
             <button className="cw-btn cw-btn-primary" onClick={onClose}>
-              OK
+              {t('common.ok')}
             </button>
           )}
         </div>

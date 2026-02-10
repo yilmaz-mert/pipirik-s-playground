@@ -1,0 +1,91 @@
+{
+  "nav": {
+    "logoPart1": "Pipirik's",
+    "logoPart2": "Playground",
+    "home": "Start",
+    "about": "O mnie",
+    "projects": "Projekty"
+  },
+  "home": {
+    "heroTitle": "Cześć, jestem {{name}}",
+    "heroSubtitle": "Inżynier Elektryk i Elektronik",
+    "specializedPrefix": "Specjalizacja:",
+    "skill1": "Machine Learning",
+    "skill2": "Computer Vision",
+    "skills": ["Web Development", "Machine Learning", "Data Science", "Computer Vision"]
+  },
+  "about": {
+    "titlePart1": "Więcej niż",
+    "titlePart2": "Kod",
+    "subtitle": "Inżynier Elektryk i Elektronik oraz pasjonat programowania.",
+    "dnaTitle": "Moje inżynierskie DNA",
+    "competenciesTitle": "Kluczowe kompetencje",
+    "bioParagraph1": "Jestem <strong>Inżynierem Elektrykiem i Elektronikiem</strong>, który wierzy, że oprogramowanie jest najpotężniejszym narzędziem do rozwiązywania współczesnych wyzwań inżynieryjnych. Moje doświadczenie nie ogranicza się tylko do kodu; pasjonuję się <strong>obróbką metali, spawaniem</strong> oraz <strong>drukiem 3D</strong>.",
+    "bioParagraph2": "Od tworzenia systemów <strong>rozpoznawania twarzy</strong> w czasie rzeczywistym na Raspberry Pi po optymalizację modeli <strong>Machine Learning</strong>, takich jak LightGBM – koncentruję się na budowaniu praktycznych rozwiązań opartych na danych.",
+    "comp": {
+      "aiTitle": "AI & Data Science",
+      "aiDesc": "Python, ML, Computer Vision",
+      "toolsTitle": "Narzędzia inżynierskie",
+      "toolsDesc": "Modelowanie 3D (CATIA, Solidworks), SQL, Git",
+      "intlTitle": "Doświadczenie międzynarodowe",
+      "intlDesc": "Work and Travel (TN, USA) - Biegłość w języku angielskim"
+    },
+    "skills": ["Python", "PyTorch", "LightGBM", "Raspberry Pi", "React", "YOLO", "OpenCV"]
+  },
+  "projects": {
+    "titlePart1": "Moje",
+    "titlePart2": "Projekty",
+    "hangman": "Wisielec",
+    "hangmanDesc": "Sprawdź swoje słownictwo!",
+    "todolist": "Lista zadań",
+    "todolistDesc": "Zarządzaj swoimi codziennymi zadaniami.",
+    "exam": "Egzamin",
+    "examDesc": "Sprawdź swoją wiedzę!"
+  },
+  "hangman": {
+    "loading": "Ładowanie słowa...",
+    "title": "Wisielec",
+    "winMsg": "🎉 Wspaniale! Uratowałeś go.",
+    "loseMsg": "💀 Misja nieudana. Hasło: {{word}}",
+    "newGame": "Nowa gra"
+  },
+  "todo": {
+    "title": "Zadania Pipirika",
+    "placeholder": "Wpisz zadanie i naciśnij Enter...",
+    "done": "Gotowe",
+    "cancel": "Anuluj",
+    "edit": "Edytuj",
+    "delete": "Usuń"
+  },
+  "exam": {
+    "preparing": "Przygotowywanie pytań, proszę czekać...",
+    "resultsTitle": "Wyniki egzaminu",
+    "retry": "Ponów próbę",
+    "resultTextGood": "Świetna robota — tak trzymaj!",
+    "resultTextBad": "Przejrzyj błędy i spróbuj ponownie.",
+    "viewMistakes": "Zobacz błędy ({{count}})",
+    "reviewMistakes": "Przegląd błędów",
+    "hideDetails": "Ukryj szczegóły",
+    "showDetails": "Pokaż szczegóły",
+    "your": "Twój wynik",
+    "correct": "Poprawne",
+    "wrong": "Błędne",
+    "unanswered": "Bez odpowiedzi",
+    "timeLeft": "Pozostały czas: {{minutes}}:{{seconds}}",
+    "finishExam": "Zakończ egzamin",
+    "finishConfirm": "Czy na pewno chcesz zakończyć egzamin?",
+    "questionLabel": "Pytanie {{num}}",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "opticalForm": "Arkusz odpowiedzi",
+    "retryConfirm": "Ponów"
+  },
+  "common": {
+    "loading": "Ładowanie...",
+    "ok": "OK",
+    "cancel": "Anuluj",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "retry": "Ponów"
+  }
+}

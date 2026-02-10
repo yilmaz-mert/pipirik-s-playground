@@ -19,6 +19,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 2rem;
+  position: relative;
 }
 
 /* Logo styling */
@@ -43,6 +44,25 @@
   display: flex;
   gap: 30px; 
   align-items: center;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto; /* push this group to the far right */
+}
+
+/* Vertical separator between nav links and language switcher */
+.lang-switcher::before {
+  content: '';
+  display: inline-block;
+  width: 1px;
+  height: 22px;
+  background: rgba(148,163,184,0.12);
+  margin-right: 10px;
+  vertical-align: middle;
+  border-radius: 1px;
 }
 
 /* Individual navigation link styling */
@@ -103,7 +123,7 @@
   font-weight: 600;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 992px) {
   .nav-links {
     gap: 12px; 
   }
@@ -112,5 +132,274 @@
     font-size: 0.85rem; 
     padding: 8px 4px; 
   }
+  /* Hide desktop nav links on small screens; use mobile menu */
+  .nav-links { display: none; }
+  .lang-switcher { display: none; }
+  .hamburger { display: inline-flex !important; }
+}
 
+/* Hamburger styles */
+.hamburger {
+  display: none;
+  background: transparent !important;
+  border: 0;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  color: #e6eef8;
+  outline: none;
+  -webkit-tap-highlight-color: transparent; /* remove mobile tap highlight */
+  appearance: none;
+  -webkit-appearance: none;
+}
+.hamburger-box {
+  width: 22px;
+  height: 2px;
+  background: #e6eef8;
+  display: block;
+  position: relative;
+}
+.hamburger-box::before,
+.hamburger-box::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 22px;
+  height: 2px;
+  background: #e6eef8;
+  transition: transform 0.18s ease;
+}
+.hamburger-box::before { top: -6px; }
+.hamburger-box::after { top: 6px; }
+.hamburger-box.open { background: transparent; }
+.hamburger-box.open::before { transform: translateY(6px) rotate(45deg); }
+.hamburger-box.open::after { transform: translateY(-6px) rotate(-45deg); }
+
+/* Remove rectangle/focus effect on click/tap */
+.hamburger:focus,
+.hamburger:active,
+.hamburger:focus-visible {
+  outline: none;
+  box-shadow: none;
+  background: transparent !important;
+}
+
+/* --- MOBİL MENÜ ANA PANEL --- */
+.mobile-menu {
+  position: absolute;
+  right: 16px;
+  top: 72px;
+  /* Çok daha koyu, derin ve premium bir Slate tonu */
+  background: rgba(15, 23, 42, 0.98); 
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  /* Çok ince, zarif bir cam kenarlığı */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px;
+  border-radius: 18px; /* Daha kavisli, modern köşeler */
+  min-width: 230px;
+  /* Derinlik katan yumuşak gölge */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  z-index: 1200;
+  /* Akıcı bir giriş animasyonu */
+  animation: menuFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes menuFadeIn {
+  from { opacity: 0; transform: scale(0.98) translateY(-5px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* --- LİNKLER --- */
+.mobile-links { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+
+.mobile-item { 
+  color: #e2e8f0; /* Soft beyaz */
+  text-decoration: none; 
+  padding: 12px 16px; 
+  border-radius: 12px; 
+  font-weight: 500;
+  font-size: 1rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+}
+
+/* Hover'da Pipirik'in Turkuazı devreye girer */
+.mobile-item:hover { 
+  background: rgba(6, 182, 212, 0.12);
+  color: #06b6d4;
+  padding-left: 20px; /* Hafif bir kayma hissi */
+}
+
+/* --- AYRAÇ --- */
+.mobile-separator { 
+  height: 1px; 
+  background: rgba(255, 255, 255, 0.05); /* Çok silik bir ayraç */
+  margin: 8px 12px; 
+}
+
+/* --- DİL SEÇENEKLERİ --- */
+.mobile-lang { padding: 4px; }
+
+.mobile-lang-current { 
+  background: rgba(255, 255, 255, 0.03); 
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #94a3b8;
+  padding: 10px 14px; 
+  border-radius: 12px; 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.mobile-lang-current:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #f8fafc;
+}
+
+.lang-option-mobile { 
+  background: transparent; 
+  border: 0; 
+  color: #64748b; 
+  padding: 10px 14px; 
+  text-align: left; 
+  border-radius: 10px; 
+  display: flex; 
+  gap: 10px; 
+  align-items: center; 
+  cursor: pointer;
+  margin-top: 4px;
+}
+
+.lang-option-mobile.active { 
+  background: rgba(6, 182, 212, 0.08); 
+  color: #06b6d4;
+  font-weight: 600;
+}
+
+/* Fade + slide animation for mobile language list */
+.mobile-lang-list {
+  max-height: 0;
+  opacity: 0;
+  transform: translateY(-6px);
+  overflow: hidden;
+  transition: max-height 220ms ease, opacity 160ms ease, transform 200ms ease;
+  pointer-events: none;
+}
+.mobile-lang-list.open {
+  max-height: 400px; /* enough to show options */
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* --- Language Switcher Container --- */
+.lang-switcher {
+  position: relative;
+  margin-left: 1.5rem;
+}
+
+/* --- Aktif Dil Butonu (Tetikleyici) --- */
+.lang-current {
+  background: rgba(255, 255, 255, 0.03); /* Hafif bir derinlik */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: #f1f5f9;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 12px; /* Mobil menü ile uyumlu kavis */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lang-current:hover { 
+  background: rgba(6, 182, 212, 0.08); /* Pipirik Cyan dokunuşu */
+  border-color: rgba(6, 182, 212, 0.3);
+  color: #06b6d4;
+}
+
+/* --- Açılır Menü (Dropdown Panel) --- */
+.lang-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px); /* Butonun tam altından biraz boşluklu */
+  background: rgba(15, 23, 42, 0.98); /* Derin Slate arka plan */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px;
+  border-radius: 14px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  min-width: 160px;
+  z-index: 1100;
+  /* Yumuşak bir düşüş animasyonu */
+  animation: dropdownFade 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Dil Seçenekleri --- */
+.lang-option {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding-top: 3px;
+  padding-bottom: 6px;
+  padding-left: 14px;
+  color: #94a3b8; /* Varsayılan daha sakin gri */
+  cursor: pointer;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+/* --- Dil Seçenekleri --- */
+.lang-option {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  color: #94a3b8;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  transition: 0.2s;
+}
+
+.lang-option:hover { 
+  background: rgba(255, 255, 255, 0.04); 
+  color: #f1f5f9;
+}
+
+.lang-option.active { 
+  background: rgba(6, 182, 212, 0.1); 
+  color: #06b6d4;
+  font-weight: 600;
+}
+
+/* Menü açıkken oku döndürmek istersen JS ile class ekleyebilirsin */
+.lang-switcher:hover .caret {
+  transform: rotate(180deg);
+  opacity: 1;
+  color: #06b6d4;
+}
+
+.mobile-menu-open .page-wrapper::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 900; /* below navbar (1000) and mobile-menu (1200) */
+  pointer-events: none;
 }

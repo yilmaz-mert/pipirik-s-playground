@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import "./Exam.css";
 import "../../../App.css"; // Global animations and layout styles
 import { useModal } from '../../../components/useModal';
 
 function Exam() {
+  const { t } = useTranslation();
   // --- STATE MANAGEMENT ---
   const [questions, setQuestions] = useState([]); // Stores formatted questions from API
   const [currentIdx, setCurrentIdx] = useState(0); // Index of the currently displayed question
@@ -59,7 +61,7 @@ function Exam() {
   const { showConfirm } = useModal();
 
   const finishExam = async () => {
-    const confirmed = await showConfirm({ title: 'Finish Exam', message: 'Are you sure you want to finish the exam?' });
+    const confirmed = await showConfirm({ title: t('exam.finishExam'), message: t('exam.finishConfirm') });
     if (confirmed) {
       setIsFinished(true);
     }
@@ -67,11 +69,11 @@ function Exam() {
 
   const handleJumpToQuestion = (idx) => {
     setCurrentIdx(idx);
-    setIsDrawerOpen(false); // Mobil kullanıcı bir soru seçince drawer kapansın
+    setIsDrawerOpen(false); // Close drawer when a mobile user selects a question
   };
 
   // --- CONDITIONAL RENDERING: LOADING ---
-  if (loading) return <div className="loading-screen">Preparing questions, please wait...</div>;
+  if (loading) return <div className="loading-screen">{t('exam.preparing')}</div>;
 
   // --- CONDITIONAL RENDERING: RESULT SCREEN ---
   if (isFinished) {
@@ -98,9 +100,9 @@ function Exam() {
         <div className="result-container">
           <div className="result-card result-card--modern">
             <div className="result-header">
-              <h2>Exam Results</h2>
+              <h2>{t('exam.resultsTitle')}</h2>
               <div className="result-actions">
-                <button className="cw-btn cw-btn-primary" onClick={() => window.location.reload()}>Retry</button>
+                <button className="cw-btn cw-btn-primary" onClick={() => window.location.reload()}>{t('exam.retry')}</button>
               </div>
             </div>
 
@@ -111,7 +113,7 @@ function Exam() {
               </div>
 
               <div className="score-details">
-                <p className="result-text">{pct >= 60 ? 'Great work — keep it up!' : 'Review the incorrect items and try again.'}</p>
+                <p className="result-text">{pct >= 60 ? t('exam.resultTextGood') : t('exam.resultTextBad')}</p>
 
                 <div className="progress-bar">
                   <div className="progress-fill" style={{ width: `${pct}%` }}></div>
@@ -120,15 +122,15 @@ function Exam() {
                 <div className="breakdown-grid">
                   <div className="breakdown-item">
                     <div className="num">{correct}</div>
-                    <div className="label">Correct</div>
+                    <div className="label">{t('exam.correct')}</div>
                   </div>
                   <div className="breakdown-item">
                     <div className="num">{wrongList.length}</div>
-                    <div className="label">Wrong</div>
+                    <div className="label">{t('exam.wrong')}</div>
                   </div>
                   <div className="breakdown-item">
                     <div className="num">{total - answered}</div>
-                    <div className="label">Unanswered</div>
+                    <div className="label">{t('exam.unanswered')}</div>
                   </div>
                 </div>
               </div>
@@ -136,7 +138,7 @@ function Exam() {
 
             {wrongList.length > 0 && (
               <button className="cw-btn cw-btn-secondary" onClick={() => setShowMistakeModal(true)}>
-                View {wrongList.length} Mistake{wrongList.length > 1 ? 's' : ''}
+                {t('exam.viewMistakes', { count: wrongList.length })}
               </button>
             )}
 
@@ -144,7 +146,7 @@ function Exam() {
               <div className="mistake-modal-overlay" onClick={() => setShowMistakeModal(false)}>
                 <div className="mistake-modal" onClick={(e) => e.stopPropagation()}>
                   <div className="mistake-modal-header">
-                    <h2>Review Mistakes</h2>
+                    <h2>{t('exam.reviewMistakes')}</h2>
                     <button className="close-btn" onClick={() => setShowMistakeModal(false)}>✕</button>
                   </div>
                   <div className="mistake-modal-body">
@@ -157,13 +159,13 @@ function Exam() {
                           </div>
 
                           <div className="wrong-meta">
-                            <div className="meta-pill wrong-pill">Your: {w.selected}</div>
-                            <div className="meta-pill correct-pill">Correct: {w.correct}</div>
+                            <div className="meta-pill wrong-pill">{t('exam.your')}: {w.selected}</div>
+                            <div className="meta-pill correct-pill">{t('exam.correct')}: {w.correct}</div>
                           </div>
 
                           <div className="wrong-actions">
                             <button className="cw-btn-ghost-full" onClick={() => setOpenWrong(prev => ({ ...prev, [w.index]: !prev[w.index] }))}>
-                              {openWrong[w.index] ? '▼ Hide details' : '▶ Show details'}
+                              {openWrong[w.index] ? `▼ ${t('exam.hideDetails')}` : `▶ ${t('exam.showDetails')}`}
                             </button>
                           </div>
 
@@ -207,23 +209,23 @@ function Exam() {
       </div>
 
       <div className="exam-content-area">
-        {/* 1. DEĞİŞİKLİK: Overlay artık burada, içerik alanının içinde */}
+        {/* CHANGE 1: Overlay moved here, inside the content area */}
         {isDrawerOpen && <div className="drawer-overlay" onClick={() => setIsDrawerOpen(false)}></div>}
 
         <div className="exam-header-bar">
           <div className="timer-display">
-            Time Left: {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
+            {t('exam.timeLeft', { minutes: Math.floor(timeLeft / 60), seconds: (timeLeft % 60).toString().padStart(2, '0') })}
           </div>
-          <button className="finish-exam-btn" onClick={finishExam}>Finish Exam</button>
+          <button className="finish-exam-btn" onClick={finishExam}>{t('exam.finishExam')}</button>
         </div>
 
         <div className="exam-main-layout">
           <div className="question-area">
             <div className="q-card">
-              <span className="q-label">Question {currentIdx + 1}</span>
+              <span className="q-label">{t('exam.questionLabel', { num: currentIdx + 1 })}</span>
               <h2 dangerouslySetInnerHTML={{ __html: currentQ.question }}></h2>
               <div className="choices-list">
-                {/* Not: API 4 şık döndürdüğü için diziyi 4 elemanlı (A-D) tutmak daha sağlıklı */}
+                {/* Note: API returns 4 choices, so keeping the array to 4 elements (A-D) is safer */}
                 {currentQ.choices.map((choice, i) => (
                   <button
                     key={i}
@@ -236,21 +238,19 @@ function Exam() {
             </div>
 
             <div className="nav-btns">
-              <button disabled={currentIdx === 0} onClick={() => setCurrentIdx(currentIdx - 1)}>Back</button>
-              <button disabled={currentIdx === questions.length - 1} onClick={() => setCurrentIdx(currentIdx + 1)}>Next</button>
+              <button disabled={currentIdx === 0} onClick={() => setCurrentIdx(currentIdx - 1)}>{t('common.back')}</button>
+              <button disabled={currentIdx === questions.length - 1} onClick={() => setCurrentIdx(currentIdx + 1)}>{t('common.next')}</button>
             </div>
           </div>
 
           <div className={`optical-sidebar ${isDrawerOpen ? "drawer-open" : ""}`}>
             <div className="optical-card">
-              <button className="close-drawer-btn" onClick={() => setIsDrawerOpen(false)}>✕</button>
-              <h3>Optical Form</h3>
               <div className="optical-grid-scroll">
                 {questions.map((_, i) => (
                   <div 
                     key={i} 
                     className={`opt-row ${currentIdx === i ? "current" : ""}`}
-                    onClick={() => handleJumpToQuestion(i)} // SATIRA TIKLAYINCA: Soruya gider ve Kapanır
+                    onClick={() => handleJumpToQuestion(i)} // On row click: jump to question and close drawer
                   >
                     <span className="opt-num">{i + 1}</span>
                     
@@ -259,8 +259,8 @@ function Exam() {
                         key={letter}
                         className={`opt-bubble ${answers[i] === letter ? "checked" : ""}`}
                         onClick={(e) => {
-                          e.stopPropagation(); // Satırın tıklanma olayını engeller
-                          // 2. DEĞİŞİKLİK: Burada handleJump... kaldırıldı, sadece işaretleme yapılır
+                          e.stopPropagation(); // Prevents the row click event
+                          // CHANGE 2: Removed handleJump here; only marking occurs
                           setAnswers({ ...answers, [i]: letter });
                         }}
                       >
@@ -279,7 +279,7 @@ function Exam() {
         onClick={() => setIsDrawerOpen(!isDrawerOpen)}
       >
         <div className="hub-content">
-          {/* İkonu duruma göre değiştiriyoruz: Açıksa X, Kapalıysa Liste */}
+          {/* Icon changes based on state: X when open, list when closed */}
           <span className="hub-icon">
             {isDrawerOpen ? "✕" : "📋"}
           </span>
