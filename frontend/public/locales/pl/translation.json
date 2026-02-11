@@ -40,7 +40,9 @@
     "todolist": "Lista zadań",
     "todolistDesc": "Zarządzaj swoimi codziennymi zadaniami.",
     "exam": "Egzamin",
-    "examDesc": "Sprawdź swoją wiedzę!"
+    "examDesc": "Sprawdź swoją wiedzę!",
+    "flightTracker": "Śledzenie lotów",
+    "flightTrackerDesc": "Śledź loty na mapie w czasie rzeczywistym."
   },
   "hangman": {
     "loading": "Ładowanie słowa...",
@@ -87,5 +89,27 @@
     "back": "Wstecz",
     "next": "Dalej",
     "retry": "Ponów"
+  }
+  ,
+  "flight": {
+    "callsign": "Znak wywoławczy",
+    "country": "Kraj",
+    "altitude": "Wysokość",
+    "speed": "Prędkość",
+    "position": "Pozycja",
+    "direction": "Kierunek",
+    "aircraftType": "Typ samolotu"
+    ,
+    "radarStation": "Stacja radarowa",
+    "liveTracking": "Śledzenie na żywo 60 FPS"
+  }
+  ,
+  "countries": {
+    "tr": "Turcja",
+    "de": "Niemcy",
+    "cy": "Cypr",
+    "sa": "Arabia Saudyjska",
+    "hu": "Węgry",
+    "un": "Nieznany"
   }
 }

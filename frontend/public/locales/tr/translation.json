@@ -41,7 +41,9 @@
     "todolist": "Yapılacaklar Listesi",
     "todolistDesc": "Günlük görevlerinizi yönetin.",
     "exam": "Sınav",
-    "examDesc": "Bilginizi test edin!"
+    "examDesc": "Bilginizi test edin!",
+    "flightTracker": "Uçuş Takipçisi",
+    "flightTrackerDesc": "Uçuşları harita üzerinde gerçek zamanlı takip edin."
   },
   "hangman": {
     "loading": "Kelime Yükleniyor...",
@@ -88,5 +90,27 @@
     "back": "Geri",
     "next": "İleri",
     "retry": "Tekrar"
+  }
+  ,
+  "flight": {
+    "callsign": "Çağrı Kodu",
+    "country": "Ülke",
+    "altitude": "İrtifa",
+    "speed": "Hız",
+    "position": "Pozisyon",
+    "direction": "Yön",
+    "aircraftType": "Uçak Tipi"
+    ,
+    "radarStation": "Radar İstasyonu",
+    "liveTracking": "60 FPS Canlı Takip"
+  }
+  ,
+  "countries": {
+    "tr": "Türkiye",
+    "de": "Almanya",
+    "cy": "Kıbrıs",
+    "sa": "Suudi Arabistan",
+    "hu": "Macaristan",
+    "un": "Bilinmiyor"
   }
 }

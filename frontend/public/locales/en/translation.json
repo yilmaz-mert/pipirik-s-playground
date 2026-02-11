@@ -41,7 +41,9 @@
     "todolist": "Todo List",
     "todolistDesc": "Manage your daily tasks.",
     "exam": "Exam",
-    "examDesc": "Test your knowledge!"
+    "examDesc": "Test your knowledge!",
+    "flightTracker": "Flight Tracker",
+    "flightTrackerDesc": "Track flights on a map in real-time."
   },
   "hangman": {
     "loading": "Loading Word...",
@@ -88,5 +90,27 @@
     "back": "Back",
     "next": "Next",
     "retry": "Retry"
+  }
+  ,
+  "flight": {
+    "callsign": "Callsign",
+    "country": "Country",
+    "altitude": "Altitude",
+    "speed": "Speed",
+    "position": "Position",
+    "direction": "Direction",
+    "aircraftType": "Aircraft Type"
+    ,
+    "radarStation": "Radar Station",
+    "liveTracking": "60 FPS Live Tracking"
+  }
+  ,
+  "countries": {
+    "tr": "Turkey",
+    "de": "Germany",
+    "cy": "Cyprus",
+    "sa": "Saudi Arabia",
+    "hu": "Hungary",
+    "un": "Unknown"
   }
 }

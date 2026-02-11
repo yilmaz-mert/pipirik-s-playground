@@ -36,6 +36,11 @@ const Projects = () => {
                 <h3>{t('projects.exam')}</h3>
                 <p>{t('projects.examDesc')}</p>
               </Link>
+
+              <Link to="flight-tracker" className="project-card">
+                <h3>{t('projects.flightTracker')}</h3>
+                <p>{t('projects.flightTrackerDesc')}</p>
+              </Link>
             
             </div>
           </>

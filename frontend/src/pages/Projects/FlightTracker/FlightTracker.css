@@ -1,0 +1,144 @@
+/* src/pages/Projects/FlightTracker/FlightTracker.css */
+
+.tracker-wrapper {
+  /* align with global navbar height variable if available */
+  position: absolute;
+  top: var(--navbar-height, 64px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background: #0f172a;
+  overflow: hidden;
+}
+
+/* Reset common page margins that can create tiny gaps */
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+/* Üst Panel: Mobilde küçülür */
+.floating-panel {
+  position: absolute;
+  top: 30px;
+  left: 15px;
+  z-index: 1000;
+  max-width: calc(100% - 30px);
+}
+
+/* Tema Değiştirici Buton */
+.theme-toggle {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  /* Keep below mobile menus/overlays so they can cover the toggle */
+  z-index: 500;
+}
+
+/* Visual state when toggle is active (stays until outside click) */
+.theme-toggle.active button {
+  /* Remove browser outline on mouse click while keeping a subtle shadow */
+  outline: none !important;
+  border: none !important;
+  box-shadow: 0 6px 20px rgba(190, 242, 100, 0.12);
+  border-radius: 9999px;
+}
+
+/* Ensure no border appears when clicking or focusing the toggle */
+.theme-toggle button:active,
+.theme-toggle button:focus,
+.theme-toggle button:focus-visible,
+.theme-toggle.active button:active,
+.theme-toggle.active button:focus {
+  border: none !important;
+  outline: none !important;
+}
+
+/* Remove visible outline for mouse interactions but keep it for keyboard users */
+.theme-toggle button:focus {
+  outline: none;
+}
+.theme-toggle button:focus-visible {
+  outline: 2px solid rgba(190, 242, 100, 0.95);
+  box-shadow: 0 6px 20px rgba(190, 242, 100, 0.12);
+}
+
+/* Detay Paneli: Mobilde alt kısma yapışır */
+.detail-panel {
+  position: absolute;
+  bottom: 25px;
+  right: 25px;
+  z-index: 1000;
+  animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes slideIn {
+  from { transform: translateY(100px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Mobil Entegrasyon (Responsive) */
+@media (max-width: 768px) {
+  .detail-panel {
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+  }
+  
+  .detail-panel .nextui-card {
+    border-radius: 20px 20px 0 0;
+    width: 100% !important;
+  }
+
+  .floating-panel {
+    top: 20px;
+    left: 10px;
+  }
+  /* Ensure theme toggle sits beneath mobile menus */
+  .theme-toggle {
+    z-index: 400;
+  }
+}
+
+.custom-plane-icon {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: none;
+}
+
+/* Improve readability in light (day) mode when `.dark` is absent on .tracker-wrapper */
+.tracker-wrapper:not(.dark) .floating-panel .nextui-card,
+.tracker-wrapper:not(.dark) .detail-panel .nextui-card {
+  background: rgba(255,255,255,0.92) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15,23,42,0.06) !important;
+  box-shadow: 0 8px 24px rgba(15,23,42,0.06) !important;
+}
+
+.tracker-wrapper:not(.dark) .floating-panel,
+.tracker-wrapper:not(.dark) .detail-panel {
+  color: #0f172a;
+}
+
+/* Use a dark value for any `--color-white` variable inside the floating panel in day (light) mode */
+.tracker-wrapper:not(.dark) .floating-panel {
+  --color-white: #000000;
+}
+
+.tracker-wrapper:not(.dark) .floating-panel .text-cyanAccent,
+.tracker-wrapper:not(.dark) .detail-panel .text-cyanAccent {
+  color: #0b7285 !important;
+}

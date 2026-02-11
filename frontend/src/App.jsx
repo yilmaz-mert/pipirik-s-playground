@@ -6,6 +6,7 @@ import About from './pages/About';
 import Hangman from './pages/Projects/Hangman/Hangman';
 import TodoList from './pages/Projects/TodoList/TodoList'; 
 import Exam from "./pages/Projects/Exam/Exam";
+import FlightTracker from './pages/Projects/FlightTracker/FlightTracker';
 import Projects from './pages/Projects/Projects';
 import './App.css';
 
@@ -35,6 +36,7 @@ function App() {
           <Route path="hangman" element={<Hangman />} />
           <Route path="todolist" element={<TodoList />} />
           <Route path="/projects/exam" element={<Exam />} />
+          <Route path="flight-tracker" element={<FlightTracker />} />
         </Route>
       </Routes>
     </Router>
