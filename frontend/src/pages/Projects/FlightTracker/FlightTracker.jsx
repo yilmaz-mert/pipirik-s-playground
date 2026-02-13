@@ -3,10 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import { Card, CardBody, Chip, Button, Divider } from "@nextui-org/react";
+import { Button as HeroButton } from '@heroui/react';
+import { Eye, EyeOff, MapPin, MapPinOff, Globe, GlobeX } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import './FlightTracker.css';
 
-// Resize helper: invalidate map size when container changes
+// FlightTracker page: simulated live flights displayed on a Leaflet map
+// Helper: invalidate map size when its container changes
 const ResizeMap = () => {
   const map = useMap();
   useEffect(() => {
@@ -15,7 +18,7 @@ const ResizeMap = () => {
   return null;
 };
 
-// Map listener to expose map instance to the parent component
+// Expose the Leaflet map instance to the parent via callback
 const MapListener = ({ onMapReady }) => {
   const map = useMap();
   useEffect(() => {
@@ -26,10 +29,81 @@ const MapListener = ({ onMapReady }) => {
   return null;
 };
 
-// Icon cache: avoid recreating identical DivIcon for same angle/selection
+// AutoFitMap: compute and set a minimum zoom so the map fills vertical space
+const AutoFitMap = () => {
+  const map = useMap();
+
+  useEffect(() => {
+    const updateMinZoom = () => {
+      const mapSize = map.getSize();
+
+      // Use a target world height to compute a minimum zoom that fills
+      // the viewport vertically (keeps map from zooming too far out).
+      const targetWorldSize = 256; 
+
+      const minZoom = Math.log2(mapSize.y / targetWorldSize);
+
+      map.setMinZoom(minZoom);
+      map.setZoom(minZoom);
+    };
+
+    updateMinZoom();
+    map.on('resize', updateMinZoom);
+    return () => map.off('resize', updateMinZoom);
+  }, [map]);
+
+  return null;
+};
+
+// FlightFollower: follow a selected or pinned flight and adjust map bounds
+// Behavior:
+// - If `pinnedFlight` is set, lock map to that aircraft and follow it.
+// - If only `activeFlight` is set, fly to it once when selection changes.
+const FlightFollower = ({ activeFlight, pinnedFlight }) => {
+  const map = useMap();
+  const previousSelRef = useRef(null);
+
+  useEffect(() => {
+    // If there is no active or pinned flight, reset map bounds
+    if (!activeFlight && !pinnedFlight) {
+      map.setMaxBounds([[-90, -Infinity], [90, Infinity]]);
+      previousSelRef.current = null;
+      return;
+    }
+
+    // If a flight is pinned, enter follow mode and lock bounds
+    if (pinnedFlight) {
+      const { lat, lng } = pinnedFlight;
+      // Haritayı uçağın konumuna taşı ve etrafına kafes koy
+      map.flyTo([lat, lng], 8, { animate: true, duration: 1.0 });
+
+      const buffer = 3.0;
+      const cageBounds = L.latLngBounds(
+        [lat - buffer, lng - buffer],
+        [lat + buffer, lng + buffer]
+      );
+      map.setMaxBounds(cageBounds);
+      return;
+    }
+
+    // If only selected (not pinned), fly to it once and keep world bounds
+    if (activeFlight) {
+      const { lat, lng, id } = activeFlight;
+      if (previousSelRef.current !== id) {
+        map.flyTo([lat, lng], 8, { animate: true, duration: 1.5 });
+        previousSelRef.current = id;
+      }
+      map.setMaxBounds([[-90, -Infinity], [90, Infinity]]);
+    }
+  }, [map, activeFlight, pinnedFlight]);
+
+  return null;
+};
+
+// Plane icon factory with caching (reduces DOM updates by reusing icons)
 const _planeIconCache = new Map();
 const CREATE_PLANE_ICON = (TRACK, IS_SELECTED) => {
-  // bucket angle to reduce number of distinct icons (every 5°)
+  // Bucket angle to reduce the number of distinct rotated icons (5° steps)
   const bucket = Math.round(TRACK / 5) * 5;
   const key = `${bucket}_${IS_SELECTED ? 1 : 0}`;
   if (_planeIconCache.has(key)) return _planeIconCache.get(key);
@@ -51,7 +125,7 @@ const CREATE_PLANE_ICON = (TRACK, IS_SELECTED) => {
   return icon;
 };
 
-// --- Airport list and helpers for generating random flights ---
+// Airport dataset and helpers for generating random flights
 const AIRPORTS = [
   { code: 'IST', name: 'Istanbul', lat: 41.275, lng: 28.751, country: 'tr', weight: 100 },
   { code: 'LHR', name: 'London Heathrow', lat: 51.47, lng: -0.454, country: 'gb', weight: 95 },
@@ -85,8 +159,9 @@ const weightedPick = (items) => {
   return items[items.length - 1];
 };
 
+// Haversine formula to compute great-circle distance (km)
 const haversineKm = (aLat, aLng, bLat, bLng) => {
-  const R = 6371; // km
+  const R = 6371;
   const toRad = v => v * Math.PI / 180;
   const dLat = toRad(bLat - aLat);
   const dLon = toRad(bLng - aLng);
@@ -96,6 +171,7 @@ const haversineKm = (aLat, aLng, bLat, bLng) => {
   return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 };
 
+// Bearing (heading) from point A to B in degrees
 const bearingBetween = (aLat, aLng, bLat, bLng) => {
   const toRad = v => v * Math.PI / 180;
   const toDeg = v => v * 180 / Math.PI;
@@ -104,7 +180,7 @@ const bearingBetween = (aLat, aLng, bLat, bLng) => {
   return (toDeg(Math.atan2(y, x)) + 360) % 360;
 };
 
-// Great-circle interpolation helpers
+// Great-circle interpolation helpers (slerp-based) for smooth routes
 const toRad = v => v * Math.PI / 180;
 const toDeg = v => v * 180 / Math.PI;
 const latLngToVector = (lat, lng) => {
@@ -146,7 +222,7 @@ const greatCirclePath = (aLat, aLng, bLat, bLng, segments = 40) => {
   return pts;
 };
 
-// compute a single flight's derived state for given timestamp (pure helper)
+// Compute a flight's derived state (position, track, alt, speed) at time `now`
 const computeFlightState = (f, now) => {
   const totalMs = f.durationMin * 60000;
   const elapsed = Math.min(totalMs, Math.max(0, (now - f.departTime)));
@@ -193,6 +269,7 @@ const computeFlightState = (f, now) => {
   return { ...f, lat, lng, progress, track, alt, gs };
 };
 
+// Small helper to generate a random callsign
 const randCallsign = () => {
   const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const pfx = letters.charAt(Math.floor(Math.random()*letters.length)) + letters.charAt(Math.floor(Math.random()*letters.length));
@@ -200,8 +277,9 @@ const randCallsign = () => {
   return `${pfx}${num}`;
 };
 
+// Generate a random flight object with route and timing
 const generateFlight = () => {
-  // pick country first using country weights, then choose an airport within
+  // pick a country (weighted) then an origin airport within it
   const chosenCountry = weightedPickCountry();
   const airportsInCountry = AIRPORTS.filter(a => a.country === chosenCountry.code);
   const from = (airportsInCountry.length > 0) ? weightedPick(airportsInCountry) : weightedPick(AIRPORTS);
@@ -213,7 +291,7 @@ const generateFlight = () => {
   let tries = 0;
   while (to.code === from.code && tries++ < 8) to = weightedPick(AIRPORTS);
 
-  // For helicopters, prefer nearby airports or short offsets
+  // For helicopters prefer nearby airports; otherwise short random offset
   let destLat = to.lat;
   let destLng = to.lng;
   if (isHeli) {
@@ -240,7 +318,7 @@ const generateFlight = () => {
   const alt = aircraft.alt || Math.round(10000 + Math.random() * 30000);
   const windPhase = Math.random() * Math.PI * 2;
 
-  // Precompute great-circle route for a subtle curve on the map
+  // Precompute great-circle route for a smooth curve on the map
   const route = greatCirclePath(from.lat, from.lng, destLat, destLng, 60).map(([lat,lng]) => [lat, lng]);
 
   const id = randCallsign();
@@ -272,7 +350,7 @@ const generateFlight = () => {
   };
 };
 
-// --- Aircraft types including helicopters ---
+// Aircraft dataset (including helicopters)
 const AIRCRAFT_TYPES = [
   { model: 'Airbus A320neo', speed: 450, alt: 36000, weight: 100 },
   { model: 'Boeing 737-800', speed: 440, alt: 35000, weight: 95 },
@@ -293,6 +371,7 @@ const AIRCRAFT_TYPES = [
 
 const HELI_MODELS = new Set(['Bell 407','Sikorsky S-76','Airbus H145']);
 
+// Helicopter icon factory with caching
 const _heliIconCache = new Map();
 const CREATE_HELI_ICON = (TRACK, IS_SELECTED) => {
   const bucket = Math.round(TRACK / 5) * 5;
@@ -318,7 +397,7 @@ const CREATE_HELI_ICON = (TRACK, IS_SELECTED) => {
   return icon;
 };
 
-// --- Countries list ---
+// Country list and helpers
 const COUNTRIES = [
   { code: 'tr', name: 'Türkiye', weight: 100 },
   { code: 'us', name: 'USA', weight: 85 },
@@ -345,14 +424,18 @@ const countryCodeFrom = (country) => {
 
 const weightedPickCountry = () => weightedPick(COUNTRIES);
 
-// Memoized marker component to avoid unnecessary re-renders
-const FlightMarker = React.memo(({ f, isSelected, onClick, getFlagUrl, t }) => (
+// Memoized Marker + Popup component for a flight
+const FlightMarker = React.memo(({ f, isSelected, onClick, getFlagUrl, t, onMarkerAdd, onMarkerRemove, showRoutes }) => (
   <React.Fragment>
-    <Polyline positions={f.route} pathOptions={{ color: '#888', weight: 1, opacity: 0.18 }} />
+    {showRoutes && <Polyline positions={f.route} pathOptions={{ color: '#888', weight: 1, opacity: 0.18 }} />}
     <Marker
       position={[f.lat, f.lng]}
       icon={f.isHelicopter ? CREATE_HELI_ICON(f.track, isSelected) : CREATE_PLANE_ICON(f.track, isSelected)}
-      eventHandlers={{ click: () => onClick(f.id) }}
+      eventHandlers={{
+        click: () => onClick(f.id),
+        add: (e) => onMarkerAdd && onMarkerAdd(f.id, e.target),
+        remove: () => onMarkerRemove && onMarkerRemove(f.id)
+      }}
     >
       <Popup>
         <div style={{ minWidth: 160 }}>
@@ -377,21 +460,29 @@ const FlightMarker = React.memo(({ f, isSelected, onClick, getFlagUrl, t }) => (
     && prev.f.track === next.f.track
     && prev.f.alt === next.f.alt
     && prev.f.gs === next.f.gs
-    && prev.isSelected === next.isSelected;
+    && prev.isSelected === next.isSelected
+    && prev.showRoutes === next.showRoutes;
 });
 
 
+// Main FlightTracker component
 const FlightTracker = () => {
   const MAX_FLIGHTS = 20;
   const createInitialFlights = () => Array.from({ length: MAX_FLIGHTS }, () => generateFlight());
 
   const [flights, setFlights] = useState(() => createInitialFlights());
   const [selectedId, setSelectedId] = useState(null);
+  const [pinnedId, setPinnedId] = useState(null);
+  const [popupOpenId, setPopupOpenId] = useState(null);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isToggleActive, setIsToggleActive] = useState(false);
   
   const flightsRef = useRef(flights);
   const mapRef = useRef(null);
+  const initialZoomDoneRef = useRef(false);
+  const zoomControlsRef = useRef(null);
+  const [zoomBottom, setZoomBottom] = useState(12);
+  const [showGreatCircles, setShowGreatCircles] = useState(false);
   const trailsRef = useRef({});
   const [trails, setTrails] = useState({});
   const handleMapReady = useCallback((m) => {
@@ -403,6 +494,101 @@ const FlightTracker = () => {
 
   const toggleRef = useRef(null);
 
+  // Initial map view can be adjusted based on user's location or locale.
+  const [initialView, setInitialView] = useState({ center: [39.0, 35.0], zoom: 6 });
+
+  // Try to get a geolocation first (more accurate). If it fails or times out,
+  // fall back to extracting a region from `navigator.language` and centering
+  // on a representative airport for that country.
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+
+    const setViewByCoords = (lat, lng, z = 7) => setInitialView({ center: [lat, lng], zoom: z });
+
+    if (navigator.geolocation) {
+      try {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => setViewByCoords(pos.coords.latitude, pos.coords.longitude, 7),
+          () => fallbackLocale(),
+          { timeout: 8000, maximumAge: 1000 * 60 * 60 }
+        );
+      } catch {
+        fallbackLocale();
+      }
+    } else {
+      fallbackLocale();
+    }
+
+    async function fallbackLocale() {
+      try {
+        const nav = navigator;
+        const lang = (nav.language || (nav.languages && nav.languages[0]) || '').toString();
+        const parts = lang.split(/[-_]/);
+        const region = (parts[1] || parts[0]) ? parts[1] || parts[0] : null;
+        if (region) {
+          const code = region.toLowerCase();
+
+          // Try to load airports from the public folder (served at /data/...)
+          try {
+            const res = await fetch('/data/airports.geojson');
+            if (res.ok) {
+              const json = await res.json();
+              const features = Array.isArray(json.features) ? json.features : [];
+              // Match by country code (case-insensitive). GeoJSON `properties.country` often uses upper-case.
+              const match = features.find(f => f.properties && String(f.properties.country || '').toLowerCase() === code);
+              if (match && match.geometry && Array.isArray(match.geometry.coordinates)) {
+                const [lng, lat] = match.geometry.coordinates;
+                setInitialView({ center: [lat, lng], zoom: 7 });
+                return;
+              }
+              // If no exact match, try to find any feature whose country starts with the code
+              const fuzzy = features.find(f => f.properties && String(f.properties.country || '').toLowerCase().startsWith(code));
+              if (fuzzy && fuzzy.geometry && Array.isArray(fuzzy.geometry.coordinates)) {
+                const [lng, lat] = fuzzy.geometry.coordinates;
+                setInitialView({ center: [lat, lng], zoom: 6 });
+                return;
+              }
+            }
+          } catch {
+            // fall through to AIRPORTS fallback below
+          }
+
+          // fallback to built-in AIRPORTS list if geojson didn't help
+          const airport = AIRPORTS.find(a => a.country === code) || AIRPORTS.find(a => a.country === code);
+          if (airport) {
+            setInitialView({ center: [airport.lat, airport.lng], zoom: 6 });
+            return;
+          }
+        }
+      } catch {
+        // ignore errors
+      }
+      // leave default if nothing matches
+    }
+  }, []);
+
+  // When initialView changes after the map instance exists, update the map view.
+  useEffect(() => {
+    const m = mapRef.current;
+    if (m && initialView && initialView.center && !initialZoomDoneRef.current) {
+      try {
+        const prefersReduced = (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        if (prefersReduced) {
+          // Respect user's reduced motion preference: no animated fly
+          m.setView(initialView.center, initialView.zoom);
+        } else {
+          // Start from a wider zoom level and fly in to create a zoom-in animation
+          const startZoom = Math.max(1, (initialView.zoom || 6) - 4);
+          try { m.setView(initialView.center, startZoom); } catch { /* ignore */ }
+          m.flyTo(initialView.center, initialView.zoom, { animate: true, duration: 1.8 });
+        }
+      } catch {
+        try { m.setView(initialView.center, initialView.zoom); } catch { /* ignore */ }
+      }
+      initialZoomDoneRef.current = true;
+    }
+  }, [initialView]);
+
   useEffect(() => {
     const handleDocClick = (e) => {
       if (toggleRef.current && !toggleRef.current.contains(e.target)) {
@@ -413,10 +599,79 @@ const FlightTracker = () => {
     return () => document.removeEventListener('mousedown', handleDocClick);
   }, []);
 
+
   // Find the active (selected) flight's current data
   const activeFlight = useMemo(() => 
     flights.find(f => f.id === selectedId), [flights, selectedId]
   );
+
+  // If user pinned a flight, keep reference to that flight object (may be undefined)
+  const pinnedFlight = useMemo(() => flights.find(f => f.id === pinnedId), [flights, pinnedId]);
+
+  // Move zoom controls above the detail panel when it is visible.
+  useEffect(() => {
+    const updateZoomBottom = () => {
+      try {
+        const panel = document.querySelector('.detail-panel');
+        const base = 12;
+        if (panel) {
+          const rect = panel.getBoundingClientRect();
+          const style = getComputedStyle(panel);
+          const panelBottom = parseFloat(style.bottom) || 0;
+          setZoomBottom(Math.round(panelBottom + rect.height + base));
+        } else {
+          setZoomBottom(base);
+        }
+      } catch {
+        setZoomBottom(12);
+      }
+    };
+
+    updateZoomBottom();
+    window.addEventListener('resize', updateZoomBottom);
+    return () => window.removeEventListener('resize', updateZoomBottom);
+  }, [activeFlight]);
+
+  const markerRefs = useRef({});
+  const handleMarkerAdd = useCallback((id, marker) => {
+    markerRefs.current[id] = marker;
+    try {
+      // keep popup state in sync when user closes popup via built-in close button
+      const onOpen = () => setPopupOpenId(id);
+      const onClose = () => setPopupOpenId(prev => (prev === id ? null : prev));
+      marker.___onPopupOpen = onOpen;
+      marker.___onPopupClose = onClose;
+      marker.on('popupopen', onOpen);
+      marker.on('popupclose', onClose);
+    } catch {
+      // ignore if marker doesn't support events yet
+      void 0;
+    }
+  }, []);
+  const handleMarkerRemove = useCallback((id) => {
+    const marker = markerRefs.current[id];
+    if (marker) {
+      try {
+        if (marker.___onPopupOpen) marker.off('popupopen', marker.___onPopupOpen);
+        if (marker.___onPopupClose) marker.off('popupclose', marker.___onPopupClose);
+      } catch { void 0; }
+      delete markerRefs.current[id];
+    }
+    if (popupOpenId === id) setPopupOpenId(null);
+  }, [popupOpenId]);
+
+  const togglePopupForSelected = useCallback(() => {
+    if (!selectedId) return;
+    const marker = markerRefs.current[selectedId];
+    if (!marker) return;
+    if (popupOpenId === selectedId) {
+      marker.closePopup();
+      setPopupOpenId(null);
+    } else {
+      marker.openPopup();
+      setPopupOpenId(selectedId);
+    }
+  }, [selectedId, popupOpenId]);
 
   // keep flightsRef in sync with state
   useEffect(() => {
@@ -515,9 +770,22 @@ const FlightTracker = () => {
     return t(`countries.${code}`, { defaultValue: flight.from || 'Unknown' });
   };
 
+  // create a centered ring effect inside a button element (visual UX)
+  const createRing = (el) => {
+    try {
+      if (!el || !(el instanceof HTMLElement)) return;
+      const ring = document.createElement('span');
+      ring.className = 'ring-wave';
+      el.appendChild(ring);
+      ring.addEventListener('animationend', () => ring.remove(), { once: true });
+    } catch {
+      // ignore DOM errors in SSR or unusual environments
+    }
+  };
+
   return (
     <div className={`tracker-wrapper ${isDarkMode ? 'dark' : ''}`}>
-      {/* Theme toggle */}
+      {/* Theme toggle button */}
       <div className={`theme-toggle ${isToggleActive ? 'active' : ''}`} ref={toggleRef}>
         <Button 
           isIconOnly 
@@ -541,7 +809,7 @@ const FlightTracker = () => {
         </Card>
       </div>
 
-      {/* Dynamic info panel */}
+      {/* Dynamic info panel (shown when a flight is selected) */}
       {activeFlight && (
         <div className="detail-panel">
           <Card isBlurred className="bg-background/80 border-1 border-cyanAccent/40 w-full sm:w-[320px] shadow-2xl">
@@ -557,7 +825,31 @@ const FlightTracker = () => {
                     <span className="text-xs text-foreground/70">{getCountryName(activeFlight)}</span>
                   </div>
                 </div>
-                <Button isIconOnly size="sm" variant="light" color="danger" onPress={() => setSelectedId(null)}>✕</Button>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color={popupOpenId === selectedId ? 'primary' : 'default'}
+                      onClick={(e) => { createRing(e.currentTarget); togglePopupForSelected(); }}
+                      aria-label={popupOpenId === selectedId ? 'Close popup' : 'Open popup'}
+                    >
+                      {popupOpenId === selectedId ? <Eye size={18} /> : <EyeOff size={18} />}
+                    </Button>
+
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      color={pinnedId === selectedId ? 'success' : 'default'}
+                      onClick={(e) => { createRing(e.currentTarget); setPinnedId(prev => (prev === selectedId ? null : selectedId)); }}
+                      aria-label={pinnedId === selectedId ? 'Unpin flight' : 'Pin flight'}
+                    >
+                      {pinnedId === selectedId ? <MapPin size={16} /> : <MapPinOff size={16} />}
+                    </Button>
+
+                    <Button isIconOnly size="sm" variant="light" color="danger" onPress={() => { setSelectedId(null); setPinnedId(null); setPopupOpenId(null); }}>✕</Button>
+                  </div>
               </div>
 
               <Divider className="my-4 opacity-20" />
@@ -592,8 +884,49 @@ const FlightTracker = () => {
         </div>
       )}
 
-      <MapContainer center={[39.0, 35.0]} zoom={6} className="leaflet-container" zoomControl={false}>
+      <MapContainer 
+        center={initialView.center} 
+        zoom={initialView.zoom} 
+        
+        zoomSnap={0}
+        zoomDelta={0.5}
+
+        maxBounds={[[-90, -Infinity], [90, Infinity]]} 
+        maxBoundsViscosity={1.0} 
+        worldCopyJump={true} 
+        className="leaflet-container" 
+        zoomControl={false} 
+        attributionControl={false}
+      >
+        {/* Zoom controls (HeroUI) */}
+        <div ref={zoomControlsRef} className="hero-zoom-controls" style={{ position: 'absolute', right: 12, bottom: zoomBottom, zIndex: 650, display: 'flex', flexDirection: 'column', gap: 8, transition: 'bottom 260ms cubic-bezier(.2,.9,.3,1)' }}>
+          <HeroButton aria-label="Zoom in" onClick={() => {
+            try {
+              const m = mapRef.current; if (!m) return; m.setZoom(Math.min((m.getMaxZoom && m.getMaxZoom()) || 21, Math.round(m.getZoom()) + 1));
+            } catch { void 0; }
+          }}>
+            +
+          </HeroButton>
+          <HeroButton aria-label="Zoom out" onClick={() => {
+            try {
+              const m = mapRef.current; if (!m) return; m.setZoom(Math.max((m.getMinZoom && m.getMinZoom()) || 0, Math.round(m.getZoom()) - 1));
+            } catch { void 0; }
+          }}>
+            −
+          </HeroButton>
+          <HeroButton
+            className={`globe-toggle ${showGreatCircles ? 'on' : 'off'}`}
+            aria-label={showGreatCircles ? 'Hide routes' : 'Show routes'}
+            aria-pressed={showGreatCircles}
+            onClick={() => { setShowGreatCircles(prev => !prev); }}
+            title={showGreatCircles ? 'Hide great-circle routes' : 'Show great-circle routes'}
+          >
+            {showGreatCircles ? <Globe size={16} /> : <GlobeX size={16} />}
+          </HeroButton>
+        </div>
         <ResizeMap />
+        <AutoFitMap />
+        <FlightFollower activeFlight={activeFlight} pinnedFlight={pinnedFlight} />
         <MapListener onMapReady={handleMapReady} />
         <TileLayer 
           url={isDarkMode 
@@ -615,6 +948,9 @@ const FlightTracker = () => {
             f={f}
             isSelected={selectedId === f.id}
             onClick={(id) => setSelectedId(id)}
+            onMarkerAdd={handleMarkerAdd}
+            onMarkerRemove={handleMarkerRemove}
+            showRoutes={showGreatCircles}
             getFlagUrl={getFlagUrl}
             t={t}
           />

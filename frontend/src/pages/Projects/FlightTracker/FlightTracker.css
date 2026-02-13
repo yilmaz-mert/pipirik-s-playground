@@ -1,40 +1,46 @@
 /* src/pages/Projects/FlightTracker/FlightTracker.css */
 
 .tracker-wrapper {
-  /* align with global navbar height variable if available */
   position: absolute;
-  top: var(--navbar-height, 64px);
+  /* Subtract navbar height if present; otherwise full screen */
+  top: var(--navbar-height, 0px); 
   left: 0;
   right: 0;
   bottom: 0;
   width: 100%;
-  background: #0f172a;
+  
+  /* Use dynamic viewport height for modern mobile browsers */
+  height: 100dvh; 
+  /* Subtract navbar height if present */
+  height: calc(100dvh - var(--navbar-height, 0px));
+
+  background: #0f172a; /* background before map tiles load */
   overflow: hidden;
 }
 
-/* Reset common page margins that can create tiny gaps */
-html, body, #root {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
 
 .leaflet-container {
   width: 100%;
   height: 100%;
   z-index: 0;
+  /* Match map ocean color to avoid visible seams at tile edges */
+  background: #d4dadc;
 }
 
-/* Üst Panel: Mobilde küçülür */
+.tracker-wrapper.dark .leaflet-container {
+  background: #262626; 
+}
+
+
 .floating-panel {
   position: absolute;
-  top: 30px;
+  top: 15px;
   left: 15px;
-  z-index: 1000;
+  z-index: 999;
   max-width: calc(100% - 30px);
 }
 
-/* Tema Değiştirici Buton */
+/* Theme toggle button */
 .theme-toggle {
   position: absolute;
   top: 15px;
@@ -42,6 +48,7 @@ html, body, #root {
   /* Keep below mobile menus/overlays so they can cover the toggle */
   z-index: 500;
 }
+
 
 /* Visual state when toggle is active (stays until outside click) */
 .theme-toggle.active button {
@@ -51,6 +58,7 @@ html, body, #root {
   box-shadow: 0 6px 20px rgba(190, 242, 100, 0.12);
   border-radius: 9999px;
 }
+
 
 /* Ensure no border appears when clicking or focusing the toggle */
 .theme-toggle button:active,
@@ -62,7 +70,8 @@ html, body, #root {
   outline: none !important;
 }
 
-/* Remove visible outline for mouse interactions but keep it for keyboard users */
+
+/* Keep visible focus outlines for keyboard accessibility */
 .theme-toggle button:focus {
   outline: none;
 }
@@ -71,7 +80,8 @@ html, body, #root {
   box-shadow: 0 6px 20px rgba(190, 242, 100, 0.12);
 }
 
-/* Detay Paneli: Mobilde alt kısma yapışır */
+
+/* Detail panel (sticks to bottom on mobile) */
 .detail-panel {
   position: absolute;
   bottom: 25px;
@@ -80,12 +90,111 @@ html, body, #root {
   animation: slideIn 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
+
+/* Ensure ripple/click effects from UI library are positioned relative
+   to the detail card instead of the page (fixes top-left ripple issue) */
+.detail-panel .nextui-card {
+  position: relative;
+  overflow: visible;
+}
+
+
+/* Make buttons inside detail-panel a properly positioned container
+   so ripples compute offsets correctly */
+.detail-panel .nextui-button,
+.detail-panel button {
+  position: relative;
+  overflow: visible;
+}
+
+
+/* Ring wave effect element inserted on click */
+.ring-wave {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(190, 242, 100, 0.95);
+  pointer-events: none;
+  opacity: 0.9;
+  animation: ringWave 700ms cubic-bezier(0.22, 0.98, 0.36, 1);
+}
+
+
+.hero-zoom-controls {
+  position: absolute;
+  right: 12px;
+  z-index: 650;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* Detail panel ile aynı hızda kayması için geçiş efekti */
+  transition: bottom 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+.hero-zoom-controls button {
+  min-width: 44px !important; /* Daha büyük butonlar */
+  height: 44px !important;
+  font-size: 20px !important;
+  font-weight: bold;
+  background: rgba(15, 23, 42, 0.6) !important; /* Koyu mod varsayılan */
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Hover ve Aktif Durumlar */
+.hero-zoom-controls button:hover {
+  background: rgba(6, 182, 212, 0.8) !important; /* Cyan rengi vurgusu */
+  transform: scale(1.05);
+}
+
+.hero-zoom-controls button:active {
+  transform: scale(0.95);
+}
+
+/* Globe toggle styling: center icon and show strike-through when off */
+.globe-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0; /* let library control button sizing, we center icon ourselves */
+}
+.globe-toggle svg {
+  display: block;
+}
+.globe-toggle .globe-x {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  color: rgba(255,255,255,0.92);
+  opacity: 0.95;
+}
+.tracker-wrapper:not(.dark) .globe-toggle .globe-x {
+  color: rgba(15, 23, 42, 0.95);
+}
+@keyframes ringWave {
+  from { transform: translate(-50%, -50%) scale(0.4); opacity: 0.9; }
+  to { transform: translate(-50%, -50%) scale(3.8); opacity: 0; }
+}
+
 @keyframes slideIn {
   from { transform: translateY(100px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* Mobil Entegrasyon (Responsive) */
+
+/* Mobile integration (responsive adjustments) */
 @media (max-width: 768px) {
   .detail-panel {
     bottom: 0;
@@ -100,14 +209,26 @@ html, body, #root {
   }
 
   .floating-panel {
-    top: 20px;
+    top: 10px;
     left: 10px;
   }
   /* Ensure theme toggle sits beneath mobile menus */
   .theme-toggle {
     z-index: 400;
   }
+
+  .hero-zoom-controls {
+    right: 15px;
+  }
 }
+
+/* Non-mobile: nudge zoom controls 25px to the right (overrides inline styles) */
+@media (min-width: 769px) {
+  .hero-zoom-controls {
+    right: 25px !important; /* 12px + 25px */
+  }
+}
+
 
 .custom-plane-icon {
   background: transparent;
@@ -118,6 +239,7 @@ html, body, #root {
   cursor: pointer;
   pointer-events: none;
 }
+
 
 /* Improve readability in light (day) mode when `.dark` is absent on .tracker-wrapper */
 .tracker-wrapper:not(.dark) .floating-panel .nextui-card,
@@ -133,7 +255,7 @@ html, body, #root {
   color: #0f172a;
 }
 
-/* Use a dark value for any `--color-white` variable inside the floating panel in day (light) mode */
+/* Use a darker fallback for any `--color-white` variable in day mode */
 .tracker-wrapper:not(.dark) .floating-panel {
   --color-white: #000000;
 }
@@ -141,4 +263,11 @@ html, body, #root {
 .tracker-wrapper:not(.dark) .floating-panel .text-cyanAccent,
 .tracker-wrapper:not(.dark) .detail-panel .text-cyanAccent {
   color: #0b7285 !important;
+}
+
+.tracker-wrapper:not(.dark) .hero-zoom-controls button {
+  background: rgba(255, 255, 255, 0.8) !important;
+  color: #0f172a !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
 }
