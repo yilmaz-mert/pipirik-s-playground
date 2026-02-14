@@ -37,13 +37,13 @@
     "titlePart1": "My",
     "titlePart2": "Projects",
     "hangman": "Hangman Game",
-    "hangmanDesc": "Test your vocabulary!",
+    "hangmanDesc": "Classic hangman game implemented with vanilla JS and CSS animations. Contains responsive layout, keyboard support, and simple state management for rounds and scoring.",
     "todolist": "Todo List",
-    "todolistDesc": "Manage your daily tasks.",
+    "todolistDesc": "Lightweight todo app using Local Storage for persistence, optimistic UI updates and accessible form controls. Includes filtering, sorting and small animations for better UX.",
     "exam": "Exam",
-    "examDesc": "Test your knowledge!",
+    "examDesc": " A validation-first exam interface with real-time answer checking, localized strings, keyboard navigation and progress persistence. Focused on minimal latency and clear feedback for users.",
     "flightTracker": "Flight Tracker",
-    "flightTrackerDesc": "Track flights on a map in real-time."
+    "flightTrackerDesc": "Built with React and Leaflet to display live flight positions, custom clustered markers and performant map interactions. Includes API retry/caching, accessibility labels for map controls and mobile-friendly gestures."
   },
   "hangman": {
     "loading": "Loading Word...",

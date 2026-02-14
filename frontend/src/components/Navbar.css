@@ -4,7 +4,7 @@
   --navbar-height: 67.39px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   :root { --navbar-height: 60.2px; }
 }
 .navbar {

@@ -13,8 +13,8 @@ function Navbar() {
   const mobileLangRef = useRef(null);
 
   const langs = [
-    { code: 'en', label: 'English', flag: '🇪🇳' },
-    { code: 'tr', label: 'Türkçe', flag: '🇹🇷' }
+     { code: 'en', label: 'English', flag: '🇺🇸' },
+     { code: 'tr', label: 'Türkçe', flag: '🇹🇷' }
     ,{ code: 'pl', label: 'Polski', flag: '🇵🇱' }
   ];
 
@@ -51,9 +51,9 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        {/* Brand/Logo link leading to home */}
+        {/* Brand/Logo link leading to home (fixed text across languages) */}
         <NavLink to="/" className="navbar-logo">
-          {t('nav.logoPart1')} <span>{t('nav.logoPart2')}</span>
+          Pipirik's <span>Playground</span>
         </NavLink>
 
         <div className="nav-right" ref={navRef}>

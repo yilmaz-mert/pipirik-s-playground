@@ -14,7 +14,18 @@ createRoot(document.getElementById('root')).render(
       <Suspense fallback={<div className="h-screen w-screen bg-[#0f172a] flex items-center justify-center text-white">Loading...</div>}>
         <ModalProvider>
           {/* 3. 'dark' class'ını ve HeroUI tema sınıflarını buraya ekliyoruz */}
-          <main className="dark text-foreground bg-background min-h-screen">
+          {/* Global theme tokens via CSS variables for pages/components */}
+          <main
+            className="dark text-foreground bg-background min-h-screen"
+            style={{
+              '--accent': '#38BDF8',
+              '--accent-2': '#818CF8',
+              '--card-bg': 'rgba(30,41,59,0.4)',
+              '--card-border': 'rgba(51,65,85,0.5)',
+              '--muted': '#94A3B8',
+              '--page-bg': '#0f172a'
+            }}
+          >
             <App />
           </main>
         </ModalProvider>
