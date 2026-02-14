@@ -31,8 +31,8 @@ const About = () => {
           <p className="text-[color:var(--muted)] text-xl max-w-2xl mx-auto italic">{t('about.subtitle')}</p>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 md:gap-8 items-start">
-          <Card className="col-span-1 md:col-span-3 bg-[var(--card-bg)] border-[1px] border-[var(--card-border)]">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
+          <Card className="col-span-1 md:col-span-1 bg-[var(--card-bg)] border-[1px] border-[var(--card-border)]">
             <CardHeader className="px-6 pt-6">
               <h3 id="dna-title" className="text-xl font-bold text-[color:var(--accent)]">
                 {t('about.dnaTitle')}
@@ -44,7 +44,7 @@ const About = () => {
             </CardBody>
           </Card>
 
-          <Card className="col-span-1 md:col-span-2 bg-[var(--card-bg)] border-[1px] border-[var(--card-border)]">
+          <Card className="col-span-1 md:col-span-1 bg-[var(--card-bg)] border-[1px] border-[var(--card-border)]">
             <CardHeader className="px-6 pt-6">
               <h3 id="competencies-title" className="text-lg font-semibold text-white">{t('about.competenciesTitle')}</h3>
             </CardHeader>

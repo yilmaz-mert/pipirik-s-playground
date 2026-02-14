@@ -19,6 +19,7 @@
     "titlePart2": "Aşan",
     "subtitle": "Elektrik-Elektronik Mühendisi ve Yazılım Tutkunu.",
     "dnaTitle": "Mühendislik DNA'm",
+    "engineeredLine": "Mühendislik Çözümleri ve Etkileşimli Deneyimler",
     "competenciesTitle": "Temel Yetenekler"
     ,
     "bioParagraph1": "Ben bir <strong>Elektrik-Elektronik Mühendisiyim</strong> ve yazılımın modern mühendislik sorunlarını çözmede en güçlü araç olduğuna inanıyorum. Arka planım yalnızca kodla sınırlı değil; <strong>metal işleri, kaynak</strong> ve <strong>3B baskı</strong> ile ilgileniyorum.",
@@ -36,14 +37,16 @@
   "projects": {
     "titlePart1": "Projelerim",
     "titlePart2": "",
+    "subtitle": "Mühendislik Çözümleri ve Etkileşimli Deneyimler",
+    "featured": "Öne Çıkan Proje",
     "hangman": "Adam Asmaca",
-    "hangmanDesc": "Kelime bilginizi test edin!",
+    "hangmanDesc": "Vanilla JS ve CSS animasyonları ile uygulanmış klasik adam asmaca oyunu. Duyarlı tasarım, klavye desteği ve tur/puan yönetimi için basit durum yönetimi içerir.",
     "todolist": "Yapılacaklar Listesi",
-    "todolistDesc": "Günlük görevlerinizi yönetin.",
+    "todolistDesc": "Yerel Depolama ile kalıcılık sağlayan hafif bir yapılacaklar uygulaması; iyimser UI güncellemeleri, erişilebilir form kontrolleri, filtreleme, sıralama ve daha iyi kullanıcı deneyimi için küçük animasyonlar içerir.",
     "exam": "Sınav",
-    "examDesc": "Bilginizi test edin!",
+    "examDesc": "Gerçek zamanlı cevap kontrolü, yerelleştirilmiş metinler, klavye ile gezinme ve ilerleme kalıcılığı sunan doğrulama odaklı sınav arayüzü. Kullanıcıya düşük gecikme ve net geri bildirim sağlamaya odaklıdır.",
     "flightTracker": "Uçuş Takipçisi",
-    "flightTrackerDesc": "Uçuşları harita üzerinde gerçek zamanlı takip edin."
+    "flightTrackerDesc": "Canlı uçuş konumlarını göstermek için React ve Leaflet kullanılarak oluşturulmuş; özel kümelenmiş işaretçiler ve performanslı harita etkileşimleri içerir. API yeniden deneme/önbellekleme, harita kontrolleri için erişilebilir etiketler ve mobil dostu hareketler sağlar."
   },
   "hangman": {
     "loading": "Kelime Yükleniyor...",

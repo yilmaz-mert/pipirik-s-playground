@@ -85,12 +85,12 @@ const Projects = () => {
                     {project.isFeatured && (
                       <Chip 
                         size="sm" 
-                        variant="dot" 
+                        variant="flat" 
                         color="primary" 
                         className="mb-2 border-white/10"
                         style={{ color: 'var(--accent)' }}
                       >
-                        Featured Project
+                        {t('projects.featured', { defaultValue: 'Featured Project' })}
                       </Chip>
                     )}
                     <h3 className="text-2xl font-bold text-[#F8FAFC] group-hover:text-[color:var(--accent)] transition-colors">

@@ -19,6 +19,7 @@
     "titlePart2": "Kod",
     "subtitle": "Inżynier Elektryk i Elektronik oraz pasjonat programowania.",
     "dnaTitle": "Moje inżynierskie DNA",
+    "engineeredLine": "Inżynieryjne rozwiązania i interaktywne doświadczenia",
     "competenciesTitle": "Kluczowe kompetencje",
     "bioParagraph1": "Jestem <strong>Inżynierem Elektrykiem i Elektronikiem</strong>, który wierzy, że oprogramowanie jest najpotężniejszym narzędziem do rozwiązywania współczesnych wyzwań inżynieryjnych. Moje doświadczenie nie ogranicza się tylko do kodu; pasjonuję się <strong>obróbką metali, spawaniem</strong> oraz <strong>drukiem 3D</strong>.",
     "bioParagraph2": "Od tworzenia systemów <strong>rozpoznawania twarzy</strong> w czasie rzeczywistym na Raspberry Pi po optymalizację modeli <strong>Machine Learning</strong>, takich jak LightGBM – koncentruję się na budowaniu praktycznych rozwiązań opartych na danych.",
@@ -35,14 +36,16 @@
   "projects": {
     "titlePart1": "Moje",
     "titlePart2": "Projekty",
+    "subtitle": "Inżynieryjne rozwiązania i interaktywne doświadczenia",
+    "featured": "Wyróżniony projekt",
     "hangman": "Wisielec",
-    "hangmanDesc": "Sprawdź swoje słownictwo!",
+    "hangmanDesc": "Klasyczna gra wisielec zaimplementowana w czystym JS i z animacjami CSS. Zawiera responsywny układ, obsługę klawiatury oraz prosty mechanizm stanu rund i punktacji.",
     "todolist": "Lista zadań",
-    "todolistDesc": "Zarządzaj swoimi codziennymi zadaniami.",
+    "todolistDesc": "Lekka aplikacja TODO wykorzystująca Local Storage do przechowywania, optymistyczne aktualizacje interfejsu i dostępne kontrolki formularza. Zawiera filtrowanie, sortowanie i drobne animacje poprawiające UX.",
     "exam": "Egzamin",
-    "examDesc": "Sprawdź swoją wiedzę!",
+    "examDesc": "Interfejs egzaminu z priorytetem walidacji — sprawdzanie odpowiedzi w czasie rzeczywistym, lokalizowane napisy, nawigacja klawiaturą oraz zachowywanie postępu. Skoncentrowany na minimalnej latencji i jasnej informacji zwrotnej.",
     "flightTracker": "Śledzenie lotów",
-    "flightTrackerDesc": "Śledź loty na mapie w czasie rzeczywistym."
+    "flightTrackerDesc": "Zbudowany z użyciem React i Leaflet do wyświetlania pozycji lotów na żywo, niestandardowych zgrupowanych markerów oraz wydajnych interakcji z mapą. Zawiera ponawianie/keŝowanie API, etykiety dostępności dla kontrolek mapy i gesty przyjazne dla urządzeń mobilnych."
   },
   "hangman": {
     "loading": "Ładowanie słowa...",
