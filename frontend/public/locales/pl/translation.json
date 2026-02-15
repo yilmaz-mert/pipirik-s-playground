@@ -58,6 +58,10 @@
     "title": "Zadania Pipirika",
     "placeholder": "Wpisz zadanie i naciśnij Enter...",
     "done": "Gotowe",
+    "more": "Więcej",
+    "less": "Zwiń",
+    "complete": "Oznacz jako wykonane",
+    "incomplete": "Oznacz jako niewykonane",
     "cancel": "Anuluj",
     "edit": "Edytuj",
     "delete": "Usuń"

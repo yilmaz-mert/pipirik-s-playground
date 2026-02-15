@@ -45,7 +45,7 @@ const Projects = () => {
 
   return (
     <div
-      className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-16 max-w-[1200px]"
+      className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-8 max-w-[1200px]"
       style={{
         paddingTop: 'calc(var(--navbar-height) + 1rem)',
         minHeight: 'calc(100vh - var(--navbar-height) - 1rem)'

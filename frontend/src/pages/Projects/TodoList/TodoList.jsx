@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslation } from 'react-i18next';
-import "./TodoList.css";
-import "../../../App.css";
+import TodoItem from './TodoItem';
 import 'drag-drop-touch';
 
 const getNow = () => Date.now();
@@ -20,12 +19,15 @@ function TodoList() {
   const [deletingId, setDeletingId] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
+  const [newText, setNewText] = useState("");
   
   // Refs to track taps and touch duration per-item on mobile devices
   const touchStart = useRef({});
   const lastToggle = useRef({});
   const lastGlobalTap = useRef({ id: null, time: 0 });
   const lastTouchAt = useRef(0);
+  const textareaRef = useRef(null);
+  const liRefs = useRef({});
 
   /* --- EFFECTS --- */
 
@@ -71,23 +73,68 @@ function TodoList() {
   }, [toggleComplete]);
 
   const handleKeyDown = useCallback((event) => {
-    const val = event.target.value;
-    if (event.key === "Enter" && val.trim() !== "") {
-      const newTodo = { id: getNow(), text: val.trim(), completed: false };
-      setTodos(prev => [...prev, newTodo]);
-      event.target.value = "";
+    if (event.key === "Enter" && !event.shiftKey) {
+      const val = (event.currentTarget && event.currentTarget.value) ? event.currentTarget.value : '';
+      if (val.trim() !== "") {
+        const newTodo = { id: getNow(), text: val.trim(), completed: false };
+        setTodos(prev => [...prev, newTodo]);
+      }
+      event.preventDefault();
+      setNewText('');
+      if (textareaRef.current) textareaRef.current.style.height = 'auto';
     }
+  }, [setTodos]);
+
+  const autoResize = useCallback(() => {
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = 'auto';
+    ta.style.height = `${ta.scrollHeight}px`;
+  }, []);
+
+  const addTodo = useCallback(() => {
+    const ta = textareaRef.current;
+    const val = (ta && typeof ta.value === 'string') ? ta.value.trim() : '';
+    if (val === '') return;
+    const newTodo = { id: getNow(), text: val, completed: false };
+    setTodos(prev => [...prev, newTodo]);
+    setNewText('');
+    if (ta) ta.style.height = 'auto';
   }, [setTodos]);
 
   // clearAll functionality removed
 
   // Trigger delete animation and then remove the item
   const deleteTodo = useCallback((id) => {
-    setDeletingId(id);
-    setTimeout(() => {
-      setTodos(prevTodos => prevTodos.filter((t) => t.id !== id));
-      setDeletingId(null);
-    }, 400);
+    const el = liRefs.current && liRefs.current[id];
+    const ANIM_DURATION = 400;
+    if (el) {
+      // prepare for animation
+      el.style.overflow = 'hidden';
+      const startHeight = el.offsetHeight;
+      el.style.height = `${startHeight}px`;
+      // force reflow
+      // eslint-disable-next-linetypescript-eslint/no-unused-expressions
+      el.offsetHeight;
+      el.style.transition = `height ${ANIM_DURATION}ms ease, opacity ${ANIM_DURATION}ms ease, margin ${ANIM_DURATION}ms ease, transform ${ANIM_DURATION}ms ease`;
+      el.style.height = '0px';
+      el.style.opacity = '0';
+      el.style.marginBottom = '0px';
+      el.style.transform = 'scale(0.98)';
+      // remove from state after animation
+      setTimeout(() => {
+        setTodos(prevTodos => prevTodos.filter((t) => t.id !== id));
+        // cleanup
+        delete liRefs.current[id];
+      }, ANIM_DURATION);
+    } else {
+      // fallback
+      setDeletingId(id);
+      setTimeout(() => {
+        setTodos(prevTodos => prevTodos.filter((t) => t.id !== id));
+        setDeletingId(null);
+      }, ANIM_DURATION);
+    }
   }, [setTodos]);
 
   // Enter edit mode for a specific task
@@ -106,8 +153,24 @@ function TodoList() {
 
   const handleDragStart = useCallback((e, id) => {
     if (editingId) return;
+    // Ensure dataTransfer is populated so browsers allow the drag to start
+    try {
+      if (e.dataTransfer) {
+        e.dataTransfer.setData('text/plain', String(id));
+        e.dataTransfer.effectAllowed = 'move';
+      }
+    } catch (err) {
+      void err;
+    }
     setTimeout(() => setDraggedItemId(id), 0);
   }, [editingId]);
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    try {
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    } catch (err) { void err; }
+  }, []);
 
   const handleDragEnter = useCallback((id) => {
     if (draggedItemId === null || draggedItemId === id) return;
@@ -132,66 +195,83 @@ function TodoList() {
       </div>
 
       {/* Main container shifts layout based on list length */}
-      <div className={`todo-container ${todos.length > 0 ? "at-top" : "centered"}`}>
-        <h1 className="hero-title">{t('todo.title')}</h1>
-        
-        <div className="todo-input-wrapper">
-          <input 
-            type="text" 
-            placeholder={t('todo.placeholder')} 
-            onKeyDown={handleKeyDown} 
-            className="main-input"
+      <div
+        className={`mx-auto w-full max-w-[650px] flex flex-col items-center z-10 ${todos.length > 0 ? 'pt-12' : 'pt-[25vh]'} transition-[padding-top] duration-500`}
+        style={{ minHeight: todos.length > 0 ? '80vh' : 'calc(100vh - 25vh)' }}
+      >
+        <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl font-bold mb-6 px-4 sm:px-0 text-white whitespace-nowrap overflow-hidden">
+          {t('todo.title')}
+        </h1>
+
+        <div className="w-full flex items-end bg-[rgba(30,41,59,0.5)] backdrop-blur-md px-4 py-2 rounded-xl border border-[rgba(6,182,212,0.25)]">
+          <textarea
+            ref={textareaRef}
+            rows={1}
+            placeholder={t('todo.placeholder')}
+            value={newText}
+            onChange={(e) => { setNewText(e.target.value); autoResize(); }}
+            onKeyDown={handleKeyDown}
+            onInput={autoResize}
+            className="flex-1 min-w-0 bg-transparent text-white text-lg placeholder:text-slate-400 focus:outline-none resize-none transition-[height] duration-200 ease-out"
           />
+          <button
+            aria-label={t('todo.add')}
+            onClick={addTodo}
+            aria-hidden={newText.trim() === ''}
+            disabled={newText.trim() === ''}
+            className={`p-2 rounded-md hover:bg-white/5 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white/20 ml-2 text-sky-400 self-end transition-all duration-200 ease-out transform ${newText.trim() !== '' ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-1 scale-90 pointer-events-none'}`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-4 h-4">
+              <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
         </div>
 
-        <ul className="todo-list">
-          {todos.map((todo) => (
-            <li 
-              key={todo.id} 
+        <ul className="w-full mt-10" role="list">
+          {todos.map((todo, index) => (
+            <li
+              ref={(el) => {
+                if (el) liRefs.current[todo.id] = el;
+                else delete liRefs.current[todo.id];
+              }}
+              key={todo.id}
+              role="listitem"
               onDoubleClick={(e) => {
-                          const now = e.timeStamp ?? getNow();
-                          if (now - lastTouchAt.current < 700) return;
-                          if (!editingId) toggleComplete(todo.id, now);
-                        }}
-                      onTouchStart={(e) => { if (!editingId) touchStart.current[todo.id] = e.timeStamp ?? getNow(); }}
-                onTouchEnd={(e) => !editingId && handleTouchComplete(e, todo.id)}
-                onTouchCancel={() => { if (touchStart.current) touchStart.current[todo.id] = 0; if (lastGlobalTap.current && lastGlobalTap.current.id === todo.id) lastGlobalTap.current = { id: null, time: 0 }; }}
+                const now = e.timeStamp ?? getNow();
+                if (now - lastTouchAt.current < 700) return;
+                if (!editingId) toggleComplete(todo.id, now);
+              }}
+              onTouchStart={(e) => { if (!editingId) touchStart.current[todo.id] = e.timeStamp ?? getNow(); }}
+              onTouchEnd={(e) => !editingId && handleTouchComplete(e, todo.id)}
+              onTouchCancel={() => { if (touchStart.current) touchStart.current[todo.id] = 0; if (lastGlobalTap.current && lastGlobalTap.current.id === todo.id) lastGlobalTap.current = { id: null, time: 0 }; }}
               draggable={!editingId}
               onDragStart={(e) => handleDragStart(e, todo.id)}
               onDragEnter={() => handleDragEnter(todo.id)}
-              onDragOver={(e) => e.preventDefault()}
+              onDragOver={handleDragOver}
               onDragEnd={() => setDraggedItemId(null)}
-              className={`
-                  ${draggedItemId === todo.id ? "dragging" : ""} 
-                  ${deletingId === todo.id ? "deleting" : ""}
-                  ${todo.completed ? "completed" : ""}
-                `}
+              className={`mb-4 transition-all duration-500 ease-in-out overflow-visible ${draggedItemId === todo.id ? 'opacity-30' : ''} ${deletingId === todo.id ? 'opacity-0 scale-95 max-h-0 mb-0 p-0' : ''}`}
+              style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
             >
-              {editingId === todo.id ? (
-                /* Rendering the Edit UI */
-                <div className="edit-container">
-                  <input 
-                    className="edit-input"
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && saveEdit(todo.id)}
-                    autoFocus 
+              {(() => {
+                const isFirst = index === 0;
+                const isLast = index === todos.length - 1;
+                const roundedClass = todos.length === 1 ? 'rounded-xl' : isFirst ? 'rounded-t-xl' : isLast ? 'rounded-b-xl' : '';
+                return (
+                  <TodoItem
+                    roundedClass={roundedClass}
+                    todo={todo}
+                    editingId={editingId}
+                    editText={editText}
+                    setEditText={setEditText}
+                    startEditing={startEditing}
+                    saveEdit={saveEdit}
+                    setEditingId={setEditingId}
+                    deleteTodo={deleteTodo}
+                    toggleComplete={toggleComplete}
+                    t={t}
                   />
-                  <div className="item-actions">
-                    <button className="save-btn" onClick={() => saveEdit(todo.id)}>{t('todo.done')}</button>
-                    <button className="cancel-btn" onClick={() => setEditingId(null)}>{t('todo.cancel')}</button>
-                  </div>
-                </div>
-              ) : (
-                /* Rendering the Standard UI */
-                <>
-                  <span className="todo-text">{todo.text}</span>
-                  <div className="item-actions">
-                    <button className="edit-btn" onClick={() => startEditing(todo)}>{t('todo.edit')}</button>
-                    <button className="delete-btn" onClick={() => deleteTodo(todo.id)}>{t('todo.delete')}</button>
-                  </div>
-                </>
-              )}
+                );
+              })()}
             </li>
           ))}
         </ul>

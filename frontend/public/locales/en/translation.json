@@ -59,6 +59,10 @@
     "title": "Pipirik's Tasks",
     "placeholder": "Type your task and press Enter...",
     "done": "Done",
+    "more": "More",
+    "less": "Less",
+    "complete": "Mark complete",
+    "incomplete": "Mark incomplete",
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete"

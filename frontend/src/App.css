@@ -23,21 +23,21 @@ body {
 
 /* Primary heading style with a signature gradient */
 h1 { 
-  font-size: 3.5rem; 
-  margin-bottom: 1rem;
   background: linear-gradient(90deg, #06b6d4, #8b5cf6); 
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent; 
   font-weight: 700;
+  padding-bottom: 5px;
 }
 
-/* p { 
-  font-size: 1.25rem; 
+h2 { 
+  padding-bottom: 2px;
+}
+
+p { 
   color: #94a3b8; 
-  max-width: 600px;
-  line-height: 1.6;
-} */
+}
 
 /* --- Project Selection Cards --- */
 /* Legacy .project-grid / .project-card styles removed — using Tailwind/Heroui Card components now */

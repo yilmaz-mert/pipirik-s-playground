@@ -59,6 +59,10 @@
     "title": "Pipirik'in Görevleri",
     "placeholder": "Görev yazın ve Enter'a basın...",
     "done": "Tamam",
+    "more": "Daha fazla",
+    "less": "Küçült",
+    "complete": "Tamamlandı olarak işaretle",
+    "incomplete": "Tamamlanmamış olarak işaretle",
     "cancel": "İptal",
     "edit": "Düzenle",
     "delete": "Sil"
