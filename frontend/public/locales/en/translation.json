@@ -65,7 +65,9 @@
     "incomplete": "Mark incomplete",
     "cancel": "Cancel",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "previous": "Previous",
+    "next": "Next"
   },
   "exam": {
     "preparing": "Preparing questions, please wait...",

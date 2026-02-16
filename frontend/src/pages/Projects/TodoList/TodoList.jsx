@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import TodoItem from './TodoItem';
 import 'drag-drop-touch';
 
@@ -14,6 +16,20 @@ function TodoList() {
     const saved = localStorage.getItem("pipirik-todos");
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(0);
+  const [pageSize, _setPageSize] = useState(8);
+
+  // Sayfa numaralarını hesaplayan yardımcı fonksiyon
+  const getPageRange = (current, total) => {
+    if (total <= 7) return Array.from({ length: total }, (_, i) => i);
+
+    if (current <= 3) return [0, 1, 2, 3, 4, '...', total - 1];
+    if (current >= total - 4) return [0, '...', total - 5, total - 4, total - 3, total - 2, total - 1];
+
+    return [0, '...', current - 1, current, current + 1, '...', total - 1];
+  };
 
   const [draggedItemId, setDraggedItemId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
@@ -77,13 +93,17 @@ function TodoList() {
       const val = (event.currentTarget && event.currentTarget.value) ? event.currentTarget.value : '';
       if (val.trim() !== "") {
         const newTodo = { id: getNow(), text: val.trim(), completed: false };
-        setTodos(prev => [...prev, newTodo]);
+        setTodos(prev => {
+          const newList = [...prev, newTodo];
+          setCurrentPage(Math.ceil(newList.length / pageSize) - 1);
+          return newList;
+        });
       }
       event.preventDefault();
       setNewText('');
       if (textareaRef.current) textareaRef.current.style.height = 'auto';
     }
-  }, [setTodos]);
+  }, [setTodos, pageSize]);
 
   const autoResize = useCallback(() => {
     const ta = textareaRef.current;
@@ -97,10 +117,14 @@ function TodoList() {
     const val = (ta && typeof ta.value === 'string') ? ta.value.trim() : '';
     if (val === '') return;
     const newTodo = { id: getNow(), text: val, completed: false };
-    setTodos(prev => [...prev, newTodo]);
+    setTodos(prev => {
+      const newList = [...prev, newTodo];
+      setCurrentPage(Math.ceil(newList.length / pageSize) - 1);
+      return newList;
+    });
     setNewText('');
     if (ta) ta.style.height = 'auto';
-  }, [setTodos]);
+  }, [setTodos, pageSize]);
 
   // clearAll functionality removed
 
@@ -123,7 +147,11 @@ function TodoList() {
       el.style.transform = 'scale(0.98)';
       // remove from state after animation
       setTimeout(() => {
-        setTodos(prevTodos => prevTodos.filter((t) => t.id !== id));
+        setTodos(prevTodos => {
+          const newList = prevTodos.filter((t) => t.id !== id);
+          setCurrentPage(curr => Math.min(curr, Math.max(0, Math.ceil(newList.length / pageSize) - 1)));
+          return newList;
+        });
         // cleanup
         delete liRefs.current[id];
       }, ANIM_DURATION);
@@ -131,11 +159,18 @@ function TodoList() {
       // fallback
       setDeletingId(id);
       setTimeout(() => {
-        setTodos(prevTodos => prevTodos.filter((t) => t.id !== id));
+        setTodos(prevTodos => {
+          const newList = prevTodos.filter((t) => t.id !== id);
+          setCurrentPage(curr => Math.min(curr, Math.max(0, Math.ceil(newList.length / pageSize) - 1)));
+          return newList;
+        });
         setDeletingId(null);
       }, ANIM_DURATION);
     }
-  }, [setTodos]);
+  }, [setTodos, pageSize]);
+
+  // Note: avoid calling setState inside an effect to prevent cascading renders.
+  // We derive an effective page index at render time instead of forcing state here.
 
   // Enter edit mode for a specific task
   const startEditing = useCallback((todo) => {
@@ -186,6 +221,54 @@ function TodoList() {
     });
   }, [draggedItemId, setTodos]);
 
+  // Pagination calculations (derived at render time)
+  const totalPages = Math.max(1, Math.ceil(todos.length / pageSize));
+  const maxPage = Math.max(0, totalPages - 1);
+  const pageIndex = Math.min(currentPage, maxPage);
+  const pageStart = pageIndex * pageSize;
+  const visibleTodos = todos.slice(pageStart, pageStart + pageSize);
+  const [pageSelectOpen, setPageSelectOpen] = useState(false);
+  const [pageSelectClosing, setPageSelectClosing] = useState(false);
+  const pageSelectRef = useRef(null);
+  const pageDropdownRef = useRef(null);
+  const [pageDropdownStyle, setPageDropdownStyle] = useState({ top: 0, left: 0, width: 0, maxHeight: 300 });
+  
+  // keep a ref in sync with `pageSelectOpen` so callbacks don't need that
+  // boolean as a dependency (avoids stale closures and memoization warnings)
+  const pageSelectOpenRef = useRef(pageSelectOpen);
+  useEffect(() => { pageSelectOpenRef.current = pageSelectOpen; }, [pageSelectOpen]);
+
+  const closePageSelect = useCallback(() => {
+    if (!pageSelectOpenRef.current) return;
+    setPageSelectClosing(true);
+    const D = 220; // match CSS duration in index.css
+    setTimeout(() => {
+      setPageSelectOpen(false);
+      setPageSelectClosing(false);
+    }, D);
+  }, [setPageSelectOpen, setPageSelectClosing]);
+
+  // Close dropdown when clicking outside or on resize/scroll — use animated close
+  useEffect(() => {
+    function onDocClick(e) {
+      if (!pageSelectRef.current) return;
+      if (pageSelectRef.current.contains(e.target)) return;
+      if (pageDropdownRef.current && pageDropdownRef.current.contains(e.target)) return;
+      closePageSelect();
+    }
+    function onResize() { closePageSelect(); }
+    document.addEventListener('click', onDocClick);
+    window.addEventListener('resize', onResize);
+    window.addEventListener('scroll', onResize, true);
+    return () => {
+      document.removeEventListener('click', onDocClick);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('scroll', onResize, true);
+    };
+  }, [closePageSelect]);
+
+  
+
   return (
     <div className="home-wrapper">
       {/* Background visual effects */}
@@ -196,7 +279,7 @@ function TodoList() {
 
       {/* Main container shifts layout based on list length */}
       <div
-        className={`mx-auto w-full max-w-[650px] flex flex-col items-center z-10 ${todos.length > 0 ? 'pt-12' : 'pt-[25vh]'} transition-[padding-top] duration-500`}
+        className={`mx-auto w-full max-w-[650px] flex flex-col items-center z-10 ${todos.length > 0 ? 'pt-10' : 'pt-[25vh]'} transition-[padding-top] duration-500`}
         style={{ minHeight: todos.length > 0 ? '80vh' : 'calc(100vh - 25vh)' }}
       >
         <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl font-bold mb-6 px-4 sm:px-0 text-white whitespace-nowrap overflow-hidden">
@@ -228,53 +311,168 @@ function TodoList() {
         </div>
 
         <ul className="w-full mt-10" role="list">
-          {todos.map((todo, index) => (
-            <li
-              ref={(el) => {
-                if (el) liRefs.current[todo.id] = el;
-                else delete liRefs.current[todo.id];
-              }}
-              key={todo.id}
-              role="listitem"
-              onDoubleClick={(e) => {
-                const now = e.timeStamp ?? getNow();
-                if (now - lastTouchAt.current < 700) return;
-                if (!editingId) toggleComplete(todo.id, now);
-              }}
-              onTouchStart={(e) => { if (!editingId) touchStart.current[todo.id] = e.timeStamp ?? getNow(); }}
-              onTouchEnd={(e) => !editingId && handleTouchComplete(e, todo.id)}
-              onTouchCancel={() => { if (touchStart.current) touchStart.current[todo.id] = 0; if (lastGlobalTap.current && lastGlobalTap.current.id === todo.id) lastGlobalTap.current = { id: null, time: 0 }; }}
-              draggable={!editingId}
-              onDragStart={(e) => handleDragStart(e, todo.id)}
-              onDragEnter={() => handleDragEnter(todo.id)}
-              onDragOver={handleDragOver}
-              onDragEnd={() => setDraggedItemId(null)}
-              className={`mb-4 transition-all duration-500 ease-in-out overflow-visible ${draggedItemId === todo.id ? 'opacity-30' : ''} ${deletingId === todo.id ? 'opacity-0 scale-95 max-h-0 mb-0 p-0' : ''}`}
-              style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
-            >
-              {(() => {
-                const isFirst = index === 0;
-                const isLast = index === todos.length - 1;
-                const roundedClass = todos.length === 1 ? 'rounded-xl' : isFirst ? 'rounded-t-xl' : isLast ? 'rounded-b-xl' : '';
-                return (
-                  <TodoItem
-                    roundedClass={roundedClass}
-                    todo={todo}
-                    editingId={editingId}
-                    editText={editText}
-                    setEditText={setEditText}
-                    startEditing={startEditing}
-                    saveEdit={saveEdit}
-                    setEditingId={setEditingId}
-                    deleteTodo={deleteTodo}
-                    toggleComplete={toggleComplete}
-                    t={t}
-                  />
-                );
-              })()}
-            </li>
-          ))}
+          {visibleTodos.map((todo, index) => {
+            const isFirst = index === 0;
+            const isLast = index === visibleTodos.length - 1;
+            const roundedClass = visibleTodos.length === 1 ? 'rounded-xl' : isFirst ? 'rounded-t-xl' : isLast ? 'rounded-b-xl' : '';
+
+            return (
+              <li
+                ref={(el) => {
+                  if (el) liRefs.current[todo.id] = el;
+                  else delete liRefs.current[todo.id];
+                }}
+                key={todo.id}
+                role="listitem"
+                onDoubleClick={(e) => {
+                  const now = e.timeStamp ?? getNow();
+                  if (now - lastTouchAt.current < 700) return;
+                  if (!editingId) toggleComplete(todo.id, now);
+                }}
+                onTouchStart={(e) => { if (!editingId) touchStart.current[todo.id] = e.timeStamp ?? getNow(); }}
+                onTouchEnd={(e) => !editingId && handleTouchComplete(e, todo.id)}
+                onTouchCancel={() => { if (touchStart.current) touchStart.current[todo.id] = 0; if (lastGlobalTap.current && lastGlobalTap.current.id === todo.id) lastGlobalTap.current = { id: null, time: 0 }; }}
+                draggable={!editingId}
+                onDragStart={(e) => handleDragStart(e, todo.id)}
+                onDragEnter={() => handleDragEnter(todo.id)}
+                onDragOver={handleDragOver}
+                onDragEnd={() => setDraggedItemId(null)}
+                className={`mb-4 transition-all duration-500 ease-in-out overflow-visible ${draggedItemId === todo.id ? 'opacity-30' : ''} ${deletingId === todo.id ? 'opacity-0 scale-95 max-h-0 mb-0 p-0' : ''}`}
+                style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
+              >
+                <TodoItem
+                  roundedClass={roundedClass}
+                  todo={todo}
+                  editingId={editingId}
+                  editText={editText}
+                  setEditText={setEditText}
+                  startEditing={startEditing}
+                  saveEdit={saveEdit}
+                  setEditingId={setEditingId}
+                  deleteTodo={deleteTodo}
+                  toggleComplete={toggleComplete}
+                  t={t}
+                />
+              </li>
+            );
+          })}
         </ul>
+
+        {/* Modernize Edilmiş Fonksiyonel Pagination */}
+        {todos.length > 0 && (
+          <div className="w-full flex flex-row flex-wrap items-center md:justify-between justify-center gap-3 mt-10 mb-12 px-2 pt-6 border-t border-white/10">
+            
+            <div className="flex items-center gap-3">
+              {/* Geri Butonu (ikon mobil için) */}
+              <button
+                className={`flex items-center justify-center p-1 rounded-md transition-colors ${pageIndex === 0 ? 'text-white/20 cursor-not-allowed' : 'text-white/60 hover:text-white'}`}
+                onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
+                disabled={pageIndex === 0}
+                aria-label={t('todo.previous')}
+              >
+                <ChevronLeft className="w-4 h-4 sm:hidden" />
+                <span className="hidden sm:inline text-sm">{t('todo.previous') || 'Previous'}</span>
+              </button>
+
+              {/* Sayı Grupları - compact on mobile */}
+              <div className="flex items-center gap-1">
+                {getPageRange(pageIndex, totalPages).map((p, i) => (
+                  p === '...' ? (
+                    <span key={`sep-${i}`} className="px-2 text-white/30 text-xs">...</span>
+                  ) : (
+                    <button
+                      key={p}
+                      onClick={() => setCurrentPage(p)}
+                      className={`
+                        min-w-[28px] h-[28px] sm:min-w-[34px] sm:h-[34px] flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all
+                        ${p === currentPage 
+                          ? 'border border-sky-400/50 text-sky-400 bg-sky-400/10 shadow-[0_0_15px_rgba(56,189,248,0.1)]' 
+                          : 'text-white/50 hover:text-white hover:bg-white/5'
+                        }
+                      `}
+                      aria-current={p === currentPage}
+                    >
+                      {p + 1}
+                    </button>
+                  )
+                ))}
+              </div>
+
+              {/* İleri Butonu (ikon mobil için) */}
+              <button
+                className={`flex items-center justify-center p-1 rounded-md transition-colors ${currentPage >= Math.ceil(todos.length / pageSize) - 1 ? 'text-white/20 cursor-not-allowed' : 'text-sky-400 hover:text-sky-300'}`}
+                onClick={() => setCurrentPage(p => Math.min(Math.ceil(todos.length / pageSize) - 1, p + 1))}
+                disabled={currentPage >= Math.ceil(todos.length / pageSize) - 1}
+                aria-label={t('todo.next')}
+              >
+                <span className="hidden sm:inline text-sm">{t('todo.next') || 'Next'}</span>
+                <ChevronRight className="w-4 h-4 sm:hidden" />
+              </button>
+            </div>
+            {/* Sağ Kısım: Sayfa Seçici (Sayfalar Arası Geçiş) */}
+            {/* Custom page-select: button toggles a fixed-position dropdown that will position above if not enough space below */}
+            <div className="relative group overflow-visible">
+              <button
+                ref={pageSelectRef}
+                type="button"
+                onClick={() => {
+                  if (!pageSelectRef.current) return;
+                  const rect = pageSelectRef.current.getBoundingClientRect();
+                  const total = Math.max(1, Math.ceil(todos.length / pageSize));
+                  const estimatedHeight = Math.min( (total * 40) + 16, window.innerHeight - 120 );
+                  const spaceBelow = window.innerHeight - rect.bottom;
+                  const placeAbove = spaceBelow < estimatedHeight && rect.top > spaceBelow;
+                  const top = placeAbove ? Math.max(12, rect.top - estimatedHeight - 8) : rect.bottom + 8;
+                  setPageDropdownStyle({ top, left: rect.left, width: rect.width, maxHeight: estimatedHeight });
+                  if (!pageSelectOpen) {
+                    setPageSelectClosing(false);
+                    setPageSelectOpen(true);
+                  } else {
+                    // animate close
+                    setPageSelectClosing(true);
+                    setTimeout(() => { setPageSelectOpen(false); setPageSelectClosing(false); }, 180);
+                  }
+                }}
+                className="appearance-none bg-white/5 border border-white/10 rounded-xl px-3 py-1 pr-8 text-sm text-white/70 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer outline-none focus:ring-2 focus:ring-sky-400/50 min-w-[44px] sm:w-auto text-center relative z-10 flex items-center justify-center gap-2 whitespace-nowrap"
+                aria-haspopup="listbox"
+                aria-expanded={pageSelectOpen}
+              >
+                <span className="whitespace-nowrap">{`${pageIndex + 1} / ${Math.max(1, Math.ceil(todos.length / pageSize))}`}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`text-white/40 transition-transform ${pageSelectOpen ? 'rotate-180' : ''}`}>
+                  <path d="m6 9 6 6 6-6"/>
+                </svg>
+              </button>
+
+              {pageSelectOpen && typeof document !== 'undefined' && createPortal(
+                <>
+                  <div
+                    className={`page-select-backdrop ${pageSelectClosing ? 'closing' : 'open'}`}
+                    onClick={() => { closePageSelect(); }}
+                  />
+
+                  <div
+                    ref={pageDropdownRef}
+                    role="listbox"
+                    className={`page-select-portal ${pageSelectClosing ? 'closing' : 'open'}`}
+                    style={{ position: 'fixed', top: `${pageDropdownStyle.top}px`, left: `${pageDropdownStyle.left}px`, width: `${pageDropdownStyle.width}px`, maxHeight: `${pageDropdownStyle.maxHeight}px` }}
+                  >
+                    {Array.from({ length: Math.max(1, Math.ceil(todos.length / pageSize)) }).map((_, i) => (
+                      <button
+                        key={i}
+                        role="option"
+                        aria-selected={i === pageIndex}
+                        onClick={() => { setCurrentPage(i); setPageSelectClosing(true); setTimeout(() => { setPageSelectOpen(false); setPageSelectClosing(false); }, 220); }}
+                        className={`w-full text-left px-3 py-2 text-sm ${i === pageIndex ? 'bg-sky-400/10 text-sky-400 font-semibold' : 'text-white/80 hover:bg-white/5'}`}
+                      >
+                        {`${i + 1} / ${Math.max(1, Math.ceil(todos.length / pageSize))}`}
+                      </button>
+                    ))}
+                  </div>
+                </>, document.body
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

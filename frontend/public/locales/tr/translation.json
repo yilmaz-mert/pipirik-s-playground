@@ -65,7 +65,9 @@
     "incomplete": "Tamamlanmamış olarak işaretle",
     "cancel": "İptal",
     "edit": "Düzenle",
-    "delete": "Sil"
+    "delete": "Sil",
+    "previous": "Önceki",
+    "next": "Sonraki"
   },
   "exam": {
     "preparing": "Sorular hazırlanıyor, lütfen bekleyin...",

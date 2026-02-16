@@ -24,3 +24,49 @@ body {
   width: 100%;
   min-height: 100vh;
 }
+
+/* Page-select portal dropdown animation */
+:root {
+  --ps-duration: 220ms;
+  --ps-easing: cubic-bezier(.16,.84,.24,1);
+  --ps-open-delay: 60ms;
+}
+
+.page-select-portal {
+  background: rgba(15,23,42,0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
+  overflow: auto;
+  transform-origin: center top;
+  transition: transform var(--ps-duration) var(--ps-easing), opacity var(--ps-duration) var(--ps-easing);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.985);
+  z-index: 9999; /* sit above the backdrop so the dropdown itself isn't blurred */
+}
+.page-select-portal.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition-delay: var(--ps-open-delay);
+}
+.page-select-portal.closing {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.985);
+  transition-delay: 0ms;
+}
+
+/* Backdrop that sits under portal dropdown to blur/dim page */
+.page-select-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.18);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--ps-duration) var(--ps-easing);
+  z-index: 9998;
+}
+.page-select-backdrop.open { opacity: 1; }
+.page-select-backdrop.closing { opacity: 0; }

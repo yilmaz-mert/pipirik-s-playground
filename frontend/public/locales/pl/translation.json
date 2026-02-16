@@ -64,7 +64,9 @@
     "incomplete": "Oznacz jako niewykonane",
     "cancel": "Anuluj",
     "edit": "Edytuj",
-    "delete": "Usuń"
+    "delete": "Usuń",
+    "previous": "Poprzednia",
+    "next": "Następna"
   },
   "exam": {
     "preparing": "Przygotowywanie pytań, proszę czekać...",

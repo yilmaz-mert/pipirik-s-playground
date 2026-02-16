@@ -46,15 +46,12 @@ const Projects = () => {
   return (
     <div
       className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-8 max-w-[1200px]"
-      style={{
-        paddingTop: 'calc(var(--navbar-height) + 1rem)',
-        minHeight: 'calc(100vh - var(--navbar-height) - 1rem)'
-      }}
+
     >
       {isMainProjectsPage ? (
           <>
             {/* Header Kısmı */}
-            <header className="text-center mb-12 flex flex-col gap-6 items-center">
+            <header className="text-center mb-12 pt-16 flex flex-col gap-6 items-center">
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-[#F8FAFC] mb-4 pb-1">
                 {t('projects.titlePart1')}{" "}
                 <span className="bg-gradient-to-r from-[#38BDF8] to-[#818CF8] bg-clip-text text-transparent">

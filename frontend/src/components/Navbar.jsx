@@ -2,6 +2,9 @@ import { NavLink } from 'react-router-dom';
 import './Navbar.css';
 import { useTranslation } from 'react-i18next';
 import { useState, useRef, useEffect } from 'react';
+import GB from 'country-flag-icons/react/3x2/GB';
+import TR from 'country-flag-icons/react/3x2/TR';
+import PL from 'country-flag-icons/react/3x2/PL';
 
 function Navbar() {
   const { t, i18n } = useTranslation();
@@ -12,11 +15,11 @@ function Navbar() {
   const navRef = useRef(null);
   const mobileLangRef = useRef(null);
 
-  const langs = [
-     { code: 'en', label: 'English', flag: '🇺🇸' },
-     { code: 'tr', label: 'Türkçe', flag: '🇹🇷' }
-    ,{ code: 'pl', label: 'Polski', flag: '🇵🇱' }
-  ];
+    const langs = [
+      { code: 'en', label: 'English', Flag: GB },
+      { code: 'tr', label: 'Türkçe', Flag: TR },
+      { code: 'pl', label: 'Polski', Flag: PL }
+    ];
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -65,15 +68,15 @@ function Navbar() {
           </div>
           <div className="lang-switcher" ref={ref} aria-label="Language switcher">
               <button className="lang-current" onClick={() => setOpen(s => !s)} aria-haspopup="listbox" aria-expanded={open}>
-              <span className="flag">{current.flag}</span>
+              <span className="flag"><current.Flag className="inline-block w-5 h-5" aria-hidden="true"/></span>
               <span className="caret">▾</span>
             </button>
 
             {open && (
               <ul className="lang-dropdown" role="listbox">
                 {langs.map(l => (
-                  <li key={l.code} className={`lang-option ${i18n.language === l.code ? 'active' : ''}`} onClick={() => changeLang(l.code)} role="option" aria-selected={i18n.language === l.code}>
-                    <span className="flag">{l.flag}</span>
+                    <li key={l.code} className={`lang-option ${i18n.language === l.code ? 'active' : ''}`} onClick={() => changeLang(l.code)} role="option" aria-selected={i18n.language === l.code}>
+                    <span className="flag"><l.Flag className="inline-block w-5 h-5" aria-hidden="true"/></span>
                     <span className="label">{l.label}</span>
                   </li>
                 ))}
@@ -96,14 +99,14 @@ function Navbar() {
               <div className="mobile-separator" />
               <div className="mobile-lang" ref={mobileLangRef}>
                 <button className="mobile-lang-current" onClick={() => setMobileLangOpen(v => !v)}>
-                  <span className="flag">{current.flag}</span>
+                  <span className="flag"><current.Flag className="inline-block w-5 h-5" aria-hidden="true"/></span>
                   <span className="label">{current.label}</span>
                 </button>
 
                 <div className={`mobile-lang-list ${mobileLangOpen ? 'open' : ''}`}>
                   {langs.filter(l => l.code !== (i18n.language || 'en')).map(l => (
                     <button key={l.code} className={`lang-option-mobile ${i18n.language === l.code ? 'active' : ''}`} onClick={() => { changeLang(l.code); setMobileOpen(false); setMobileLangOpen(false); }}>
-                      <span className="flag">{l.flag}</span>
+                      <span className="flag"><l.Flag className="inline-block w-5 h-5" aria-hidden="true"/></span>
                       <span className="label">{l.label}</span>
                     </button>
                   ))}
