@@ -13,7 +13,8 @@ export default function TodoItem({
   deleteTodo,
   t,
   roundedClass = '',
-  toggleComplete
+  toggleComplete,
+  isMobileDragging = false
 }) {
   const [expanded, setExpanded] = useState(false);
   const isLong = todo && todo.text && todo.text.length > 220;
@@ -22,11 +23,13 @@ export default function TodoItem({
 
   const handleTextDoubleClick = (e) => {
     e.stopPropagation();
+    if (isMobileDragging) return;
     if (toggleComplete) toggleComplete(todo.id, Date.now());
   };
 
   const handleTextTouchEnd = (e) => {
     const now = Date.now();
+    if (isMobileDragging) return;
     if (now - lastTapRef.current < 300) {
       e.preventDefault();
       e.stopPropagation();

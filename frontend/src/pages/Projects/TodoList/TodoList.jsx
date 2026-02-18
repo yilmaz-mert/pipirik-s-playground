@@ -44,6 +44,16 @@ function TodoList() {
   const lastTouchAt = useRef(0);
   const textareaRef = useRef(null);
   const liRefs = useRef({});
+  // Mobile long-press drag state
+  const [mobileDragActiveId, setMobileDragActiveId] = useState(null);
+  const mobileDragTimer = useRef({});
+  const touchStartPos = useRef({});
+  const bodyOverflowRef = useRef(null);
+  const touchMovePreventRef = useRef(null);
+  const LONG_PRESS_MS = 250;
+  const MOVE_CANCEL_PX = 8;
+  const isTouchDevice = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator && navigator.maxTouchPoints > 0));
+  const isDesktop = !isTouchDevice;
 
   /* --- EFFECTS --- */
 
@@ -169,6 +179,31 @@ function TodoList() {
     }
   }, [setTodos, pageSize]);
 
+  // Enable mobile drag: add a non-passive touchmove listener to prevent scroll
+  const enableMobileDrag = useCallback((id) => {
+    bodyOverflowRef.current = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    // touchmove preventDefault handler
+    const onTouchMovePrevent = (e) => { e.preventDefault(); };
+    touchMovePreventRef.current = onTouchMovePrevent;
+    document.addEventListener('touchmove', onTouchMovePrevent, { passive: false });
+    setMobileDragActiveId(id);
+  }, []);
+
+  const disableMobileDrag = useCallback(() => {
+    if (touchMovePreventRef.current) {
+      document.removeEventListener('touchmove', touchMovePreventRef.current, { passive: false });
+      touchMovePreventRef.current = null;
+    }
+    if (bodyOverflowRef.current !== null) {
+      document.body.style.overflow = bodyOverflowRef.current;
+      bodyOverflowRef.current = null;
+    } else {
+      document.body.style.overflow = '';
+    }
+    setMobileDragActiveId(null);
+  }, []);
+
   // Note: avoid calling setState inside an effect to prevent cascading renders.
   // We derive an effective page index at render time instead of forcing state here.
 
@@ -220,6 +255,29 @@ function TodoList() {
       return newList;
     });
   }, [draggedItemId, setTodos]);
+
+  // Cleanup timers and listeners on unmount
+  useEffect(() => {
+    // snapshot refs so cleanup uses stable values even if refs change later
+    const timersSnapshot = { ...(mobileDragTimer.current || {}) };
+    const touchMoveHandler = touchMovePreventRef.current;
+    const bodyOverflow = bodyOverflowRef.current;
+
+    return () => {
+      // clear any pending long-press timers captured at effect time
+      try {
+        Object.values(timersSnapshot).forEach((t) => clearTimeout(t));
+      } catch (e) { void e; }
+
+      if (touchMoveHandler) {
+        try { document.removeEventListener('touchmove', touchMoveHandler, { passive: false }); } catch (e) { void e; }
+      }
+
+      if (bodyOverflow !== null) {
+        try { document.body.style.overflow = bodyOverflow; } catch (e) { void e; }
+      }
+    };
+  }, []);
 
   // Pagination calculations (derived at render time)
   const totalPages = Math.max(1, Math.ceil(todos.length / pageSize));
@@ -329,16 +387,61 @@ function TodoList() {
                   if (now - lastTouchAt.current < 700) return;
                   if (!editingId) toggleComplete(todo.id, now);
                 }}
-                onTouchStart={(e) => { if (!editingId) touchStart.current[todo.id] = e.timeStamp ?? getNow(); }}
-                onTouchEnd={(e) => !editingId && handleTouchComplete(e, todo.id)}
-                onTouchCancel={() => { if (touchStart.current) touchStart.current[todo.id] = 0; if (lastGlobalTap.current && lastGlobalTap.current.id === todo.id) lastGlobalTap.current = { id: null, time: 0 }; }}
-                draggable={!editingId}
+                onTouchStart={(e) => {
+                  if (editingId) return;
+                  const now = e.timeStamp ?? getNow();
+                  touchStart.current[todo.id] = now;
+                  const t = e.touches && e.touches[0];
+                  touchStartPos.current[todo.id] = t ? { x: t.clientX, y: t.clientY } : { x: 0, y: 0 };
+                  // start long-press timer
+                  try { mobileDragTimer.current[todo.id] = setTimeout(() => { enableMobileDrag(todo.id); }, LONG_PRESS_MS); } catch (err) { void err; }
+                }}
+                onTouchMove={(e) => {
+                  // cancel long-press if moved beyond threshold
+                  const start = touchStartPos.current[todo.id];
+                  const t = e.touches && e.touches[0];
+                  if (!start || !t) return;
+                  const dx = Math.abs(t.clientX - (start.x || 0));
+                  const dy = Math.abs(t.clientY - (start.y || 0));
+                  if (mobileDragActiveId === todo.id) {
+                    // prevent scrolling while actively dragging
+                    try { e.preventDefault(); } catch (err) { void err; }
+                    return;
+                  }
+                  if (dx > MOVE_CANCEL_PX || dy > MOVE_CANCEL_PX) {
+                    const timer = mobileDragTimer.current && mobileDragTimer.current[todo.id];
+                    if (timer) { clearTimeout(timer); mobileDragTimer.current[todo.id] = null; }
+                    touchStart.current[todo.id] = 0;
+                    touchStartPos.current[todo.id] = null;
+                  }
+                }}
+                onTouchEnd={(e) => {
+                  // clear timer if it didn't fire; handle normal tap behavior
+                  const timer = mobileDragTimer.current && mobileDragTimer.current[todo.id];
+                  if (timer) { clearTimeout(timer); mobileDragTimer.current[todo.id] = null; }
+                  if (mobileDragActiveId === todo.id) {
+                    // finish mobile drag
+                    disableMobileDrag();
+                  } else {
+                    !editingId && handleTouchComplete(e, todo.id);
+                  }
+                  touchStart.current[todo.id] = 0;
+                }}
+                onTouchCancel={() => {
+                  const timer = mobileDragTimer.current && mobileDragTimer.current[todo.id];
+                  if (timer) { clearTimeout(timer); mobileDragTimer.current[todo.id] = null; }
+                  touchStart.current[todo.id] = 0;
+                  touchStartPos.current[todo.id] = null;
+                  if (lastGlobalTap.current && lastGlobalTap.current.id === todo.id) lastGlobalTap.current = { id: null, time: 0 };
+                  if (mobileDragActiveId === todo.id) disableMobileDrag();
+                }}
+                draggable={!editingId && (isDesktop || mobileDragActiveId === todo.id)}
                 onDragStart={(e) => handleDragStart(e, todo.id)}
                 onDragEnter={() => handleDragEnter(todo.id)}
                 onDragOver={handleDragOver}
                 onDragEnd={() => setDraggedItemId(null)}
-                className={`mb-4 transition-all duration-500 ease-in-out overflow-visible ${draggedItemId === todo.id ? 'opacity-30' : ''} ${deletingId === todo.id ? 'opacity-0 scale-95 max-h-0 mb-0 p-0' : ''}`}
-                style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
+                className={`mb-4 transition-all duration-500 ease-in-out overflow-visible ${draggedItemId === todo.id ? 'opacity-30' : ''} ${deletingId === todo.id ? 'opacity-0 scale-95 max-h-0 mb-0 p-0' : ''} ${mobileDragActiveId === todo.id ? 'todo-item--dragging' : ''}`}
+                style={{ ...(mobileDragActiveId === todo.id ? { touchAction: 'none' } : {}), WebkitUserSelect: 'none', userSelect: 'none' }}
               >
                 <TodoItem
                   roundedClass={roundedClass}
@@ -352,6 +455,7 @@ function TodoList() {
                   deleteTodo={deleteTodo}
                   toggleComplete={toggleComplete}
                   t={t}
+                  isMobileDragging={mobileDragActiveId === todo.id}
                 />
               </li>
             );
