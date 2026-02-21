@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @plugin './hero.js';
 @source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
@@ -6,7 +7,6 @@
 /* Kalan her şey (Blob'lar vb.) senin yazdığın gibi kalacak... */
 
 /* --- 1. GLOBAL FONTS & THEME VARIABLES --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   /* Navbar Layout */
