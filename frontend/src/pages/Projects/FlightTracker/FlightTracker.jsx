@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useTranslation } from 'react-i18next';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { Card, CardBody, Chip, Button, Divider } from "@nextui-org/react";
-import { Button as HeroButton } from '@heroui/react';
+import { Card, CardBody, Chip, Button, Divider } from "@heroui/react";
 import { Eye, EyeOff, MapPin, MapPinOff, Globe, GlobeX } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 import './FlightTracker.css';
@@ -799,7 +798,7 @@ const FlightTracker = () => {
       </div>
 
       <div className="floating-panel">
-        <Card isBlurred className="bg-background/60 border-1 border-white/10 shadow-lg">
+        <Card isBlurred className="bg-background/60 border border-white/10 shadow-lg">
           <CardBody className="p-3">
             <h3 className="text-cyanAccent font-bold text-lg mb-1">{t('flight.radarStation')}</h3>
             <Chip color="secondary" variant="dot" size="sm" className="text-foreground border-none">
@@ -812,7 +811,7 @@ const FlightTracker = () => {
       {/* Dynamic info panel (shown when a flight is selected) */}
       {activeFlight && (
         <div className="detail-panel">
-          <Card isBlurred className="bg-background/80 border-1 border-cyanAccent/40 w-full sm:w-[320px] shadow-2xl">
+          <Card isBlurred className="bg-background/80 border border-cyanAccent/40 w-full sm:w-[320px] shadow-2xl">
             <CardBody className="p-5">
               <div className="flex justify-between items-start">
                 <div className="flex flex-col">
@@ -900,21 +899,21 @@ const FlightTracker = () => {
       >
         {/* Zoom controls (HeroUI) */}
         <div ref={zoomControlsRef} className="hero-zoom-controls" style={{ position: 'absolute', right: 12, bottom: zoomBottom, zIndex: 650, display: 'flex', flexDirection: 'column', gap: 8, transition: 'bottom 260ms cubic-bezier(.2,.9,.3,1)' }}>
-          <HeroButton aria-label="Zoom in" onClick={() => {
+          <Button aria-label="Zoom in" onClick={() => {
             try {
               const m = mapRef.current; if (!m) return; m.setZoom(Math.min((m.getMaxZoom && m.getMaxZoom()) || 21, Math.round(m.getZoom()) + 1));
             } catch { void 0; }
           }}>
             +
-          </HeroButton>
-          <HeroButton aria-label="Zoom out" onClick={() => {
+          </Button>
+          <Button aria-label="Zoom out" onClick={() => {
             try {
               const m = mapRef.current; if (!m) return; m.setZoom(Math.max((m.getMinZoom && m.getMinZoom()) || 0, Math.round(m.getZoom()) - 1));
             } catch { void 0; }
           }}>
             −
-          </HeroButton>
-          <HeroButton
+          </Button>
+          <Button
             className={`globe-toggle ${showGreatCircles ? 'on' : 'off'}`}
             aria-label={showGreatCircles ? 'Hide routes' : 'Show routes'}
             aria-pressed={showGreatCircles}
@@ -922,7 +921,7 @@ const FlightTracker = () => {
             title={showGreatCircles ? 'Hide great-circle routes' : 'Show great-circle routes'}
           >
             {showGreatCircles ? <Globe size={16} /> : <GlobeX size={16} />}
-          </HeroButton>
+          </Button>
         </div>
         <ResizeMap />
         <AutoFitMap />

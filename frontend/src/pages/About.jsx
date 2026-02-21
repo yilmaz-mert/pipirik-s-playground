@@ -15,33 +15,32 @@ const About = () => {
       </div>
 
       <div
-        className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-16 max-w-[1100px]"
-
+        className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-16 max-w-275"
       >
         <header className="text-center mb-12 pt-16 flex flex-col gap-6 items-center">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-[#F8FAFC] mb-4 pb-1">
             {t('about.titlePart1')}{' '}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#38BDF8] to-[#818CF8]">
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-[#38BDF8] to-[#818CF8]">
               {t('about.titlePart2')}
             </span>
           </h1>
-          <p className="text-[color:var(--muted)] text-xl max-w-2xl mx-auto italic">{t('about.subtitle')}</p>
+          <p className="text-(--muted) text-xl max-w-2xl mx-auto italic">{t('about.subtitle')}</p>
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch">
-          <Card className="col-span-1 md:col-span-1 bg-[var(--card-bg)] border-[1px] border-[var(--card-border)]">
+          <Card className="col-span-1 md:col-span-1 bg-(--card-bg) border border-(--card-border)">
             <CardHeader className="px-6 pt-6">
-              <h3 id="dna-title" className="text-xl font-bold text-[color:var(--accent)]">
+              <h3 id="dna-title" className="text-xl font-bold text-(--accent)">
                 {t('about.dnaTitle')}
               </h3>
             </CardHeader>
             <CardBody className="px-6 pb-6">
-              <div className="text-[color:var(--muted)] leading-relaxed text-sm" dangerouslySetInnerHTML={{ __html: t('about.bioParagraph1') }} />
-              <div className="text-[color:var(--muted)] leading-relaxed text-sm mt-4" dangerouslySetInnerHTML={{ __html: t('about.bioParagraph2') }} />
+              <div className="text-(--muted) leading-relaxed text-sm" dangerouslySetInnerHTML={{ __html: t('about.bioParagraph1') }} />
+              <div className="text-(--muted) leading-relaxed text-sm mt-4" dangerouslySetInnerHTML={{ __html: t('about.bioParagraph2') }} />
             </CardBody>
           </Card>
 
-          <Card className="col-span-1 md:col-span-1 bg-[var(--card-bg)] border-[1px] border-[var(--card-border)]">
+          <Card className="col-span-1 md:col-span-1 bg-(--card-bg) border border-(--card-border)">
             <CardHeader className="px-6 pt-6">
               <h3 id="competencies-title" className="text-lg font-semibold text-white">{t('about.competenciesTitle')}</h3>
             </CardHeader>
@@ -49,15 +48,15 @@ const About = () => {
               <ul className="space-y-4" role="list" aria-labelledby="competencies-title">
                 <li>
                   <h4 className="text-sm font-semibold text-white">{t('about.comp.aiTitle')}</h4>
-                  <p className="text-[color:var(--muted)] text-sm">{t('about.comp.aiDesc')}</p>
+                  <p className="text-(--muted) text-sm">{t('about.comp.aiDesc')}</p>
                 </li>
                 <li>
                   <h4 className="text-sm font-semibold text-white">{t('about.comp.toolsTitle')}</h4>
-                  <p className="text-[color:var(--muted)] text-sm">{t('about.comp.toolsDesc')}</p>
+                  <p className="text-(--muted) text-sm">{t('about.comp.toolsDesc')}</p>
                 </li>
                 <li>
                   <h4 className="text-sm font-semibold text-white">{t('about.comp.intlTitle')}</h4>
-                  <p className="text-[color:var(--muted)] text-sm">{t('about.comp.intlDesc')}</p>
+                  <p className="text-(--muted) text-sm">{t('about.comp.intlDesc')}</p>
                 </li>
               </ul>
 

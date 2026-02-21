@@ -45,7 +45,7 @@ const Projects = () => {
 
   return (
     <div
-      className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-8 max-w-[1200px]"
+      className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-8 max-w-300"
 
     >
       {isMainProjectsPage ? (
@@ -54,7 +54,7 @@ const Projects = () => {
             <header className="text-center mb-12 pt-16 flex flex-col gap-6 items-center">
               <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-[#F8FAFC] mb-4 pb-1">
                 {t('projects.titlePart1')}{" "}
-                <span className="bg-gradient-to-r from-[#38BDF8] to-[#818CF8] bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-[#38BDF8] to-[#818CF8] bg-clip-text text-transparent">
                   {t('projects.titlePart2')}
                 </span>
               </h1>
@@ -90,13 +90,13 @@ const Projects = () => {
                         {t('projects.featured', { defaultValue: 'Featured Project' })}
                       </Chip>
                     )}
-                    <h3 className="text-2xl font-bold text-[#F8FAFC] group-hover:text-[color:var(--accent)] transition-colors">
+                    <h3 className="text-2xl font-bold text-[#F8FAFC] group-hover:text-(--accent) transition-colors">
                       {project.title}
                     </h3>
                   </CardHeader>
 
                   <CardBody className="px-6 pb-6 flex-1 flex flex-col">
-                    <p className="text-[color:var(--muted)] text-sm leading-relaxed mb-6 flex-1">
+                    <p className="text-(--muted) text-sm leading-relaxed mb-6 flex-1">
                       {project.desc}
                     </p>
 

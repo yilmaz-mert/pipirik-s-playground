@@ -1,22 +1,25 @@
 // src/App.jsx
+import React, { lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
-import Home from './pages/Home';
-import About from './pages/About';
-import Hangman from './pages/Projects/Hangman/Hangman';
-import TodoList from './pages/Projects/TodoList/TodoList'; 
-import Exam from "./pages/Projects/Exam/Exam";
-import FlightTracker from './pages/Projects/FlightTracker/FlightTracker';
-import Projects from './pages/Projects/Projects';
-import './App.css';
+
+// Sayfaları Lazy Loading ile asenkron hale getiriyoruz
+// Bu sayede kullanıcı hangi sayfaya girerse sadece o sayfanın kodu yüklenir
+const Home = lazy(() => import('./pages/Home'));
+const About = lazy(() => import('./pages/About'));
+const Projects = lazy(() => import('./pages/Projects/Projects'));
+const Hangman = lazy(() => import('./pages/Projects/Hangman/Hangman'));
+const TodoList = lazy(() => import('./pages/Projects/TodoList/TodoList'));
+const Exam = lazy(() => import('./pages/Projects/Exam/Exam'));
+const FlightTracker = lazy(() => import('./pages/Projects/FlightTracker/FlightTracker'));
 
 function App() {
   return (
     <Router>
-      {/* Navbar is persistent across all pages */}
+      {/* Navbar her zaman görünür olacak */}
       <Navbar />
 
-      {/* Global background animation stays here to avoid re-mounting on route change */}
+      {/* Global arka plan animasyonu */}
       <div className="bg-animation"> 
         <div className="blob"></div>
         <div className="blob"></div>
@@ -24,18 +27,14 @@ function App() {
       </div>
 
       <Routes>
-        {/* Main Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         
-        {/* Nested Route Structure for Projects.
-            This allows 'Projects' to act as a layout for its children.
-        */}
+        {/* Projects Layout ve Alt Rotalar */}
         <Route path="/projects" element={<Projects />}>
-          {/* Sub-routes: accessible via /projects/hangman and /projects/todolist */}
           <Route path="hangman" element={<Hangman />} />
           <Route path="todolist" element={<TodoList />} />
-          <Route path="/projects/exam" element={<Exam />} />
+          <Route path="exam" element={<Exam />} /> {/* /projects/exam şeklindeki hata düzeltildi */}
           <Route path="flight-tracker" element={<FlightTracker />} />
         </Route>
       </Routes>

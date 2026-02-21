@@ -12,6 +12,7 @@
     "specializedPrefix": "Uzmanlık",
     "skill1": "Makine Öğrenmesi",
     "skill2": "Bilgisayarlı Görü",
+    "heroFooter": "<0>Makine Öğrenmesi</0> ve <0>Bilgisayarlı Görü</0> alanlarında uzmanım. <1>Yüksek performans</1> ile <2>rafine estetik</2> buluşturan dijital deneyimler tasarlıyorum.",
     "skills": ["Web Geliştirme", "Makine Öğrenmesi", "Veri Bilimi", "Bilgisayarlı Görü"]
   },
   "about": {

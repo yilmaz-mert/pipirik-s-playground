@@ -12,7 +12,7 @@ const Home = () => {
   return (
     <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] overflow-hidden">
       <div 
-        className="mx-auto w-full px-6 sm:px-12 lg:px-16 max-w-[1300px]"
+        className="mx-auto w-full px-6 sm:px-12 lg:px-16 max-w-325"
         style={{ paddingTop: 'var(--navbar-height, 20px)' }}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full pb-12">
@@ -32,7 +32,7 @@ const Home = () => {
                 {t('home.heroTitle', { name: 'Mert' })}
               </h1>
               
-              <h2 className="text-2xl md:text-4xl font-bold bg-gradient-to-r from-[#38BDF8] to-[#818CF8] bg-clip-text text-transparent">
+              <h2 className="text-2xl md:text-4xl font-bold bg-linear-to-r from-[#38BDF8] to-[#818CF8] bg-clip-text text-transparent">
                 {t('home.heroSubtitle')}
               </h2>
             </header>
@@ -46,7 +46,7 @@ const Home = () => {
               <span className="opacity-80 italic"> Crafting digital experiences where performance meets aesthetics.</span>
             </p>
 
-            {/* Yetenek Etiketleri - Nokta kaldırıldı ve ortalandı */}
+            {/* Yetenek Etiketleri */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-2 max-w-md" role="list">
               {skills.map((skill) => (
                 <Chip
@@ -88,8 +88,8 @@ const Home = () => {
 
           {/* Sağ Taraf: Profil Fotoğrafı */}
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
-            <div className="relative w-[280px] h-[280px] md:w-[420px] md:h-[420px] group">
-              <div className="absolute inset-0 bg-gradient-to-tr from-[#38BDF8] to-[#818CF8] opacity-20 blur-[80px] group-hover:opacity-40 transition-opacity duration-700" />
+            <div className="relative w-70 h-70 md:w-105 md:h-105 group">
+              <div className="absolute inset-0 bg-linear-to-tr from-[#38BDF8] to-[#818CF8] opacity-20 blur-[80px] group-hover:opacity-40 transition-opacity duration-700" />
               
               <div 
                 className="relative w-full h-full border-2 border-white/10 bg-[#1e293b] overflow-hidden transition-all duration-1000 ease-in-out group-hover:scale-[1.02] shadow-2xl"
@@ -103,7 +103,7 @@ const Home = () => {
                   alt="Mert's Profile" 
                   className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/60 to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-[#0f172a]/60 to-transparent" />
               </div>
 
               <div className="absolute -bottom-2 -right-2 bg-slate-900/90 backdrop-blur-xl border border-white/20 p-4 rounded-2xl hidden md:flex items-center gap-3 shadow-2xl animate-bounce-slow">

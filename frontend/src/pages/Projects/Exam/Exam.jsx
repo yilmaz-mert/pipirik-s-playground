@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import "./Exam.css";
-import "../../../App.css"; // Global animations and layout styles
 import { useModal } from '../../../components/useModal';
 
 function Exam() {

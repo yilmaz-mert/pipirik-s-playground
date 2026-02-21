@@ -12,6 +12,8 @@
     "specializedPrefix": "Specjalizacja:",
     "skill1": "Machine Learning",
     "skill2": "Computer Vision",
+    "and": "i",
+    "heroFooter": "Specjalizuję się w <0>Uczeniu maszynowym i widzeniu komputerowym</0>. Tworzę doświadczenia cyfrowe, w których <1>wysoka wydajność</1> łączy się z <2>wyrafinowaną estetyką</2>.",
     "skills": ["Web Development", "Machine Learning", "Data Science", "Computer Vision"]
   },
   "about": {

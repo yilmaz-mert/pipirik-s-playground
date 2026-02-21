@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import './Navbar.css';
+import './Navbar.css'; // Orijinal CSS dosyanı tekrar bağladık
 import { useTranslation } from 'react-i18next';
 import { useState, useRef, useEffect } from 'react';
 import GB from 'country-flag-icons/react/3x2/GB';
@@ -15,11 +15,11 @@ function Navbar() {
   const navRef = useRef(null);
   const mobileLangRef = useRef(null);
 
-    const langs = [
-      { code: 'en', label: 'English', Flag: GB },
-      { code: 'tr', label: 'Türkçe', Flag: TR },
-      { code: 'pl', label: 'Polski', Flag: PL }
-    ];
+  const langs = [
+    { code: 'en', label: 'English', Flag: GB },
+    { code: 'tr', label: 'Türkçe', Flag: TR },
+    { code: 'pl', label: 'Polski', Flag: PL }
+  ];
 
   useEffect(() => {
     const onDocClick = (e) => {
@@ -44,7 +44,6 @@ function Navbar() {
     setOpen(false);
   };
 
-  // Toggle a body class so other pages (like Home) can apply a dim overlay
   useEffect(() => {
     if (mobileOpen) document.body.classList.add('mobile-menu-open');
     else document.body.classList.remove('mobile-menu-open');
@@ -54,13 +53,11 @@ function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        {/* Brand/Logo link leading to home (fixed text across languages) */}
         <NavLink to="/" className="navbar-logo">
           Pipirik's <span>Playground</span>
         </NavLink>
 
         <div className="nav-right" ref={navRef}>
-          {/* Navigation menu items */}
           <div className="nav-links">
             <NavLink to="/" className="nav-item" data-text={t('nav.home')}>{t('nav.home')}</NavLink>
             <NavLink to="/about" className="nav-item" data-text={t('nav.about')}>{t('nav.about')}</NavLink>
@@ -84,7 +81,6 @@ function Navbar() {
             )}
           </div>
 
-          {/* Mobile hamburger */}
           <button className="hamburger" aria-label="Menu" onClick={() => setMobileOpen(v => !v)}>
             <span className={`hamburger-box ${mobileOpen ? 'open' : ''}`}></span>
           </button>

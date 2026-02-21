@@ -337,7 +337,7 @@ function TodoList() {
 
       {/* Main container shifts layout based on list length */}
       <div
-        className={`mx-auto w-full max-w-[650px] flex flex-col items-center z-10 ${todos.length > 0 ? 'pt-10' : 'pt-[25vh]'} transition-[padding-top] duration-500`}
+        className={`mx-auto w-full max-w-2xl flex flex-col items-center z-10 ${todos.length > 0 ? 'pt-10' : 'pt-[25vh]'} transition-[padding-top] duration-500`}
         style={{ minHeight: todos.length > 0 ? '80vh' : 'calc(100vh - 25vh)' }}
       >
         <h1 className="text-4xl sm:text-5xl md:text-5xl lg:text-5xl font-bold mb-6 px-4 sm:px-0 text-white whitespace-nowrap overflow-hidden">
@@ -488,7 +488,7 @@ function TodoList() {
                       key={p}
                       onClick={() => setCurrentPage(p)}
                       className={`
-                        min-w-[28px] h-[28px] sm:min-w-[34px] sm:h-[34px] flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all
+                        min-w-7 h-7 sm:min-w-8.5 sm:h-8.5 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all
                         ${p === currentPage 
                           ? 'border border-sky-400/50 text-sky-400 bg-sky-400/10 shadow-[0_0_15px_rgba(56,189,248,0.1)]' 
                           : 'text-white/50 hover:text-white hover:bg-white/5'
@@ -537,7 +537,7 @@ function TodoList() {
                     setTimeout(() => { setPageSelectOpen(false); setPageSelectClosing(false); }, 180);
                   }
                 }}
-                className="appearance-none bg-white/5 border border-white/10 rounded-xl px-3 py-1 pr-8 text-sm text-white/70 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer outline-none focus:ring-2 focus:ring-sky-400/50 min-w-[44px] sm:w-auto text-center relative z-10 flex items-center justify-center gap-2 whitespace-nowrap"
+                className="appearance-none bg-white/5 border border-white/10 rounded-xl px-3 py-1 pr-8 text-sm text-white/70 hover:bg-white/10 hover:border-white/20 transition-all cursor-pointer outline-none focus:ring-2 focus:ring-sky-400/50 min-w-11 sm:w-auto text-center relative z-10 flex items-center justify-center gap-2 whitespace-nowrap"
                 aria-haspopup="listbox"
                 aria-expanded={pageSelectOpen}
               >

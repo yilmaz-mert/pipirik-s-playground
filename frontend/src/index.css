@@ -1,31 +1,84 @@
 @import "tailwindcss";
+@plugin './hero.js';
+@source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
+@custom-variant dark (&:is(.dark *));
 
-/* General reset for the page */
+/* Kalan her şey (Blob'lar vb.) senin yazdığın gibi kalacak... */
+
+/* --- 1. GLOBAL FONTS & THEME VARIABLES --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
-  font-family: system-ui, Arial, sans-serif;
-  color: white;
-  --navbar-height: 53.59px;
+  /* Navbar Layout */
+  --navbar-height: 67.39px;
+  
+  /* Global Theme Colors */
+  --accent: #38BDF8;
+  --accent-2: #818CF8;
+  --card-bg: rgba(30, 41, 59, 0.4);
+  --card-border: rgba(51, 65, 85, 0.5);
+  --muted: #94A3B8;
+  --page-bg: #0f172a;
 }
 
+@media (max-width: 992px) {
+  :root { --navbar-height: 60.2px; }
+}
+
+/* --- 2. GLOBAL HTML & BODY STYLES --- */
 html, body {
-  height: 100%;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  display: block; /* Removed flex from body to prevent centering */
-  height: 100%;
-  overflow-x: hidden; /* Prevent accidental horizontal overflow */
-  overflow-y: auto; /* Allow page-level vertical scroll when content overflows */
+  @apply h-full text-slate-100 antialiased overflow-x-hidden;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 #root {
-  width: 100%;
-  min-height: 100vh;
+  @apply w-full min-h-screen;
 }
 
-/* Page-select portal dropdown animation */
+/* Başlık ve Paragraf Standartları */
+h1 {
+  @apply font-bold bg-linear-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent pb-1;
+}
+
+h2 {
+  @apply pb-1;
+}
+
+p {
+  @apply text-slate-400;
+}
+
+/* --- 3. BACKGROUND ANIMATION (App.css'ten Taşındı) --- */
+.bg-animation {
+  @apply fixed inset-0 -z-10 bg-slate-900 overflow-hidden pointer-events-none;
+}
+
+.blob {
+  @apply absolute rounded-full blur-[100px];
+  background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
+  animation: organic-move 15s infinite alternate ease-in-out;
+}
+
+.blob:nth-child(1) { width: 450px; height: 450px; top: -10%; left: 10%; }
+.blob:nth-child(2) { 
+  width: 600px; height: 600px; top: 40%; left: 50%; 
+  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(6, 182, 212, 0.05) 100%);
+  animation-duration: 20s;
+  animation-delay: -5s;
+}
+
+@keyframes organic-move {
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33%  { transform: translate(10%, 15%) scale(1.1) rotate(10deg); }
+  66%  { transform: translate(-5%, 20%) scale(0.9) rotate(-10deg); }
+  100% { transform: translate(15%, -10%) scale(1.05) rotate(5deg); }
+}
+
+/* --- 4. FLASH FEEDBACK (Oyunlar İçin) --- */
+body.flash-correct { @apply bg-green-500/15!; transition: background-color 0.3s; }
+body.flash-incorrect { @apply bg-red-500/15!; transition: background-color 0.3s; }
+
+/* --- 5. DROPDOWN / MODAL PORTAL --- */
 :root {
   --ps-duration: 220ms;
   --ps-easing: cubic-bezier(.16,.84,.24,1);
@@ -33,40 +86,21 @@ body {
 }
 
 .page-select-portal {
-  background: rgba(15,23,42,0.98);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.06);
-  border-radius: 12px;
-  box-shadow: 0 18px 40px rgba(0,0,0,0.6);
-  overflow: auto;
-  transform-origin: center top;
-  transition: transform var(--ps-duration) var(--ps-easing), opacity var(--ps-duration) var(--ps-easing);
-  opacity: 0;
+  @apply bg-slate-900/98 backdrop-blur-md border border-white/5 rounded-xl shadow-2xl opacity-0 z-9999 overflow-auto origin-top;
   transform: translateY(-8px) scale(0.985);
-  z-index: 9999; /* sit above the backdrop so the dropdown itself isn't blurred */
+  transition: transform var(--ps-duration) var(--ps-easing), opacity var(--ps-duration) var(--ps-easing);
 }
 .page-select-portal.open {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+  @apply opacity-100 scale-100 translate-y-0;
   transition-delay: var(--ps-open-delay);
 }
 .page-select-portal.closing {
-  opacity: 0;
-  transform: translateY(-8px) scale(0.985);
-  transition-delay: 0ms;
+  @apply opacity-0 -translate-y-2 scale-[0.985] delay-0;
 }
 
-/* Backdrop that sits under portal dropdown to blur/dim page */
 .page-select-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.18);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  opacity: 0;
+  @apply fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 z-9998;
   transition: opacity var(--ps-duration) var(--ps-easing);
-  z-index: 9998;
 }
-.page-select-backdrop.open { opacity: 1; }
-.page-select-backdrop.closing { opacity: 0; }
+.page-select-backdrop.open { @apply opacity-100; }
+.page-select-backdrop.closing { @apply opacity-0; }

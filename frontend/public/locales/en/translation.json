@@ -12,6 +12,7 @@
     "specializedPrefix": "Specialized in",
     "skill1": "Machine Learning",
     "skill2": "Computer Vision",
+    "heroFooter": "Specializing in <0>Machine Learning</0> and <0>Computer Vision</0>. Crafting digital experiences where <1>high performance</1> meets <2>refined aesthetics</2>.",
     "skills": ["Web Development", "Machine Learning", "Data Science", "Computer Vision"]
   },
   "about": {
