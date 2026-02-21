@@ -47,9 +47,8 @@ export default function MobileMenu() {
 
       {mobileOpen && (
         <div 
-          ref={mobileMenuRef}
-          // .mobile-menu CSS'ini Tailwind sınıflarıyla baştan yarattık
-          className="absolute right-4 top-18 bg-slate-900/98 backdrop-blur-2xl border border-white/10 p-2.5 rounded-[18px] min-w-57.5 shadow-2xl z-1200 animate-in fade-in slide-in-from-top-2 duration-200"
+        ref={mobileMenuRef}
+        className="absolute right-4 top-18 bg-slate-900/98 backdrop-blur-2xl border border-white/10 p-2.5 rounded-[18px] min-w-60 shadow-2xl z-1200 animate-in fade-in slide-in-from-top-2 duration-200"
         >
           <div className="flex flex-col gap-1 mb-2">
             <NavLink to="/" className={mobileItemClass} onClick={() => setMobileOpen(false)}>{t('nav.home')}</NavLink>
@@ -61,20 +60,20 @@ export default function MobileMenu() {
           
           <div className="p-1">
             <button 
-              className="w-full flex items-center gap-2.5 px-3.5 py-2.5 bg-white/5 border border-white/5 rounded-xl text-slate-400 text-sm transition-all duration-200 hover:bg-white/10 hover:text-slate-50"
-              onClick={() => setMobileLangOpen(v => !v)}
+               className="w-full flex items-center gap-3 px-4 py-3 bg-white/5 border border-white/5 rounded-xl text-slate-400 text-sm transition-all duration-200 hover:bg-white/10 hover:text-slate-50"
+               onClick={() => setMobileLangOpen(v => !v)}
             >
               <CurrentFlag className="w-5 h-5 rounded-sm" aria-hidden="true"/>
               <span className="font-medium">{current.label}</span>
             </button>
 
-            <div className={`overflow-hidden transition-all duration-200 ease-in-out flex flex-col ${mobileLangOpen ? 'max-h-100 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+            <div className={`overflow-hidden transition-all duration-200 ease-in-out flex flex-col ${mobileLangOpen ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
               {langs.filter(l => l.code !== (i18n.language || 'en')).map(l => {
                 const OptionFlag = l.Flag;
                 return (
                   <button 
                     key={l.code} 
-                    className="w-full flex items-center gap-2.5 px-3.5 py-2.5 mt-1 rounded-xl text-left text-sm transition-colors duration-200 text-slate-400 hover:bg-white/5 hover:text-slate-50"
+                    className="w-full flex items-center gap-3 px-4 py-3 mt-1 rounded-xl text-left text-sm transition-colors duration-200 text-slate-400 hover:bg-white/5 hover:text-slate-50"
                     onClick={() => { changeLang(l.code); setMobileOpen(false); setMobileLangOpen(false); }}
                   >
                     <OptionFlag className="w-5 h-5 rounded-sm" aria-hidden="true"/>

@@ -5,8 +5,7 @@
 }
 @media (max-width: 992px) {
   :root { 
-    /* 64px = 4rem */
-    --navbar-height: 4rem; 
+    --navbar-height: 4.5rem; 
   }
 }
 
