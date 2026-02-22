@@ -9,11 +9,6 @@ const About = () => {
 
   return (
     <main className="home-wrapper page-wrapper">
-      <div className="bg-animation">
-        <div className="blob" />
-        <div className="blob" />
-      </div>
-
       <div
         className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-16 max-w-275"
       >

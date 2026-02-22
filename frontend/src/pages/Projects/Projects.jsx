@@ -71,11 +71,13 @@ const Projects = () => {
                   isPressable
                   as={RouterLink}
                   to={project.id}
-                  className={`group transition-all duration-500 ${project.size} h-full flex flex-col`}
+                  // 1. className'e 'sm:backdrop-blur-md' ekledik ve transition'ı optimize ettik
+                  className={`group transition-[transform,colors] duration-300 ${project.size} h-full flex flex-col sm:backdrop-blur-md`}
                   style={{
                     background: 'var(--card-bg)',
                     border: '1px solid var(--card-border)',
-                    backdropFilter: 'blur(8px)'
+                    // 2. Buradaki backdropFilter satırını sildik veya yorum satırı yaptık
+                    // backdropFilter: 'blur(8px)' 
                   }}
                 >
                   <CardHeader className="px-6 pt-6 flex-col items-start">

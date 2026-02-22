@@ -23,7 +23,6 @@ function App() {
       <div className="bg-animation"> 
         <div className="blob"></div>
         <div className="blob"></div>
-        <div className="blob"></div>
       </div>
 
       <Routes>

@@ -101,6 +101,10 @@ const Home = () => {
                 <img 
                   src={mertProfile} 
                   alt="Mert's Profile" 
+                  fetchpriority="high" 
+                  loading="eager"      
+                  width="420"         
+                  height="420"        
                   className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-[#0f172a]/60 to-transparent" />
