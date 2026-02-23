@@ -68,16 +68,17 @@ const Projects = () => {
               {projectList.map((project) => (
                 <Card 
                   key={project.id}
-                  isPressable
+                  // isPressable hala kapalı (JS tabanlı tıklama mobilde kaydırmayı bozar)
                   as={RouterLink}
                   to={project.id}
-                  // 1. className'e 'sm:backdrop-blur-md' ekledik ve transition'ı optimize ettik
-                  className={`group transition-[transform,colors] duration-300 ${project.size} h-full flex flex-col sm:backdrop-blur-md`}
+                  className={`group ${project.size} h-full flex flex-col transition-all duration-300
+                              sm:backdrop-blur-md 
+                              lg:hover:scale-[1.02] 
+                              lg:active:scale-[0.98]`} // Tıklama efekti sadece masaüstünde (lg) çalışır
                   style={{
                     background: 'var(--card-bg)',
                     border: '1px solid var(--card-border)',
-                    // 2. Buradaki backdropFilter satırını sildik veya yorum satırı yaptık
-                    // backdropFilter: 'blur(8px)' 
+                    // backdropFilter BURADAN KALDIRILDI (Mobil kasmayı önlemek için)
                   }}
                 >
                   <CardHeader className="px-6 pt-6 flex-col items-start">

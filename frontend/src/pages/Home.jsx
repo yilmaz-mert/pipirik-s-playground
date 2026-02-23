@@ -10,16 +10,17 @@ const Home = () => {
   const skills = t('home.skills', { returnObjects: true }) || [];
 
   return (
-    <main className="relative z-10 flex items-center justify-center min-h-[calc(100vh-80px)] overflow-hidden">
+    // svh (Small Viewport Height) kullanarak Opera ve Safari alt barları için tam uyum sağlıyoruz
+    <main className="relative z-10 flex items-center justify-center h-[calc(100svh-var(--navbar-height))] overflow-hidden">
       <div 
-        className="mx-auto w-full px-6 sm:px-12 lg:px-16 max-w-325"
-        style={{ paddingTop: 'var(--navbar-height, 20px)' }}
+        className="mx-auto w-full px-6 sm:px-12 lg:px-16 max-w-325 h-full flex items-center"
+        style={{ paddingTop: '0' }}
       >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center w-full pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center w-full py-2">
           
           {/* Sol Taraf: Metin ve Bilgiler */}
-          <div className="order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 animate-appearance-in">
-            <header className="space-y-4">
+          <div className="order-2 lg:order-1 flex flex-col items-center lg:items-start text-center lg:text-left space-y-3 animate-appearance-in">
+            <header className="space-y-2">
               <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs md:text-sm font-medium">
                 <span className="relative flex h-2 w-2 mr-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -37,7 +38,7 @@ const Home = () => {
               </h2>
             </header>
 
-            <p className="text-slate-400 text-lg md:text-xl leading-relaxed max-w-xl font-medium">
+            <p className="text-slate-400 text-base md:text-xl leading-snug max-w-xl font-medium">
               {t('home.specializedPrefix')}{' '}
               <span className="text-white font-semibold">{t('home.skill1')}</span>
               {' '}{t('home.and') || '&'}{' '}
@@ -46,8 +47,8 @@ const Home = () => {
               <span className="opacity-80 italic"> Crafting digital experiences where performance meets aesthetics.</span>
             </p>
 
-            {/* Yetenek Etiketleri */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-2 max-w-md" role="list">
+            {/* Yetenek Etiketleri - Mobilde daha kompakt görünüm için gap-1.5 */}
+            <div className="flex flex-wrap justify-center lg:justify-start gap-1.5 max-w-md" role="list">
               {skills.map((skill) => (
                 <Chip
                   key={skill}
@@ -60,7 +61,7 @@ const Home = () => {
             </div>
 
             {/* Sosyal Medya Butonları */}
-            <div className="flex items-center justify-center lg:justify-start gap-3 pt-6">
+            <div className="flex items-center justify-center lg:justify-start gap-3 pt-2">
               <Button
                 as="a"
                 href="https://github.com/yilmaz-mert"
@@ -88,8 +89,9 @@ const Home = () => {
 
           {/* Sağ Taraf: Profil Fotoğrafı */}
           <div className="order-1 lg:order-2 flex justify-center lg:justify-end">
-            <div className="relative w-70 h-70 md:w-105 md:h-105 group">
-              <div className="absolute inset-0 bg-linear-to-tr from-[#38BDF8] to-[#818CF8] opacity-20 blur-[80px] group-hover:opacity-40 transition-opacity duration-700" />
+            <div className="relative w-44 h-44 md:w-105 md:h-105 group">
+              {/* Performans için mobilde gizlenen, sadece masaüstünde çalışan parıltı efekti */}
+              <div className="hidden md:block absolute inset-0 bg-linear-to-tr from-[#38BDF8] to-[#818CF8] opacity-20 blur-[80px] group-hover:opacity-40 transition-opacity duration-700" />
               
               <div 
                 className="relative w-full h-full border-2 border-white/10 bg-[#1e293b] overflow-hidden transition-all duration-1000 ease-in-out group-hover:scale-[1.02] shadow-2xl"
@@ -101,10 +103,10 @@ const Home = () => {
                 <img 
                   src={mertProfile} 
                   alt="Mert's Profile" 
-                  fetchpriority="high" 
-                  loading="eager"      
-                  width="420"         
-                  height="420"        
+                  fetchpriority="high" // LCP skoru için yüksek öncelik
+                  loading="eager"      // Anında yükleme
+                  width="420"          // CLS önlemek için genişlik
+                  height="420"         // CLS önlemek için yükseklik
                   className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-[#0f172a]/60 to-transparent" />
