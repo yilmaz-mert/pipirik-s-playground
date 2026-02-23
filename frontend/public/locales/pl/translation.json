@@ -7,6 +7,7 @@
     "projects": "Projekty"
   },
   "home": {
+    "availableForWork": "Dostępny do nowych projektów",
     "heroTitle": "Cześć, jestem {{name}}",
     "heroSubtitle": "Inżynier Elektryk i Elektronik",
     "specializedPrefix": "Specjalizacja:",

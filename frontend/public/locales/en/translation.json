@@ -7,6 +7,7 @@
     "projects": "Projects"
   },
   "home": {
+    "availableForWork": "Available for new opportunities",
     "heroTitle": "Hi, I'm {{name}}",
     "heroSubtitle": "Electrical-Electronics Engineer",
     "specializedPrefix": "Specialized in",

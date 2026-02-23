@@ -5,7 +5,7 @@ import Navbar from './components/Navbar/Navbar';
 
 // Sayfaları Lazy Loading ile asenkron hale getiriyoruz
 // Bu sayede kullanıcı hangi sayfaya girerse sadece o sayfanın kodu yüklenir
-const Home = lazy(() => import('./pages/Home'));
+const Home = lazy(() => import('./pages/Home/Home'));
 const About = lazy(() => import('./pages/About'));
 const Projects = lazy(() => import('./pages/Projects/Projects'));
 const Hangman = lazy(() => import('./pages/Projects/Hangman/Hangman'));
