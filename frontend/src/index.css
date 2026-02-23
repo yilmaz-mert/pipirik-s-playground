@@ -22,7 +22,7 @@
 
 :root {
   /* Navbar Layout */
-  --navbar-height: 67.39px;
+  --navbar-height: 4.5rem;
   
   /* Global Theme Colors */
   --accent: #38BDF8;
@@ -34,7 +34,7 @@
 }
 
 @media (max-width: 992px) {
-  :root { --navbar-height: 60.2px; }
+  :root { --navbar-height: 4.5rem; }
 }
 
 /* --- 2. GLOBAL HTML & BODY STYLES --- */

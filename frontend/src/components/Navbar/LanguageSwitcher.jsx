@@ -1,6 +1,7 @@
+// src/components/Navbar/LanguageSwitcher.jsx
 import { useTranslation } from 'react-i18next';
 import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from "@heroui/react";
-import { langs } from '../constants/langs';
+import { langs } from '../../constants/langs';
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();

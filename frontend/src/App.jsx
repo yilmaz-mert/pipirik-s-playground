@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Navbar from './components/Navbar';
+import Navbar from './components/Navbar/Navbar';
 
 // Sayfaları Lazy Loading ile asenkron hale getiriyoruz
 // Bu sayede kullanıcı hangi sayfaya girerse sadece o sayfanın kodu yüklenir
