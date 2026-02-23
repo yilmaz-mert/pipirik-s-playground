@@ -3,8 +3,20 @@
 @plugin './hero.js';
 @source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
+@theme {
+  --animate-morph: morph 8s ease-in-out infinite;
+  --animate-bounce-slow: bounce-slow 3s infinite;
 
-/* Kalan her şey (Blob'lar vb.) senin yazdığın gibi kalacak... */
+  @keyframes morph {
+    0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  }
+
+  @keyframes bounce-slow {
+    0%, 100% { transform: translateY(-5%); }
+    50% { transform: translateY(0); }
+  }
+}
 
 /* --- 1. GLOBAL FONTS & THEME VARIABLES --- */
 
@@ -37,7 +49,6 @@ html, body {
   isolation: isolate;
 }
 
-/* Başlık ve Paragraf Standartları */
 h1 {
   @apply font-bold bg-linear-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent pb-1;
 }
@@ -59,23 +70,17 @@ p {
 
 .blob {
   @apply absolute rounded-full;
-  /* Masaüstü için varsayılan değerler */
-  filter: blur(80px); /* 100px yerine 80px hem şık durur hem daha hafiftir */
+  filter: blur(80px); 
   background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
   animation: organic-move 15s infinite alternate ease-in-out;
-  
-  /* Donanım hızlandırmayı (Hardware Acceleration) aktif eder */
   transform: translateZ(0);
   backface-visibility: hidden;
   will-change: transform;
 }
 
-/* MOBİL OPTİMİZASYONU: Kasmayı engelleyen kritik bölüm */
 @media (max-width: 768px) {
   .blob {
-    /* Mobil GPU'lar için 100px blur çok ağırdır, 30px'e çekiyoruz */
     filter: blur(30px);
-    /* Mobilde blob boyutlarını biraz küçültmek render yükünü azaltır */
     width: 300px !important; 
     height: 300px !important;
   }
