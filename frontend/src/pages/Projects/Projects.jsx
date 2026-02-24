@@ -1,7 +1,11 @@
+// src/pages/Projects/Projects.jsx
 import React from 'react';
 import { Link as RouterLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody, Divider, Chip } from "@heroui/react";
+// eslint-disable-next-line no-unused-vars
+import { motion } from "framer-motion";
+import { PlaneTakeoff, CheckSquare, FileQuestion, Gamepad2 } from "lucide-react"; // İkonlar eklendi
 
 const Projects = () => {
   const location = useLocation();
@@ -9,130 +13,144 @@ const Projects = () => {
   
   const isMainProjectsPage = location.pathname === '/projects';
 
-  // Proje listesi ve Bento Grid için özel ayarlar
-  // breakpointleri orta ekranlarda (768-1024) tek sütunda bozulmayı önleyecek şekilde lg'ye taşıyoruz
+  // Projelere ikonlar eklendi
   const projectList = [
     { 
       id: 'flight-tracker', 
       title: t('projects.flightTracker'), 
       desc: t('projects.flightTrackerDesc'),
-      size: "lg:col-span-2", // Bu projeyi öne çıkarıyoruz, sadece large ekranlarda genişlesin
+      size: "lg:col-span-2", 
       tech: ["React", "Leaflet.js", "API", "Lucide"],
-      isFeatured: true
+      isFeatured: true,
+      icon: PlaneTakeoff,
+      color: "from-cyan-500/20 to-blue-500/5"
     },
     { 
       id: 'exam', 
       title: t('projects.exam'), 
       desc: t('projects.examDesc'),
       size: "lg:col-span-1",
-      tech: ["React", "Validation"]
+      tech: ["React", "Validation"],
+      icon: FileQuestion,
+      color: "from-purple-500/20 to-fuchsia-500/5"
     },
     { 
       id: 'todolist', 
       title: t('projects.todolist'), 
       desc: t('projects.todolistDesc'),
       size: "lg:col-span-1",
-      tech: ["Local Storage", "React"]
+      tech: ["Local Storage", "React"],
+      icon: CheckSquare,
+      color: "from-emerald-500/20 to-teal-500/5"
     },
     { 
       id: 'hangman', 
       title: t('projects.hangman'), 
       desc: t('projects.hangmanDesc'),
       size: "lg:col-span-1",
-      tech: ["JavaScript", "CSS Animation"]
+      tech: ["JavaScript", "CSS Animation"],
+      icon: Gamepad2,
+      color: "from-orange-500/20 to-red-500/5"
     }
   ];
 
-  return (
-    <div
-      className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-8 max-w-300"
+  // Framer Motion Ayarları
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+  };
 
-    >
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+  };
+
+  return (
+    <div className="mx-auto w-full px-6 sm:px-8 md:px-10 lg:px-12 pb-12 max-w-7xl">
       {isMainProjectsPage ? (
           <>
-            {/* Header Kısmı */}
-            <header className="text-center mb-12 pt-16 flex flex-col gap-6 items-center">
-              <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-[#F8FAFC] mb-4 pb-1">
+            {/* Header Kısmı - Animasyonlu */}
+            <motion.header 
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="text-center mb-16 pt-16 flex flex-col gap-4 items-center"
+            >
+              <h1 className="text-5xl md:text-7xl font-bold tracking-tight text-white pb-1">
                 {t('projects.titlePart1')}{" "}
                 <span className="bg-linear-to-r from-[#38BDF8] to-[#818CF8] bg-clip-text text-transparent">
                   {t('projects.titlePart2')}
                 </span>
               </h1>
-              <p className="text-[#94A3B8] text-lg max-w-2xl mx-auto italic">
+              <p className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto italic font-medium">
                 {t('projects.subtitle', 'Engineered Solutions & Interactive Experiences')}
               </p>
-            </header>
+            </motion.header>
           
             {/* Bento Grid Yapısı */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch">
-              {projectList.map((project) => (
-                <Card 
-                  key={project.id}
-                  // isPressable hala kapalı (JS tabanlı tıklama mobilde kaydırmayı bozar)
-                  as={RouterLink}
-                  to={project.id}
-                  className={`group ${project.size} h-full flex flex-col transition-all duration-300
-                              sm:backdrop-blur-md 
-                              lg:hover:scale-[1.02] 
-                              lg:active:scale-[0.98]`} // Tıklama efekti sadece masaüstünde (lg) çalışır
-                  style={{
-                    background: 'var(--card-bg)',
-                    border: '1px solid var(--card-border)',
-                    // backdropFilter BURADAN KALDIRILDI (Mobil kasmayı önlemek için)
-                  }}
-                >
-                  <CardHeader className="px-6 pt-6 flex-col items-start">
-                    {project.isFeatured && (
-                      <Chip 
-                        size="sm" 
-                        variant="flat" 
-                        color="primary" 
-                        className="mb-2 border-white/10"
-                        style={{ color: 'var(--accent)' }}
-                      >
-                        {t('projects.featured', { defaultValue: 'Featured Project' })}
-                      </Chip>
-                    )}
-                    <h3 className="text-2xl font-bold text-[#F8FAFC] group-hover:text-(--accent) transition-colors">
-                      {project.title}
-                    </h3>
-                  </CardHeader>
+            <motion.div 
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 items-stretch"
+            >
+              {projectList.map((project) => {
+                const Icon = project.icon;
+                
+                return (
+                  <motion.div key={project.id} variants={itemVariants} className={project.size}>
+                    <Card 
+                      as={RouterLink}
+                      to={project.id}
+                      className="group relative h-full flex flex-col overflow-hidden bg-[#1e293b]/50 backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-cyan-500/10"
+                    >
+                      {/* Kart İçi Arka Plan Efekti (Glow) */}
+                      <div className={`absolute inset-0 bg-linear-to-br ${project.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                      
+                      {/* Dekoratif İkon (Arka planda büyük ve soluk) */}
+                      <Icon className="absolute -right-6 -bottom-6 w-32 h-32 text-white/5 group-hover:text-white/10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-500" />
 
-                  <CardBody className="px-6 pb-6 flex-1 flex flex-col">
-                    <p className="text-(--muted) text-sm leading-relaxed mb-6 flex-1">
-                      {project.desc}
-                    </p>
+                      <CardHeader className="px-6 pt-6 flex-col items-start relative z-10">
+                        {project.isFeatured && (
+                          <Chip 
+                            size="sm" 
+                            variant="flat" 
+                            className="mb-3 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-medium tracking-wide"
+                          >
+                            {t('projects.featured', { defaultValue: 'Featured Project' })}
+                          </Chip>
+                        )}
+                        <div className="flex items-center gap-3">
+                          <Icon className="w-6 h-6 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                          <h3 className="text-2xl font-bold text-slate-100 group-hover:text-cyan-400 transition-colors">
+                            {project.title}
+                          </h3>
+                        </div>
+                      </CardHeader>
 
-                    {/* Teknoloji Etiketleri (Chips) */}
-                    <div className="flex flex-wrap gap-2 mt-4">
-                      {project.tech.map((item) => (
-                        <Chip 
-                          key={item} 
-                          size="sm" 
-                          variant="flat" 
-                          className="text-[10px] font-mono inline-flex items-center justify-center"
-                          style={{
-                            background: 'color-mix(in srgb, var(--accent) 10%, transparent)',
-                            color: 'var(--accent)',
-                            padding: '0.25rem 0.6rem',
-                            borderRadius: '9999px',
-                            userSelect: 'none',
-                            lineHeight: 1,
-                            border: '1px solid rgba(255,255,255,0.04)',
-                            transition: 'transform .12s ease, background .12s ease'
-                          }}
-                          onMouseDown={(e) => e.preventDefault()}
-                        >
-                          {item}
-                        </Chip>
-                      ))}
-                    </div>
+                      <CardBody className="px-6 pb-6 pt-4 flex-1 flex flex-col relative z-10">
+                        <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-6 flex-1 group-hover:text-slate-300 transition-colors">
+                          {project.desc}
+                        </p>
 
-                    <Divider className="bg-white/5 my-4" />
-                  </CardBody>
-                </Card>
-              ))}
-            </div>
+                        <div className="flex flex-wrap gap-2 mt-auto">
+                          {project.tech.map((item) => (
+                            <Chip 
+                              key={item} 
+                              size="sm" 
+                              variant="flat" 
+                              className="bg-white/5 text-slate-300 border border-white/5 group-hover:bg-cyan-500/10 group-hover:text-cyan-300 group-hover:border-cyan-500/20 transition-all duration-300 px-3"
+                            >
+                              {item}
+                            </Chip>
+                          ))}
+                        </div>
+                      </CardBody>
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </>
       ) : (
         <Outlet /> 

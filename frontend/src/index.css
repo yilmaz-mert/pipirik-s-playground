@@ -50,7 +50,7 @@ html, body {
 }
 
 h1 {
-  @apply font-bold bg-linear-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent pb-1;
+  @apply font-bold bg-linear-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent pb-1.5 leading-[1.05] inline-block overflow-visible;
 }
 
 h2 {
