@@ -1,82 +1,62 @@
-import { useState, useEffect } from "react";
+// src/pages/Projects/Exam/Exam.jsx
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from 'react-i18next';
-import { createPortal } from 'react-dom';
-import "./Exam.css";
-import { useModal } from '../../../components/useModal';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@heroui/react";
+import { HelpCircle } from "lucide-react";
 
-function Exam() {
+// Tüm Modüler Bileşenlerimiz
+import LoadingScreen from "./components/LoadingScreen";
+import ActiveExam from "./components/ActiveExam";
+import OpticalSidebar from "./components/OpticalSidebar";
+import ResultScreen from "./components/ResultScreen";
+import MistakeReviewModal from "./components/MistakeReviewModal";
+
+export default function Exam() {
   const { t } = useTranslation();
-  // --- STATE MANAGEMENT ---
-  const [questions, setQuestions] = useState([]); // Stores formatted questions from API
-  const [currentIdx, setCurrentIdx] = useState(0); // Index of the currently displayed question
-  const [answers, setAnswers] = useState({});     // Stores user answers in {questionIndex: "A"} format
-  const [loading, setLoading] = useState(true);    // Loading state for API fetch
-  const [timeLeft, setTimeLeft] = useState(600);   // 10-minute countdown timer (600 seconds)
-  const [isFinished, setIsFinished] = useState(false); // Controls the result screen visibility
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [showMistakeModal, setShowMistakeModal] = useState(false);
-  const [openWrong, setOpenWrong] = useState({});
-  const answeredCount = Object.keys(answers).length;
-  const isAllAnswered = questions.length > 0 && answeredCount === questions.length;
   
-  // --- FETCH QUESTIONS FROM API ---
+  // --- STATE KONTROLLERİ ---
+  const [questions, setQuestions] = useState([]); 
+  const [currentIdx, setCurrentIdx] = useState(0); 
+  const [answers, setAnswers] = useState({});     
+  const [loading, setLoading] = useState(true);    
+  const [timeLeft, setTimeLeft] = useState(600);   
+  const [isFinished, setIsFinished] = useState(false); 
+  const [openWrongDetails, setOpenWrongDetails] = useState({});
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Yeni State Eklendi
+  
+  const confirmDisclosure = useDisclosure(); 
+  const mistakeDisclosure = useDisclosure(); 
+  
+  const answeredCount = Object.keys(answers).length;
+  const totalQuestions = questions.length;
+
+  // --- API İSTEĞİ ---
   useEffect(() => {
-    // Fetching 10 multiple-choice questions from OpenTDB
     fetch("https://opentdb.com/api.php?amount=10&type=multiple")
       .then((res) => res.json())
       .then((data) => {
         const formatted = data.results.map((q) => {
-          // Merge correct and incorrect answers and shuffle them
-          const allChoices = [...q.incorrect_answers, q.correct_answer].sort(
-            () => Math.random() - 0.5
-          );
-          return {
-            question: q.question,
-            choices: allChoices,
-            correct: q.correct_answer,
-          };
+          const allChoices = [...q.incorrect_answers, q.correct_answer].sort(() => Math.random() - 0.5);
+          return { question: q.question, choices: allChoices, correct: q.correct_answer };
         });
         setQuestions(formatted);
         setLoading(false);
       });
   }, []);
 
-  // --- TIMER LOGIC ---
+  // --- ZAMANLAYICI ---
   useEffect(() => {
     if (timeLeft > 0 && !isFinished && !loading) {
       const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
       return () => clearTimeout(timer);
     } else if (timeLeft === 0 && !isFinished) {
-      setIsFinished(true); // Automatically finish exam when time is up
+      setIsFinished(true); 
     }
   }, [timeLeft, isFinished, loading]);
 
-  // --- HANDLER FUNCTIONS ---
-  const handleSelect = (choiceIdx) => {
-    const letter = ["A", "B", "C", "D", "E"][choiceIdx];
-    setAnswers({ ...answers, [currentIdx]: letter });
-  };
-
-  const { showConfirm } = useModal();
-
-  const finishExam = async () => {
-    const confirmed = await showConfirm({ title: t('exam.finishExam'), message: t('exam.finishConfirm') });
-    if (confirmed) {
-      setIsFinished(true);
-    }
-  };
-
-  const handleJumpToQuestion = (idx) => {
-    setCurrentIdx(idx);
-    setIsDrawerOpen(false); // Close drawer when a mobile user selects a question
-  };
-
-  // --- CONDITIONAL RENDERING: LOADING ---
-  if (loading) return <div className="loading-screen">{t('exam.preparing')}</div>;
-
-  // --- CONDITIONAL RENDERING: RESULT SCREEN ---
-  if (isFinished) {
-    const total = questions.length;
+  // --- SONUÇ HESAPLAMA ---
+  const results = useMemo(() => {
+    if (!isFinished) return null;
     let correct = 0;
     let answered = 0;
     const wrongList = [];
@@ -86,210 +66,96 @@ function Exam() {
       if (userAnsLetter) answered++;
       const correctIdx = q.choices.indexOf(q.correct);
       const correctLetter = ["A", "B", "C", "D", "E"][correctIdx];
+      
       if (userAnsLetter === correctLetter) correct++;
-      if (userAnsLetter && userAnsLetter !== correctLetter) {
-        wrongList.push({ index: i, question: q.question, selected: userAnsLetter, correct: correctLetter, correctText: q.correct, choices: q.choices });
-      }
+      else if (userAnsLetter) wrongList.push({ index: i, question: q.question, selected: userAnsLetter, correct: correctLetter, choices: q.choices });
     });
 
-    const pct = Math.round((correct / total) * 100);
+    const pct = Math.round((correct / totalQuestions) * 100);
+    return { correct, answered, wrongList, pct, total: totalQuestions, isSuccess: pct >= 60 };
+  }, [isFinished, questions, answers, totalQuestions]);
 
+  // --- YÜKLEME EKRANI ---
+  if (loading) return <LoadingScreen />;
+
+  // --- SONUÇ EKRANI ---
+  if (isFinished && results) {
     return (
-      <div className="home-wrapper">
-        <div className="result-container">
-          <div className="result-card result-card--modern">
-            <div className="result-header">
-              <h2>{t('exam.resultsTitle')}</h2>
-              <div className="result-actions">
-                <button className="cw-btn cw-btn-primary" onClick={() => window.location.reload()}>{t('exam.retry')}</button>
-              </div>
-            </div>
-
-            <div className="score-section">
-              <div className="score-circle large">
-                <div className="score-number">{pct}<small>%</small></div>
-                <div className="score-sub">{correct} / {total}</div>
-              </div>
-
-              <div className="score-details">
-                <p className="result-text">{pct >= 60 ? t('exam.resultTextGood') : t('exam.resultTextBad')}</p>
-
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${pct}%` }}></div>
-                </div>
-
-                <div className="breakdown-grid">
-                  <div className="breakdown-item">
-                    <div className="num">{correct}</div>
-                    <div className="label">{t('exam.correct')}</div>
-                  </div>
-                  <div className="breakdown-item">
-                    <div className="num">{wrongList.length}</div>
-                    <div className="label">{t('exam.wrong')}</div>
-                  </div>
-                  <div className="breakdown-item">
-                    <div className="num">{total - answered}</div>
-                    <div className="label">{t('exam.unanswered')}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {wrongList.length > 0 && (
-              <button className="cw-btn cw-btn-secondary" onClick={() => setShowMistakeModal(true)}>
-                {t('exam.viewMistakes', { count: wrongList.length })}
-              </button>
-            )}
-
-            {showMistakeModal && createPortal(
-              <div className="mistake-modal-overlay" onClick={() => setShowMistakeModal(false)}>
-                <div className="mistake-modal" onClick={(e) => e.stopPropagation()}>
-                  <div className="mistake-modal-header">
-                    <h2>{t('exam.reviewMistakes')}</h2>
-                    <button className="close-btn" onClick={() => setShowMistakeModal(false)}>✕</button>
-                  </div>
-                  <div className="mistake-modal-body">
-                    <div className="wrong-grid">
-                      {wrongList.map((w) => (
-                        <div key={w.index} className="wrong-card">
-                          <div className="wrong-top">
-                            <div className="wrong-bubble">{w.index + 1}</div>
-                            <div className="wrong-q-text" dangerouslySetInnerHTML={{ __html: w.question }}></div>
-                          </div>
-
-                          <div className="wrong-meta">
-                            <div className="meta-pill wrong-pill">{t('exam.your')}: {w.selected}</div>
-                            <div className="meta-pill correct-pill">{t('exam.correct')}: {w.correct}</div>
-                          </div>
-
-                          <div className="wrong-actions">
-                            <button className="cw-btn-ghost-full" onClick={() => setOpenWrong(prev => ({ ...prev, [w.index]: !prev[w.index] }))}>
-                              {openWrong[w.index] ? `▼ ${t('exam.hideDetails')}` : `▶ ${t('exam.showDetails')}`}
-                            </button>
-                          </div>
-
-                          <div className={`wrong-detail ${openWrong[w.index] ? 'open' : ''}`}>
-                            <div className="choices-visual">
-                              {w.choices.map((ch, ci) => {
-                                const letter = ["A","B","C","D","E"][ci];
-                                const isSelected = letter === w.selected;
-                                const isCorrect = letter === w.correct;
-                                return (
-                                  <div key={ci} className={`choice-pill ${isSelected ? 'selected' : ''} ${isCorrect ? 'correct' : ''}`}>
-                                    <strong>{letter})</strong>&nbsp;<span dangerouslySetInnerHTML={{ __html: ch }} />
-                                  </div>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>,
-              document.body
-            )}
-
-          </div>
-        </div>
-      </div>
+        <>
+            <ResultScreen 
+                results={results} 
+                onRetry={() => window.location.reload()} 
+                onViewMistakes={mistakeDisclosure.onOpen} 
+            />
+            <MistakeReviewModal 
+                isOpen={mistakeDisclosure.isOpen}
+                onOpenChange={mistakeDisclosure.onOpenChange}
+                wrongList={results.wrongList}
+                openWrongDetails={openWrongDetails}
+                toggleWrongDetail={(idx) => setOpenWrongDetails(prev => ({ ...prev, [idx]: !prev[idx] }))}
+            />
+        </>
     );
   }
 
-  const currentQ = questions[currentIdx];
-
-  // --- MAIN EXAM UI ---
+  // --- ODAK MODU (Sınav Devam Ediyor) ---
   return (
-    <div className="exam-page-wrapper">
-      <div className="bg-animation">
-        <div className="blob"></div>
-        <div className="blob"></div>
-      </div>
+    <div className="w-full min-h-[calc(100dvh-7.5rem)] pb-12 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Immersive Arka Plan Efektleri */}
+      <div className={`absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[150px] -z-10 pointer-events-none transition-colors duration-1000 ${timeLeft < 60 ? 'bg-rose-500/20' : 'bg-cyan-500/10'}`} />
+      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[150px] -z-10 pointer-events-none" />
 
-      <div className="exam-content-area">
-        {/* CHANGE 1: Overlay moved here, inside the content area */}
-        {isDrawerOpen && <div className="drawer-overlay" onClick={() => setIsDrawerOpen(false)}></div>}
+      {/* Ana Soru Bileşeni */}
+      <ActiveExam 
+        questionData={questions[currentIdx]}
+        currentIdx={currentIdx}
+        totalQuestions={totalQuestions}
+        currentAnswer={answers[currentIdx]}
+        timeLeft={timeLeft}
+        onSelect={(i) => setAnswers({ ...answers, [currentIdx]: ["A", "B", "C", "D"][i] })}
+        onNext={() => currentIdx < totalQuestions - 1 && setCurrentIdx(currentIdx + 1)}
+        onPrev={() => currentIdx > 0 && setCurrentIdx(currentIdx - 1)}
+        onFinish={confirmDisclosure.onOpen}
+      />
 
-        <div className="exam-header-bar">
-          <div className="timer-display">
-            {t('exam.timeLeft', { minutes: Math.floor(timeLeft / 60), seconds: (timeLeft % 60).toString().padStart(2, '0') })}
-          </div>
-          <button className="finish-exam-btn" onClick={finishExam}>{t('exam.finishExam')}</button>
-        </div>
+      {/* Sağ Altta Yüzen Optik Form Çekmecesi */}
+      <OpticalSidebar 
+        questions={questions}
+        currentIdx={currentIdx}
+        answers={answers}
+        onJump={(idx) => setCurrentIdx(idx)}
+        isDrawerOpen={isDrawerOpen}
+        setIsDrawerOpen={setIsDrawerOpen}
+      />
 
-        <div className="exam-main-layout">
-          <div className="question-area">
-            <div className="q-card">
-              <span className="q-label">{t('exam.questionLabel', { num: currentIdx + 1 })}</span>
-              <h2 dangerouslySetInnerHTML={{ __html: currentQ.question }}></h2>
-              <div className="choices-list">
-                {/* Note: API returns 4 choices, so keeping the array to 4 elements (A-D) is safer */}
-                {currentQ.choices.map((choice, i) => (
-                  <button
-                    key={i}
-                    className={`choice-item ${answers[currentIdx] === ["A", "B", "C", "D"][i] ? "active" : ""}`}
-                    onClick={() => handleSelect(i)}
-                    dangerouslySetInnerHTML={{ __html: `${["A", "B", "C", "D"][i]}) ${choice}` }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="nav-btns">
-              <button disabled={currentIdx === 0} onClick={() => setCurrentIdx(currentIdx - 1)}>{t('common.back')}</button>
-              <button disabled={currentIdx === questions.length - 1} onClick={() => setCurrentIdx(currentIdx + 1)}>{t('common.next')}</button>
-            </div>
-          </div>
-
-          <div className={`optical-sidebar ${isDrawerOpen ? "drawer-open" : ""}`}>
-            <div className="optical-card">
-              <div className="optical-grid-scroll">
-                {questions.map((_, i) => (
-                  <div 
-                    key={i} 
-                    className={`opt-row ${currentIdx === i ? "current" : ""}`}
-                    onClick={() => handleJumpToQuestion(i)} // On row click: jump to question and close drawer
-                  >
-                    <span className="opt-num">{i + 1}</span>
-                    
-                    {["A", "B", "C", "D"].map((letter) => (
-                      <div
-                        key={letter}
-                        className={`opt-bubble ${answers[i] === letter ? "checked" : ""}`}
-                        onClick={(e) => {
-                          e.stopPropagation(); // Prevents the row click event
-                          // CHANGE 2: Removed handleJump here; only marking occurs
-                          setAnswers({ ...answers, [i]: letter });
-                        }}
-                      >
-                        {letter}
-                      </div>
-                    ))}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div 
-        className={`floating-hub ${isDrawerOpen ? "active" : (isAllAnswered ? "completed" : "")}`} 
-        onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+      {/* Bitirme Onay Modalı */}
+      <Modal 
+        isOpen={confirmDisclosure.isOpen} 
+        onOpenChange={confirmDisclosure.onOpenChange} 
+        backdrop="blur"
+        classNames={{
+            base: "bg-slate-900/95 backdrop-blur-2xl border border-white/10",
+            header: "border-b border-white/10 text-slate-100",
+            footer: "border-t border-white/10",
+            body: "text-slate-300 py-6",
+        }}
       >
-        <div className="hub-content">
-          {/* Icon changes based on state: X when open, list when closed */}
-          <span className="hub-icon">
-            {isDrawerOpen ? "✕" : "📋"}
-          </span>
-          
-          {!isDrawerOpen && (
-            <span className="hub-status">{answeredCount}/{questions.length}</span>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader><HelpCircle className="mr-2 text-cyan-400" />{t('exam.finishExam')}</ModalHeader>
+              <ModalBody>
+                <p>{t('exam.finishConfirm')}</p>
+                {answeredCount < totalQuestions && <p className="text-rose-400 mt-2 text-sm">{totalQuestions - answeredCount} cevapsız sorunuz var!</p>}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="ghost" onPress={onClose}>{t('common.cancel')}</Button>
+                <Button color="primary" onPress={() => { setIsFinished(true); onClose(); }}>{t('common.ok')}</Button>
+              </ModalFooter>
+            </>
           )}
-        </div>
-      </div>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
-
-export default Exam;
