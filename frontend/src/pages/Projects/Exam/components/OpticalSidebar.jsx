@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { XCircle, Map } from "lucide-react";
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@heroui/react";
 
 export default function OpticalSidebar({ 
   questions, 
@@ -11,7 +12,8 @@ export default function OpticalSidebar({
   answers, 
   onJump, 
   isDrawerOpen, 
-  setIsDrawerOpen 
+  setIsDrawerOpen, 
+  onFinish
 }) {
   const { t } = useTranslation();
   const totalQuestions = questions.length;
@@ -157,6 +159,21 @@ export default function OpticalSidebar({
               );
             })}
           </div>
+        </div>
+
+        {/* Alt Aksiyon Alanı: BURAYA YENİ BİR BUTON EKLİYORUZ */}
+        <div className="p-6 border-t border-white/10 bg-black/20 flex flex-col gap-4">
+           <Button 
+            color="danger" 
+            variant="shadow" 
+            className="w-full font-bold h-12"
+            onPress={() => {
+              onFinish(); // Exam.jsx'ten gelen onFinish fonksiyonu
+              setIsDrawerOpen(false);
+            }}
+           >
+              {t('exam.finishExam')}
+           </Button>
         </div>
 
         {/* Alt Bilgi */}

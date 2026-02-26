@@ -126,6 +126,7 @@ export default function Exam() {
         onJump={(idx) => setCurrentIdx(idx)}
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
+        onFinish={confirmDisclosure.onOpen} 
       />
 
       {/* Bitirme Onay Modalı */}
