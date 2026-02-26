@@ -17,15 +17,31 @@ export default function OpticalSidebar({
   const totalQuestions = questions.length;
   const answeredCount = Object.keys(answers).length;
 
-  // --- İlerleme Halkası (Circular Progress) Hesaplamaları ---
+  // --- İlerleme Halkası Hesaplamaları ---
   const radius = 28;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (answeredCount / totalQuestions) * circumference;
 
+  // Sidebar genişliği (w-80 = 20rem = 320px)
+  const sidebarWidth = 320;
+
   return (
     <>
       {/* --- YÜZEN BUTON (FAB) & DİNAMİK İLERLEME HALKASI --- */}
-      <div className="fixed bottom-16 right-6 z-60 flex items-center justify-center group">
+      {/* motion.div ekledik ve isDrawerOpen durumuna göre x ekseninde kaydırdık */}
+      <motion.div 
+        className="fixed bottom-12 right-6 z-60 flex items-center justify-center group"
+        initial={false}
+        animate={{ 
+          x: isDrawerOpen ? -sidebarWidth : 0,
+        }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 400, 
+          damping: 40,
+          mass: 1 
+        }}
+      >
         {/* İlerleme Halkası (SVG) */}
         <svg width="76" height="76" className="absolute -rotate-90 pointer-events-none drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
           <circle 
@@ -37,7 +53,7 @@ export default function OpticalSidebar({
           <motion.circle 
             cx="38" cy="38" r={radius} 
             fill="none" 
-            stroke="#22d3ee" // cyan-400
+            stroke="#22d3ee" 
             strokeWidth="3" 
             strokeDasharray={circumference}
             animate={{ strokeDashoffset }}
@@ -49,11 +65,11 @@ export default function OpticalSidebar({
         {/* Butonun Kendisi */}
         <button 
           onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-          className={`relative z-10 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${isDrawerOpen ? 'bg-slate-800 text-slate-300 scale-90' : 'bg-[#0f172a] text-cyan-400 hover:bg-cyan-950/50 hover:scale-105'}`}
+          className={`relative z-10 w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 ${isDrawerOpen ? 'bg-slate-800 text-slate-300 scale-90 shadow-xl border-white/10' : 'bg-[#0f172a] text-cyan-400 hover:bg-cyan-950/50 hover:scale-105 shadow-[0_0_20px_rgba(6,182,212,0.3)]'}`}
         >
           {isDrawerOpen ? <XCircle className="w-6 h-6" /> : <Map className="w-6 h-6" />}
         </button>
-      </div>
+      </motion.div>
 
 
       {/* --- ÇEKMECE (DRAWER) ARKAPLAN KARARTMASI --- */}
@@ -63,7 +79,7 @@ export default function OpticalSidebar({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm" // lg:hidden kaldırıldı
+            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
             onClick={() => setIsDrawerOpen(false)}
           />
         )}
@@ -71,9 +87,16 @@ export default function OpticalSidebar({
 
 
       {/* --- MİNİMAP ÇEKMECESİ (DRAWER) --- */}
-      {/* top Navbar yüksekliğine sabitlendi, yükseklik hesaplandı */}
-      <div className={`fixed top-(--navbar-height) right-0 z-50 w-80 bg-[#0f172a]/95 backdrop-blur-xl border-l border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.8)] transform transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)] flex flex-col h-[calc(100vh-var(--navbar-height))] ${isDrawerOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        
+      <motion.div 
+        initial={false}
+        animate={{ x: isDrawerOpen ? 0 : "100%" }}
+        transition={{ 
+          type: "spring", 
+          stiffness: 400, 
+          damping: 40 
+        }}
+        className="fixed top-18 right-0 z-50 w-80 bg-[#0f172a]/95 backdrop-blur-2xl border-l border-white/10 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] flex flex-col h-[calc(100dvh-4.5rem)]"
+      >
         {/* Çekmece Başlığı */}
         <div className="p-6 border-b border-white/10 bg-linear-to-b from-white/5 to-transparent flex justify-between items-center">
           <h3 className="font-bold text-slate-100 flex items-center gap-3 text-lg">
@@ -82,7 +105,7 @@ export default function OpticalSidebar({
           </h3>
           <div className="flex flex-col items-end">
             <span className="text-2xl font-black text-cyan-400 leading-none">{answeredCount}</span>
-            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">/ {totalQuestions} {t('exam.answered', {defaultValue: 'SOLVED'})}</span>
+            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">/ {totalQuestions} {t('exam.solved')}</span>
           </div>
         </div>
 
@@ -110,7 +133,6 @@ export default function OpticalSidebar({
                   className={boxStyle}
                   onClick={() => {
                     onJump(i);
-                    // Sadece mobilde çekmeceyi kapat (Geniş ekranda açık kalsın)
                     if (window.innerWidth < 1024) setIsDrawerOpen(false);
                   }}
                 >
@@ -138,10 +160,10 @@ export default function OpticalSidebar({
         </div>
 
         {/* Alt Bilgi */}
-        <div className="p-4 border-t border-white/10 text-center text-xs text-slate-500 font-medium bg-black/20">
-           {t('exam.jumpHint', {defaultValue: 'Bir soruya gitmek için dokun.'})}
-        </div>
-      </div>
+          <div className="p-4 border-t border-white/10 text-center text-xs text-slate-500 font-medium bg-black/20">
+            {t('exam.jumpHint', {defaultValue: 'Bir soruya gitmek için dokun.'})}
+          </div>
+      </motion.div>
     </>
   );
 }

@@ -146,7 +146,11 @@ export default function Exam() {
               <ModalHeader><HelpCircle className="mr-2 text-cyan-400" />{t('exam.finishExam')}</ModalHeader>
               <ModalBody>
                 <p>{t('exam.finishConfirm')}</p>
-                {answeredCount < totalQuestions && <p className="text-rose-400 mt-2 text-sm">{totalQuestions - answeredCount} cevapsız sorunuz var!</p>}
+                {answeredCount < totalQuestions && (
+                  <p className="text-rose-400 mt-2 text-sm">
+                    {t('exam.unansweredWarning', { count: totalQuestions - answeredCount })}
+                  </p>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="ghost" onPress={onClose}>{t('common.cancel')}</Button>
