@@ -73,7 +73,9 @@
   },
   "exam": {
     "preparing": "Sorular hazırlanıyor, lütfen bekleyin...",
+    "apiError": "API limiti aşıldı. Lütfen 5 saniye sonra sayfayı yenileyin.",
     "resultsTitle": "Sınav Sonuçları",
+    "successRate": "Başarı Oranı",
     "retry": "Tekrar",
     "resultTextGood": "Harika iş — aynen devam!",
     "resultTextBad": "Yanlışları gözden geçirin ve tekrar deneyin.",

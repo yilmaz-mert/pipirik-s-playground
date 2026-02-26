@@ -73,7 +73,9 @@
   },
   "exam": {
     "preparing": "Przygotowywanie pytań, proszę czekać...",
+    "apiError": "Limit API został osiągnięty. Odśwież stronę za 5 sekund.",
     "resultsTitle": "Wyniki egzaminu",
+    "successRate": "Wskaźnik sukcesu",
     "retry": "Ponów próbę",
     "resultTextGood": "Świetna robota — tak trzymaj!",
     "resultTextBad": "Przejrzyj błędy i spróbuj ponownie.",

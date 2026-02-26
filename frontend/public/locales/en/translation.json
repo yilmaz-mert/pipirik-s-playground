@@ -73,7 +73,9 @@
   },
   "exam": {
     "preparing": "Preparing questions, please wait...",
+    "apiError": "API limit reached. Please refresh the page after 5 seconds.",
     "resultsTitle": "Exam Results",
+    "successRate": "Success Rate",
     "retry": "Retry",
     "resultTextGood": "Great work — keep it up!",
     "resultTextBad": "Review the incorrect items and try again.",

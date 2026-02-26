@@ -8,8 +8,7 @@ import { HelpCircle } from "lucide-react";
 import LoadingScreen from "./components/LoadingScreen";
 import ActiveExam from "./components/ActiveExam";
 import OpticalSidebar from "./components/OpticalSidebar";
-import ResultScreen from "./components/ResultScreen";
-import MistakeReviewModal from "./components/MistakeReviewModal";
+import ResultDashboard from "./components/ResultDashboard"; 
 
 export default function Exam() {
   const { t } = useTranslation();
@@ -21,11 +20,9 @@ export default function Exam() {
   const [loading, setLoading] = useState(true);    
   const [timeLeft, setTimeLeft] = useState(600);   
   const [isFinished, setIsFinished] = useState(false); 
-  const [openWrongDetails, setOpenWrongDetails] = useState({});
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Yeni State Eklendi
   
   const confirmDisclosure = useDisclosure(); 
-  const mistakeDisclosure = useDisclosure(); 
   
   const answeredCount = Object.keys(answers).length;
   const totalQuestions = questions.length;
@@ -78,23 +75,23 @@ export default function Exam() {
   // --- YÜKLEME EKRANI ---
   if (loading) return <LoadingScreen />;
 
+  // --- API ÇÖKME KORUMASI ---
+  if (!loading && questions.length === 0 && !isFinished) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[70vh] gap-4">
+        <p className="text-rose-400 font-bold">{t('exam.apiError', {defaultValue: 'API limitine takıldınız. Lütfen 5 saniye sonra sayfayı yenileyin.'})}</p>
+        <Button onPress={() => window.location.reload()}>{t('exam.retry', {defaultValue: 'Tekrar Dene'})}</Button>
+      </div>
+    );
+  }
+
   // --- SONUÇ EKRANI ---
   if (isFinished && results) {
     return (
-        <>
-            <ResultScreen 
-                results={results} 
-                onRetry={() => window.location.reload()} 
-                onViewMistakes={mistakeDisclosure.onOpen} 
-            />
-            <MistakeReviewModal 
-                isOpen={mistakeDisclosure.isOpen}
-                onOpenChange={mistakeDisclosure.onOpenChange}
-                wrongList={results.wrongList}
-                openWrongDetails={openWrongDetails}
-                toggleWrongDetail={(idx) => setOpenWrongDetails(prev => ({ ...prev, [idx]: !prev[idx] }))}
-            />
-        </>
+        <ResultDashboard 
+            results={results} 
+            onRetry={() => window.location.reload()} 
+        />
     );
   }
 
