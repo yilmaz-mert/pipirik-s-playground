@@ -48,7 +48,9 @@
     "exam": "Sınav",
     "examDesc": "Gerçek zamanlı cevap kontrolü, yerelleştirilmiş metinler, klavye ile gezinme ve ilerleme kalıcılığı sunan doğrulama odaklı sınav arayüzü. Kullanıcıya düşük gecikme ve net geri bildirim sağlamaya odaklıdır.",
     "flightTracker": "Uçuş Takipçisi",
-    "flightTrackerDesc": "Canlı uçuş konumlarını göstermek için React ve Leaflet kullanılarak oluşturulmuş; özel kümelenmiş işaretçiler ve performanslı harita etkileşimleri içerir. API yeniden deneme/önbellekleme, harita kontrolleri için erişilebilir etiketler ve mobil dostu hareketler sağlar."
+    "flightTrackerDesc": "Canlı uçuş konumlarını göstermek için React ve Leaflet kullanılarak oluşturulmuş; özel kümelenmiş işaretçiler ve performanslı harita etkileşimleri içerir. API yeniden deneme/önbellekleme, harita kontrolleri için erişilebilir etiketler ve mobil dostu hareketler sağlar.",
+    "multiplicationMania": "Çarpım Tablosu Macerası",
+    "multiplicationManiaDesc": "Ezber kartları, sıralı testler ve zamana karşı yarış gibi farklı modlar içeren, interaktif bir çarpım tablosu öğrenme oyunu."
   },
   "hangman": {
     "loading": "Kelime Yükleniyor...",

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody, Divider, Chip } from "@heroui/react";
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
-import { PlaneTakeoff, CheckSquare, FileQuestion, Gamepad2 } from "lucide-react"; // İkonlar eklendi
+import { PlaneTakeoff, CheckSquare, FileQuestion, Gamepad2, Calculator } from "lucide-react"; // İkonlar eklendi
 
 const Projects = () => {
   const location = useLocation();
@@ -15,37 +15,47 @@ const Projects = () => {
 
   // Projelere ikonlar eklendi
   const projectList = [
-    { 
-      id: 'flight-tracker', 
-      title: t('projects.flightTracker'), 
-      desc: t('projects.flightTrackerDesc'),
-      size: "lg:col-span-2", 
-      tech: ["React", "Leaflet.js", "API", "Lucide"],
+    {
+      id: 'multiplication-mania',
+      title: t('projects.multiplicationMania'),
+      desc: t('projects.multiplicationManiaDesc'),
+      size: "lg:col-span-2",
+      tech: ["React 19", "Tailwind v4", "Zustand", "Framer Motion", "use-sound"],
       isFeatured: true,
+      icon: Calculator,
+      color: "from-amber-500/20 to-yellow-500/5",
+      externalUrl: "https://akilkati.yilmaz.website/"
+    },
+    {
+      id: 'flight-tracker',
+      title: t('projects.flightTracker'),
+      desc: t('projects.flightTrackerDesc'),
+      size: "lg:col-span-1",
+      tech: ["React", "Leaflet.js", "API", "Lucide"],
       icon: PlaneTakeoff,
       color: "from-cyan-500/20 to-blue-500/5"
     },
-    { 
-      id: 'exam', 
-      title: t('projects.exam'), 
+    {
+      id: 'exam',
+      title: t('projects.exam'),
       desc: t('projects.examDesc'),
       size: "lg:col-span-1",
       tech: ["React", "Validation"],
       icon: FileQuestion,
       color: "from-purple-500/20 to-fuchsia-500/5"
     },
-    { 
-      id: 'todolist', 
-      title: t('projects.todolist'), 
+    {
+      id: 'todolist',
+      title: t('projects.todolist'),
       desc: t('projects.todolistDesc'),
       size: "lg:col-span-1",
       tech: ["Local Storage", "React"],
       icon: CheckSquare,
       color: "from-emerald-500/20 to-teal-500/5"
     },
-    { 
-      id: 'hangman', 
-      title: t('projects.hangman'), 
+    {
+      id: 'hangman',
+      title: t('projects.hangman'),
       desc: t('projects.hangmanDesc'),
       size: "lg:col-span-1",
       tech: ["JavaScript", "CSS Animation"],
@@ -99,9 +109,11 @@ const Projects = () => {
                 
                 return (
                   <motion.div key={project.id} variants={itemVariants} className={project.size}>
-                    <Card 
-                      as={RouterLink}
-                      to={project.id}
+                    <Card
+                      {...(project.externalUrl
+                        ? { as: "a", href: project.externalUrl, target: "_blank", rel: "noopener noreferrer" }
+                        : { as: RouterLink, to: project.id }
+                      )}
                       className="group relative h-full flex flex-col overflow-hidden bg-[#1e293b]/50 backdrop-blur-xl border border-white/5 hover:border-white/10 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-cyan-500/10"
                     >
                       {/* Kart İçi Arka Plan Efekti (Glow) */}
