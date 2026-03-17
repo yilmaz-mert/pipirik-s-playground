@@ -6,13 +6,17 @@ import { flushSync } from 'react-dom';
  * Add new skin names here as the project grows.
  * Each name must have a matching [data-theme="<name>"] block in index.css.
  */
-const THEMES = ['modern-dark'];
+const THEMES = ['cyber-naturalism'];
 
 const ThemeContext = createContext(null);
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState(
-    () => localStorage.getItem('pp-theme') ?? 'modern-dark'
+    // Migrate old stored value if user had the previous key
+    () => {
+      const stored = localStorage.getItem('pp-theme');
+      return THEMES.includes(stored) ? stored : 'cyber-naturalism';
+    }
   );
 
   // Apply data-theme before first paint to prevent a flash of default styles.

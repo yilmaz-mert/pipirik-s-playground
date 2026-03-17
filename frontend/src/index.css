@@ -27,42 +27,43 @@
    ============================================================ */
 
 :root,
-[data-theme="modern-dark"] {
+[data-theme="cyber-naturalism"] {
   /* --- Layout ------------------------------------------------ */
-  --navbar-height: 4.5rem;
+  --navbar-height: 0rem;  /* No top navbar — dock is at bottom. Mini-apps that reference this get top: 0. */
+  --dock-height:   5rem;
 
-  /* --- Background Layers ------------------------------------ */
-  --color-bg-base:    #0f172a;
-  --color-bg-surface: rgba(30, 41, 59, 0.4);
-  --color-bg-overlay: rgba(15, 23, 42, 0.98);
-
-  /* --- Borders ---------------------------------------------- */
-  --color-border:        rgba(51, 65, 85, 0.5);
-  --color-border-subtle: rgba(255, 255, 255, 0.05);
-
-  /* --- Text Hierarchy --------------------------------------- */
-  --color-text-primary:   #f1f5f9;  /* slate-100 */
-  --color-text-secondary: #cbd5e1;  /* slate-300 */
-  --color-text-muted:     #94a3b8;  /* slate-400 */
-
-  /* --- Brand Accents ---------------------------------------- */
-  --color-accent:   #38bdf8;        /* cyan-400  */
-  --color-accent-2: #818cf8;        /* violet-400 */
+  /* --- Background Layers — Cyber-Naturalism palette --------- */
+  --color-bg-base:    #0A0A0B;                  /* Deep Charcoal Grey  */
+  --color-bg-surface: rgba(22, 22, 24, 0.60);   /* Dark Slate, layered */
+  --color-bg-overlay: rgba(10, 10, 11, 0.98);   /* Near-black glass    */
 
   /* --- Surface States --------------------------------------- */
-  --color-bg-navbar:     rgba(15, 23, 42, 0.8);   /* sticky nav bar */
-  --color-bg-card:       rgba(30, 41, 59, 0.5);   /* project cards */
-  --color-bg-card-solid: #1e293b;                 /* opaque card bg (e.g. image container) */
-  --color-image-overlay: rgba(15, 23, 42, 0.6);   /* bottom-fade on profile photo */
-  --color-surface-hover: rgba(255, 255, 255, 0.1);/* hover tint for white-on-dark surfaces */
+  --color-bg-dock:       rgba(10, 10, 11, 0.72);  /* floating dock glass */
+  --color-bg-card:       rgba(22, 22, 24, 0.65);  /* bento card bg       */
+  --color-bg-card-solid: #161618;                 /* opaque card/image container */
+  --color-image-overlay: rgba(10, 10, 11, 0.65);  /* photo bottom fade   */
+  --color-surface-hover: rgba(181, 126, 220, 0.08);/* lavender hover tint */
+
+  /* --- Borders — lavender-tinted ----------------------------- */
+  --color-border:        rgba(181, 126, 220, 0.18);
+  --color-border-subtle: rgba(181, 126, 220, 0.08);
+
+  /* --- Text Hierarchy --------------------------------------- */
+  --color-text-primary:   #EDE8F5;  /* lavender-tinted white  */
+  --color-text-secondary: #B8B0C8;  /* medium lavender-grey   */
+  --color-text-muted:     #6E677A;  /* deep muted purple-grey */
+
+  /* --- Brand Accents — Digital Lavender --------------------- */
+  --color-accent:   #B57EDC;  /* Digital Lavender (primary)   */
+  --color-accent-2: #D4A8F0;  /* Pale Lavender    (secondary) */
 
   /* --- Animated Background Blobs ---------------------------- */
-  --blob-primary:        rgba(6, 182, 212, 0.2);
-  --blob-primary-fade:   rgba(139, 92, 246, 0.05);
-  --blob-secondary:      rgba(139, 92, 246, 0.2);
-  --blob-secondary-fade: rgba(6, 182, 212, 0.05);
-  --blob-blur:           80px;
-  --blob-blur-mobile:    30px;
+  --blob-primary:        rgba(181, 126, 220, 0.12);
+  --blob-primary-fade:   rgba(181, 126, 220, 0.02);
+  --blob-secondary:      rgba(139, 85,  196, 0.10);
+  --blob-secondary-fade: rgba(212, 168, 240, 0.02);
+  --blob-blur:           110px;
+  --blob-blur-mobile:    55px;
 
   /* --- Portal / Dropdown Timing ----------------------------- */
   --ps-duration:   220ms;
@@ -70,7 +71,7 @@
   --ps-open-delay: 60ms;
 }
 
-/* Future theme stubs — populate when ready:
+/* Future theme stubs — extend when new skins ship:
 [data-theme="liquid-glass"] { --color-bg-base: ...; --color-accent: ...; }
 [data-theme="retro-rpg"]    { --color-bg-base: ...; --color-accent: ...; }
 */
@@ -120,10 +121,17 @@ html, body {
 #root {
   @apply w-full min-h-screen;
   isolation: isolate;
+  /* Ensure no page content hides beneath the fixed floating dock */
+  padding-bottom: calc(var(--dock-height) + 2.5rem);
 }
 
 h1 {
-  @apply font-bold bg-linear-to-r from-cyan-500 to-violet-500 bg-clip-text text-transparent pb-1.5 leading-[1.05] inline-block overflow-visible;
+  /* Gradient uses accent tokens — auto-reacts to any future theme swap */
+  @apply font-bold pb-1.5 leading-[1.05] inline-block overflow-visible;
+  background: linear-gradient(to right, var(--color-accent), var(--color-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 h2 {
@@ -186,7 +194,9 @@ body.flash-incorrect { @apply bg-red-500/15!;   transition: background-color 0.3
    DROPDOWN / MODAL PORTAL
    ============================================================ */
 .page-select-portal {
-  @apply bg-slate-900/98 backdrop-blur-md border border-white/5 rounded-xl shadow-2xl opacity-0 z-9999 overflow-auto origin-top;
+  @apply backdrop-blur-md rounded-xl shadow-2xl opacity-0 z-9999 overflow-auto origin-top;
+  background-color: var(--color-bg-overlay);
+  border: 1px solid var(--color-border-subtle);
   transform: translateY(-8px) scale(0.985);
   transition:
     transform var(--ps-duration) var(--ps-easing),
@@ -206,3 +216,58 @@ body.flash-incorrect { @apply bg-red-500/15!;   transition: background-color 0.3
 }
 .page-select-backdrop.open    { @apply opacity-100; }
 .page-select-backdrop.closing { @apply opacity-0;   }
+
+/* ============================================================
+   ENGINEER MODE
+   Toggled by data-engineer-mode on <body> (set by EngineerModeContext).
+   Uses [data-comp] attributes on existing root elements — NO extra divs.
+   ::before   → component label chip
+   ::after    → right-angle corner mark (decorative, bottom-right)
+   outline    → coloured dashed boundary
+   ============================================================ */
+[data-engineer-mode] [data-comp] {
+  position: relative;
+  outline: 1px dashed color-mix(in srgb, var(--color-accent) 35%, transparent);
+  outline-offset: 3px;
+}
+
+[data-engineer-mode] [data-comp]::before {
+  content: "⟨ " attr(data-comp) " ⟩";
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-100%);
+  background: var(--color-accent);
+  color: var(--color-bg-base);
+  font-size: 9px;
+  font-family: ui-monospace, 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  padding: 2px 7px;
+  border-radius: 3px 3px 0 0;
+  white-space: nowrap;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0.92;
+}
+
+/* Corner tick — bottom-right, uses ::after on the same element */
+[data-engineer-mode] [data-comp]::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid var(--color-accent);
+  border-bottom: 2px solid var(--color-accent);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Suppress engineer annotations inside the isolated project mini-apps */
+[data-engineer-mode] .project-sandbox [data-comp]::before,
+[data-engineer-mode] .project-sandbox [data-comp]::after {
+  display: none;
+}

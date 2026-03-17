@@ -5,24 +5,27 @@ import './index.css'
 import App from './App.jsx'
 import './i18n'
 import { ThemeProvider } from './context/ThemeContext';
+import { EngineerModeProvider } from './context/EngineerModeContext';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
-      <HeroUIProvider>
-        <Suspense fallback={
-          <div
-            className="h-screen w-screen flex items-center justify-center"
-            style={{ backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}
-          >
-            Loading...
-          </div>
-        }>
-          <main className="dark text-foreground min-h-screen">
-            <App />
-          </main>
-        </Suspense>
-      </HeroUIProvider>
+      <EngineerModeProvider>
+        <HeroUIProvider>
+          <Suspense fallback={
+            <div
+              className="h-screen w-screen flex items-center justify-center"
+              style={{ backgroundColor: 'var(--color-bg-base)', color: 'var(--color-text-primary)' }}
+            >
+              Loading...
+            </div>
+          }>
+            <main className="dark text-foreground min-h-screen">
+              <App />
+            </main>
+          </Suspense>
+        </HeroUIProvider>
+      </EngineerModeProvider>
     </ThemeProvider>
   </StrictMode>,
 )

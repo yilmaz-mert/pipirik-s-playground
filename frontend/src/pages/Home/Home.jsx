@@ -9,7 +9,7 @@ import ProfileSection from './components/ProfileSection';
 
 const Home = () => {
   return (
-    <main className="relative z-10 flex items-center justify-center h-[calc(100dvh-var(--navbar-height))] overflow-hidden">
+    <main data-comp="Home" className="relative z-10 flex items-center justify-center overflow-hidden" style={{ minHeight: 'calc(100dvh - var(--dock-height) - 3rem)' }}>
       <div className="mx-auto w-full px-6 sm:px-12 lg:px-16 max-w-7xl h-full flex items-center">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center w-full py-2">
           

@@ -7,6 +7,7 @@ import MobileMenu from './MobileMenu';
 function Navbar() {
   return (
     <nav
+      data-comp="Navbar"
       className="backdrop-blur-md h-18 border-b sticky top-0 z-1000 transition-all duration-300"
       style={{
         backgroundColor: 'var(--color-bg-navbar)',

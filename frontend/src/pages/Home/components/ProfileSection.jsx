@@ -9,6 +9,7 @@ export default function ProfileSection() {
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+      data-comp="ProfileSection"
       className="flex justify-center lg:justify-end"
     >
       <div className="relative w-36 h-36 md:w-104 md:h-104 group">

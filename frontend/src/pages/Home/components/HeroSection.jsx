@@ -7,7 +7,7 @@ export default function HeroSection() {
   const { t } = useTranslation();
 
   return (
-    <header className="space-y-1 md:space-y-3">
+    <header data-comp="HeroSection" className="space-y-1 md:space-y-3">
       {/* Availability badge — semantic blue kept intentionally (status indicator, not theme color) */}
       <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs md:text-sm font-medium w-fit">
         <span className="relative flex h-2 w-2 mr-2">

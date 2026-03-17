@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 export default function SocialLinks() {
   return (
     <motion.div
+      data-comp="SocialLinks"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.8 }}

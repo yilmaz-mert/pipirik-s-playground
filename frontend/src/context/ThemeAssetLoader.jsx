@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, lazy } from 'react';
 import { useTheme } from './ThemeContext';
 
 /**
@@ -19,6 +19,7 @@ import { useTheme } from './ThemeContext';
  * up its WebGL context on unmount.
  */
 const THEME_ASSETS = {
+  'cyber-naturalism': lazy(() => import('../themes/cyber-naturalism/FluidBackground')),
   // 'liquid-glass': lazy(() => import('../themes/liquid-glass/LiquidGlassAssets')),
   // 'retro-rpg':    lazy(() => import('../themes/retro-rpg/RetroRpgAssets')),
 };

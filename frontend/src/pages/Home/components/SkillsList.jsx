@@ -20,6 +20,7 @@ export default function SkillsList() {
 
   return (
     <motion.div
+      data-comp="SkillsList"
       variants={container}
       initial="hidden"
       animate="visible"
