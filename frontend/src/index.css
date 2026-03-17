@@ -3,45 +3,118 @@
 @plugin './hero.js';
 @source '../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}';
 @custom-variant dark (&:is(.dark *));
+
 @theme {
   --animate-morph: morph 8s ease-in-out infinite;
   --animate-bounce-slow: bounce-slow 3s infinite;
 
   @keyframes morph {
     0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-    50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    50%       { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
   }
 
   @keyframes bounce-slow {
     0%, 100% { transform: translateY(-5%); }
-    50% { transform: translateY(0); }
+    50%       { transform: translateY(0); }
   }
 }
 
-/* --- 1. GLOBAL FONTS & THEME VARIABLES --- */
+/* ============================================================
+   DESIGN TOKEN SYSTEM
+   To add a new theme skin, add a [data-theme="your-skin"] block
+   below and override the variables you need. Phase THREE will
+   lazy-load any heavy assets (Three.js, WebGPU) per skin.
+   ============================================================ */
 
-:root {
-  /* Navbar Layout */
+:root,
+[data-theme="modern-dark"] {
+  /* --- Layout ------------------------------------------------ */
   --navbar-height: 4.5rem;
-  
-  /* Global Theme Colors */
-  --accent: #38BDF8;
-  --accent-2: #818CF8;
-  --card-bg: rgba(30, 41, 59, 0.4);
-  --card-border: rgba(51, 65, 85, 0.5);
-  --muted: #94A3B8;
-  --page-bg: #0f172a;
+
+  /* --- Background Layers ------------------------------------ */
+  --color-bg-base:    #0f172a;
+  --color-bg-surface: rgba(30, 41, 59, 0.4);
+  --color-bg-overlay: rgba(15, 23, 42, 0.98);
+
+  /* --- Borders ---------------------------------------------- */
+  --color-border:        rgba(51, 65, 85, 0.5);
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+
+  /* --- Text Hierarchy --------------------------------------- */
+  --color-text-primary:   #f1f5f9;  /* slate-100 */
+  --color-text-secondary: #cbd5e1;  /* slate-300 */
+  --color-text-muted:     #94a3b8;  /* slate-400 */
+
+  /* --- Brand Accents ---------------------------------------- */
+  --color-accent:   #38bdf8;        /* cyan-400  */
+  --color-accent-2: #818cf8;        /* violet-400 */
+
+  /* --- Surface States --------------------------------------- */
+  --color-bg-navbar:     rgba(15, 23, 42, 0.8);   /* sticky nav bar */
+  --color-bg-card:       rgba(30, 41, 59, 0.5);   /* project cards */
+  --color-bg-card-solid: #1e293b;                 /* opaque card bg (e.g. image container) */
+  --color-image-overlay: rgba(15, 23, 42, 0.6);   /* bottom-fade on profile photo */
+  --color-surface-hover: rgba(255, 255, 255, 0.1);/* hover tint for white-on-dark surfaces */
+
+  /* --- Animated Background Blobs ---------------------------- */
+  --blob-primary:        rgba(6, 182, 212, 0.2);
+  --blob-primary-fade:   rgba(139, 92, 246, 0.05);
+  --blob-secondary:      rgba(139, 92, 246, 0.2);
+  --blob-secondary-fade: rgba(6, 182, 212, 0.05);
+  --blob-blur:           80px;
+  --blob-blur-mobile:    30px;
+
+  /* --- Portal / Dropdown Timing ----------------------------- */
+  --ps-duration:   220ms;
+  --ps-easing:     cubic-bezier(0.16, 0.84, 0.24, 1);
+  --ps-open-delay: 60ms;
 }
 
-@media (max-width: 992px) {
-  :root { --navbar-height: 4.5rem; }
+/* Future theme stubs — populate when ready:
+[data-theme="liquid-glass"] { --color-bg-base: ...; --color-accent: ...; }
+[data-theme="retro-rpg"]    { --color-bg-base: ...; --color-accent: ...; }
+*/
+
+/* ============================================================
+   VIEW TRANSITION API — Theme-switch animation
+   Runs when document.startViewTransition() is called.
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root) {
+    animation: vt-out 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  ::view-transition-new(root) {
+    animation: vt-in 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
 }
 
-/* --- 2. GLOBAL HTML & BODY STYLES --- */
+@keyframes vt-out {
+  from { opacity: 1; transform: scale(1);    }
+  to   { opacity: 0; transform: scale(0.98); }
+}
+
+@keyframes vt-in {
+  from { opacity: 0; transform: scale(1.02); }
+  to   { opacity: 1; transform: scale(1);    }
+}
+
+/* Respect reduced-motion by disabling transition animations */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   GLOBAL HTML & BODY STYLES
+   ============================================================ */
 html, body {
-  @apply h-full text-slate-100 antialiased overflow-x-hidden;
+  @apply h-full antialiased overflow-x-hidden;
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #0f172a;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-base);
 }
 
 #root {
@@ -58,10 +131,12 @@ h2 {
 }
 
 p {
-  @apply text-slate-400;
+  color: var(--color-text-muted);
 }
 
-/* --- 3. BACKGROUND ANIMATION (Optimize Edilmiş) --- */
+/* ============================================================
+   BACKGROUND ANIMATION
+   ============================================================ */
 .bg-animation {
   @apply fixed inset-0 overflow-hidden pointer-events-none;
   z-index: -1;
@@ -70,8 +145,8 @@ p {
 
 .blob {
   @apply absolute rounded-full;
-  filter: blur(80px); 
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(139, 92, 246, 0.05) 100%);
+  filter: blur(var(--blob-blur));
+  background: radial-gradient(circle, var(--blob-primary) 0%, var(--blob-primary-fade) 100%);
   animation: organic-move 15s infinite alternate ease-in-out;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -80,42 +155,42 @@ p {
 
 @media (max-width: 768px) {
   .blob {
-    filter: blur(30px);
-    width: 300px !important; 
+    filter: blur(var(--blob-blur-mobile));
+    width: 300px !important;
     height: 300px !important;
   }
 }
 
 .blob:nth-child(1) { width: 450px; height: 450px; top: -10%; left: 10%; }
-.blob:nth-child(2) { 
-  width: 600px; height: 600px; top: 40%; left: 50%; 
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(6, 182, 212, 0.05) 100%);
+.blob:nth-child(2) {
+  width: 600px; height: 600px; top: 40%; left: 50%;
+  background: radial-gradient(circle, var(--blob-secondary) 0%, var(--blob-secondary-fade) 100%);
   animation-duration: 20s;
   animation-delay: -5s;
 }
 
 @keyframes organic-move {
-  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
-  33%  { transform: translate(10%, 15%) scale(1.1) rotate(10deg); }
-  66%  { transform: translate(-5%, 20%) scale(0.9) rotate(-10deg); }
-  100% { transform: translate(15%, -10%) scale(1.05) rotate(5deg); }
+  0%   { transform: translate(0, 0)     scale(1)    rotate(0deg);   }
+  33%  { transform: translate(10%, 15%) scale(1.1)  rotate(10deg);  }
+  66%  { transform: translate(-5%, 20%) scale(0.9)  rotate(-10deg); }
+  100% { transform: translate(15%, -10%) scale(1.05) rotate(5deg);  }
 }
 
-/* --- 4. FLASH FEEDBACK (Oyunlar İçin) --- */
-body.flash-correct { @apply bg-green-500/15!; transition: background-color 0.3s; }
-body.flash-incorrect { @apply bg-red-500/15!; transition: background-color 0.3s; }
+/* ============================================================
+   FLASH FEEDBACK (For Games — do not remove)
+   ============================================================ */
+body.flash-correct   { @apply bg-green-500/15!; transition: background-color 0.3s; }
+body.flash-incorrect { @apply bg-red-500/15!;   transition: background-color 0.3s; }
 
-/* --- 5. DROPDOWN / MODAL PORTAL --- */
-:root {
-  --ps-duration: 220ms;
-  --ps-easing: cubic-bezier(.16,.84,.24,1);
-  --ps-open-delay: 60ms;
-}
-
+/* ============================================================
+   DROPDOWN / MODAL PORTAL
+   ============================================================ */
 .page-select-portal {
   @apply bg-slate-900/98 backdrop-blur-md border border-white/5 rounded-xl shadow-2xl opacity-0 z-9999 overflow-auto origin-top;
   transform: translateY(-8px) scale(0.985);
-  transition: transform var(--ps-duration) var(--ps-easing), opacity var(--ps-duration) var(--ps-easing);
+  transition:
+    transform var(--ps-duration) var(--ps-easing),
+    opacity  var(--ps-duration) var(--ps-easing);
 }
 .page-select-portal.open {
   @apply opacity-100 scale-100 translate-y-0;
@@ -129,5 +204,5 @@ body.flash-incorrect { @apply bg-red-500/15!; transition: background-color 0.3s;
   @apply fixed inset-0 bg-black/20 backdrop-blur-sm opacity-0 z-9998;
   transition: opacity var(--ps-duration) var(--ps-easing);
 }
-.page-select-backdrop.open { @apply opacity-100; }
-.page-select-backdrop.closing { @apply opacity-0; }
+.page-select-backdrop.open    { @apply opacity-100; }
+.page-select-backdrop.closing { @apply opacity-0;   }

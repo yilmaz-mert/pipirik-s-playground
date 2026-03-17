@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 
 export default function SocialLinks() {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.8 }}
@@ -19,10 +19,29 @@ export default function SocialLinks() {
         isIconOnly
         variant="flat"
         size="lg"
-        className="bg-white/5 border border-white/10 hover:border-[#38BDF8] text-slate-400 hover:text-[#38BDF8] transition-all h-14 w-14"
+        className="transition-all h-14 w-14 border"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderColor:     'var(--color-border-subtle)',
+          color:           'var(--color-text-muted)',
+          '--hover-border': 'var(--color-accent)',
+          '--hover-color':  'var(--color-accent)',
+        }}
+        // HeroUI doesn't forward style vars to hover state, so we keep
+        // the hover classes as Tailwind — accent is already a CSS var
+        // so any future theme change to --color-accent flows through here.
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = 'var(--color-accent)';
+          e.currentTarget.style.color       = 'var(--color-accent)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+          e.currentTarget.style.color       = 'var(--color-text-muted)';
+        }}
       >
         <FaGithub size={24} />
       </Button>
+
       <Button
         as="a"
         href="https://www.linkedin.com/in/yilmaz-mert/"
@@ -30,7 +49,20 @@ export default function SocialLinks() {
         isIconOnly
         variant="flat"
         size="lg"
-        className="bg-white/5 border border-white/10 hover:border-[#818CF8] text-slate-400 hover:text-[#818CF8] transition-all h-14 w-14"
+        className="transition-all h-14 w-14 border"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          borderColor:     'var(--color-border-subtle)',
+          color:           'var(--color-text-muted)',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = 'var(--color-accent-2)';
+          e.currentTarget.style.color       = 'var(--color-accent-2)';
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = 'var(--color-border-subtle)';
+          e.currentTarget.style.color       = 'var(--color-text-muted)';
+        }}
       >
         <FaLinkedin size={24} />
       </Button>

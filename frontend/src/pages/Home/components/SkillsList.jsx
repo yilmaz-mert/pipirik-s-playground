@@ -9,20 +9,17 @@ export default function SkillsList() {
   const skills = t('home.skills', { returnObjects: true }) || [];
 
   const container = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.3 }
-    }
+    hidden:  { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.3 } },
   };
 
   const item = {
-    hidden: { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1 }
+    hidden:  { opacity: 0, scale: 0.8 },
+    visible: { opacity: 1, scale: 1 },
   };
 
   return (
-    <motion.div 
+    <motion.div
       variants={container}
       initial="hidden"
       animate="visible"
@@ -32,7 +29,12 @@ export default function SkillsList() {
         <motion.div key={skill} variants={item}>
           <Chip
             variant="flat"
-            className="border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 transition-colors cursor-default px-4 h-8"
+            className="transition-colors cursor-default px-4 h-8 border"
+            style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              borderColor:     'var(--color-border-subtle)',
+              color:           'var(--color-text-secondary)',
+            }}
           >
             {skill}
           </Chip>

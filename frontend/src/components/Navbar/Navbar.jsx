@@ -6,12 +6,24 @@ import MobileMenu from './MobileMenu';
 
 function Navbar() {
   return (
-    // h-(--navbar-height) yerine standart h-[4.5rem] kullanıyoruz
-    <nav className="bg-slate-900/80 backdrop-blur-md h-18 border-b border-slate-700/50 sticky top-0 z-1000 transition-all duration-300">
+    <nav
+      className="backdrop-blur-md h-18 border-b sticky top-0 z-1000 transition-all duration-300"
+      style={{
+        backgroundColor: 'var(--color-bg-navbar)',
+        borderColor: 'var(--color-border)',
+      }}
+    >
       <div className="max-w-300 w-full h-full mx-auto flex justify-between items-center px-8 relative">
-        
-        <NavLink to="/" className="text-2xl font-bold text-slate-50 tracking-tight shrink-0">
-          Pipirik's <span className="bg-linear-to-r from-cyan-400 to-violet-500 bg-clip-text text-transparent">Playground</span>
+
+        <NavLink
+          to="/"
+          className="text-2xl font-bold tracking-tight shrink-0"
+          style={{ color: 'var(--color-text-primary)' }}
+        >
+          Pipirik's{' '}
+          <span className="bg-linear-to-r from-[var(--color-accent)] to-[var(--color-accent-2)] bg-clip-text text-transparent">
+            Playground
+          </span>
         </NavLink>
 
         <div className="flex items-center gap-3 ml-auto">
