@@ -6,7 +6,7 @@ import { flushSync } from 'react-dom';
  * Add new skin names here as the project grows.
  * Each name must have a matching [data-theme="<name>"] block in index.css.
  */
-const THEMES = ['cyber-naturalism'];
+const THEMES = ['cyber-naturalism', 'neon-monochrome', 'sunset-glass'];
 
 const ThemeContext = createContext(null);
 

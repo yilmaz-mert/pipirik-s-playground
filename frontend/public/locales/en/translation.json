@@ -9,32 +9,33 @@
   "home": {
     "availableForWork": "Available for new opportunities",
     "heroTitle": "Hi, I'm {{name}}",
-    "heroSubtitle": "Electrical-Electronics Engineer",
+    "heroSubtitle": "Software Developer",
+    "and": "&",
     "specializedPrefix": "Specialized in",
-    "skill1": "Machine Learning",
-    "skill2": "Computer Vision",
-    "heroFooter": "Specializing in <0>Machine Learning</0> and <0>Computer Vision</0>. Crafting digital experiences where <1>high performance</1> meets <2>refined aesthetics</2>.",
-    "skills": ["Web Development", "Machine Learning", "Data Science", "Computer Vision"]
+    "skill1": "React & Modern Frontend",
+    "skill2": "UI/UX Engineering",
+    "heroFooter": "Specializing in <0>React & Modern Frontend</0> and <0>UI/UX Engineering</0>. Crafting digital experiences where <1>high performance</1> meets <2>refined aesthetics</2>.",
+    "skills": ["React 19", "TypeScript", "Tailwind v4", "UI/UX Engineering", "Framer Motion"]
   },
   "about": {
     "titlePart1": "Beyond the",
     "titlePart2": "Code",
-    "subtitle": "Electrical-Electronics Engineer & Software Development Enthusiast.",
+    "subtitle": "Software Developer & UI/UX Engineer.",
     "dnaTitle": "My Engineering DNA",
     "engineeredLine": "Engineered Solutions & Interactive Experiences",
     "competenciesTitle": "Core Competencies"
     ,
-    "bioParagraph1": "I am an <strong>Electrical-Electronics Engineer</strong> who believes that software is the most powerful tool for solving modern engineering challenges. My background isn't just limited to code; I am passionate about <strong>metalworking, welding</strong>, and <strong>3D printing</strong>.",
-    "bioParagraph2": "From developing real-time <strong>Facial Recognition</strong> systems on Raspberry Pi to optimizing <strong>Machine Learning</strong> models like LightGBM, I focus on building practical, data-driven solutions.",
+    "bioParagraph1": "I am a <strong>Software Developer</strong> who believes that the browser is the most powerful canvas for solving modern product challenges. My foundation spans strict engineering logic, systems thinking, and a genuine obsession with <strong>performance, accessibility</strong>, and <strong>visual craft</strong>.",
+    "bioParagraph2": "I bridge the gap between strict engineering rigor and <strong>creative, high-performance UI/UX</strong>. From architecting <strong>polymorphic design systems</strong> with token-driven theming to building pixel-perfect interactions with <strong>React 19 and Tailwind v4</strong> — I treat the browser as my canvas and performance as a first-class feature, not an afterthought.",
     "comp": {
-      "aiTitle": "AI & Data Science",
-      "aiDesc": "Python, ML, Computer Vision",
-      "toolsTitle": "Engineering Tools",
-      "toolsDesc": "3D Modeling (CATIA, Solidworks), SQL, Git",
+      "aiTitle": "Frontend Architecture",
+      "aiDesc": "React 19, Tailwind v4, Framer Motion, Vite",
+      "toolsTitle": "UI/UX Engineering",
+      "toolsDesc": "Design Systems, Polymorphic Theming, Glassmorphism, Canvas/WebGL",
       "intlTitle": "International Experience",
-      "intlDesc": "Work and Travel (TN, USA) - English Proficiency"
+      "intlDesc": "Work and Travel (TN, USA) — English Proficiency"
     },
-    "skills": ["Python", "PyTorch", "LightGBM", "Raspberry Pi", "React", "YOLO", "OpenCV"]
+    "skills": ["React 19", "TypeScript", "Tailwind v4", "Framer Motion", "Node.js", "i18next", "Vite"]
   },
   "projects": {
     "titlePart1": "My",

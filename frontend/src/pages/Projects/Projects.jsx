@@ -3,7 +3,7 @@
 // LIST VIEW ONLY — the <Outlet /> branch renders isolated mini-apps untouched.
 // DO NOT modify anything inside src/pages/Projects/[ProjectName]/.
 // ─────────────────────────────────────────────────────────────────────────────
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { Link as RouterLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody, Chip } from '@heroui/react';
@@ -16,26 +16,24 @@ import {
 import TiltCard from '../../components/TiltCard/TiltCard';
 
 // ── Asymmetrical Bento grid placement ────────────────────────────────────────
-// CSS Grid auto-placement fills the 3-column layout with no manual grid-area:
+// 3-column layout on large screens:
 //
-//   lg (3 cols, gridAutoRows: minmax(240px,auto)):
+//   lg (3 cols, gridAutoRows: minmax(220px,auto)):
 //   ┌──────────────────────┬──────────────┐
 //   │  Multiplication Mania │ FlightTracker│  row 1
-//   │  col 1-2 · row 1-2   ├──────────────┤
-//   │                       │     Exam     │  row 2
-//   ├──────────────┬─────────┴──────────────┤
-//   │   TodoList   │        Hangman          │  row 3
-//   └──────────────┴─────────────────────────┘
+//   │  col 1-2              │              │
+//   ├───────────┬───────────┴──────────────┤
+//   │    Exam   │  TodoList  │   Hangman   │  row 2
+//   └───────────┴────────────┴─────────────┘
 //
 //   sm (2 cols): Mania spans both cols; rest stack 2-up.
 //   mobile:      single column stack.
-
 const GRID_CLASSES = {
-  'multiplication-mania': 'sm:col-span-2 lg:col-span-2 lg:row-span-2',
+  'multiplication-mania': 'sm:col-span-2 lg:col-span-2',
   'flight-tracker':       '',
   'exam':                 '',
   'todolist':             '',
-  'hangman':              'lg:col-span-2',
+  'hangman':              '',
 };
 
 // ── Framer Motion variants ────────────────────────────────────────────────────
@@ -48,6 +46,48 @@ const itemVariants = {
   hidden:  { opacity: 0, y: 24 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.2, 0, 0.2, 1] } },
 };
+
+// ── Magnetic Spotlight Card ───────────────────────────────────────────────────
+// Tracks cursor position relative to the card and paints a radial-gradient
+// spotlight directly on the DOM node — zero React state re-renders on mousemove.
+function SpotlightWrapper({ children }) {
+  const cardRef   = useRef(null);
+  const spotRef   = useRef(null);
+
+  const onMove = useCallback((e) => {
+    const card = cardRef.current;
+    const spot = spotRef.current;
+    if (!card || !spot) return;
+    const rect = card.getBoundingClientRect();
+    const x    = e.clientX - rect.left;
+    const y    = e.clientY - rect.top;
+    spot.style.background = `radial-gradient(480px circle at ${x}px ${y}px, var(--spotlight-color, rgba(181,126,220,0.13)), transparent 65%)`;
+    spot.style.opacity    = '1';
+  }, []);
+
+  const onLeave = useCallback(() => {
+    const spot = spotRef.current;
+    if (spot) spot.style.opacity = '0';
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      className="relative h-full"
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+    >
+      {/* Spotlight layer — clipped by Card's overflow-hidden via stacking context */}
+      <div
+        ref={spotRef}
+        className="pointer-events-none absolute inset-0 z-[2] rounded-[inherit] transition-opacity duration-300"
+        style={{ opacity: 0 }}
+        aria-hidden="true"
+      />
+      {children}
+    </div>
+  );
+}
 
 // ── Projects ─────────────────────────────────────────────────────────────────
 const Projects = () => {
@@ -117,7 +157,14 @@ const Projects = () => {
               style={{ color: 'var(--color-text-primary)' }}
             >
               {t('projects.titlePart1')}{' '}
-              <span className="bg-linear-to-r from-[var(--color-accent)] to-[var(--color-accent-2)] bg-clip-text text-transparent">
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: 'linear-gradient(90deg, var(--color-accent), var(--color-accent-2), var(--color-accent))',
+                  backgroundSize:  '200% 100%',
+                  animation:       'gradient-shift 4s ease infinite',
+                }}
+              >
                 {t('projects.titlePart2')}
               </span>
             </h1>
@@ -135,7 +182,7 @@ const Projects = () => {
             initial="hidden"
             animate="visible"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6"
-            style={{ gridAutoRows: 'minmax(240px, auto)' }}
+            style={{ gridAutoRows: 'minmax(220px, auto)' }}
           >
             {projectList.map((project) => {
               const Icon = project.icon;
@@ -147,120 +194,112 @@ const Projects = () => {
                   variants={itemVariants}
                   className={`${GRID_CLASSES[project.id]} min-h-0`}
                 >
-                  {/*
-                    TiltCard wraps the Card in a 3D perspective tilt.
-                    The Card itself keeps its group-hover classes so all
-                    child hover effects (text colour, glow, chip colour) still fire.
-                  */}
-                  <TiltCard>
-                    <Card
-                      {...(project.externalUrl
-                        ? { as: 'a', href: project.externalUrl, target: '_blank', rel: 'noopener noreferrer' }
-                        : { as: RouterLink, to: project.id }
-                      )}
-                      className="group relative h-full flex flex-col overflow-hidden
-                                 backdrop-blur-xl border transition-colors duration-500
-                                 shadow-lg hover:shadow-2xl"
-                      style={{
-                        backgroundColor: 'var(--color-bg-card)',
-                        borderColor:     'var(--color-border-subtle)',
-                        // Border brightens on hover via a CSS variable — no Tailwind opacity modifier needed
-                        '--hover-border': 'var(--color-border)',
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border-subtle)'; }}
-                    >
-                      {/* Per-card tinted glow that bleeds in on hover */}
-                      <div
-                        className={`absolute inset-0 bg-linear-to-br ${project.accentColor}
-                                    opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                      />
-
-                      {/* Oversized decorative background icon */}
-                      <Icon
-                        className="absolute -right-6 -bottom-6 w-36 h-36
-                                   text-white/[0.04] group-hover:text-white/[0.08]
-                                   group-hover:scale-110 group-hover:-rotate-12
-                                   transition-all duration-500"
-                      />
-
-                      <CardHeader className="px-6 pt-6 flex-col items-start relative z-10">
-                        {/* Featured badge */}
-                        {project.isFeatured && (
-                          <div className="mb-3">
-                            <Chip
-                              size="sm"
-                              variant="flat"
-                              className="font-semibold tracking-wide border"
-                              style={{
-                                backgroundColor: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
-                                color:           'var(--color-accent)',
-                                borderColor:     'color-mix(in srgb, var(--color-accent) 22%, transparent)',
-                              }}
-                            >
-                              {t('projects.featured', { defaultValue: 'Featured' })}
-                            </Chip>
-                          </div>
+                  <SpotlightWrapper>
+                    <TiltCard>
+                      <Card
+                        {...(project.externalUrl
+                          ? { as: 'a', href: project.externalUrl, target: '_blank', rel: 'noopener noreferrer' }
+                          : { as: RouterLink, to: project.id }
                         )}
+                        className="group relative h-full flex flex-col overflow-hidden
+                                   backdrop-blur-xl border transition-colors duration-500
+                                   shadow-lg hover:shadow-2xl"
+                        style={{
+                          backgroundColor: 'var(--color-bg-card)',
+                          borderColor:     'var(--color-border-subtle)',
+                        }}
+                        onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--color-border)'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--color-border-subtle)'; }}
+                      >
+                        {/* Per-card tinted glow that bleeds in on hover */}
+                        <div
+                          className={`absolute inset-0 bg-linear-to-br ${project.accentColor}
+                                      opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+                        />
 
-                        <div className="flex items-center gap-3 w-full">
-                          <Icon
-                            className="w-6 h-6 flex-shrink-0 transition-colors duration-300
-                                       group-hover:text-[var(--color-accent)]"
-                            style={{ color: 'var(--color-text-muted)' }}
-                          />
-                          <h3
-                            className="text-xl lg:text-2xl font-bold transition-colors duration-300
-                                       group-hover:text-[var(--color-accent)]"
-                            style={{ color: 'var(--color-text-primary)' }}
-                          >
-                            {project.title}
-                          </h3>
-                          {/* External link indicator — visible only on projects that open a new tab */}
-                          {project.externalUrl && (
-                            <ExternalLink
-                              className="w-4 h-4 flex-shrink-0 ml-auto transition-opacity duration-300
-                                         opacity-30 group-hover:opacity-70"
-                              style={{ color: 'var(--color-accent)' }}
-                            />
+                        {/* Oversized decorative background icon */}
+                        <Icon
+                          className="absolute -right-6 -bottom-6 w-36 h-36
+                                     text-white/[0.04] group-hover:text-white/[0.08]
+                                     group-hover:scale-110 group-hover:-rotate-12
+                                     transition-all duration-500"
+                        />
+
+                        <CardHeader className="px-6 pt-6 flex-col items-start relative z-10">
+                          {project.isFeatured && (
+                            <div className="mb-3">
+                              <Chip
+                                size="sm"
+                                variant="flat"
+                                className="font-semibold tracking-wide border"
+                                style={{
+                                  backgroundColor: 'color-mix(in srgb, var(--color-accent) 10%, transparent)',
+                                  color:           'var(--color-accent)',
+                                  borderColor:     'color-mix(in srgb, var(--color-accent) 22%, transparent)',
+                                }}
+                              >
+                                {t('projects.featured', { defaultValue: 'Featured' })}
+                              </Chip>
+                            </div>
                           )}
-                        </div>
-                      </CardHeader>
 
-                      <CardBody className="px-6 pb-6 pt-3 flex-1 flex flex-col relative z-10">
-                        <p
-                          className="text-sm md:text-base leading-relaxed mb-5 flex-1
-                                     transition-colors duration-300
-                                     group-hover:text-[var(--color-text-secondary)]"
-                          style={{ color: 'var(--color-text-muted)' }}
-                        >
-                          {project.desc}
-                        </p>
-
-                        {/* Tech stack chips */}
-                        <div className="flex flex-wrap gap-2 mt-auto">
-                          {project.tech.map((tag) => (
-                            <Chip
-                              key={tag}
-                              size="sm"
-                              variant="flat"
-                              className="border transition-all duration-300 px-3
-                                         group-hover:text-[var(--color-accent-2)]
-                                         group-hover:bg-[var(--color-surface-hover)]
-                                         group-hover:border-[var(--color-border)]"
-                              style={{
-                                backgroundColor: 'var(--color-bg-surface)',
-                                borderColor:     'var(--color-border-subtle)',
-                                color:           'var(--color-text-secondary)',
-                              }}
+                          <div className="flex items-center gap-3 w-full">
+                            <Icon
+                              className="w-6 h-6 flex-shrink-0 transition-colors duration-300
+                                         group-hover:text-[var(--color-accent)]"
+                              style={{ color: 'var(--color-text-muted)' }}
+                            />
+                            <h3
+                              className="text-xl lg:text-2xl font-bold transition-colors duration-300
+                                         group-hover:text-[var(--color-accent)]"
+                              style={{ color: 'var(--color-text-primary)' }}
                             >
-                              {tag}
-                            </Chip>
-                          ))}
-                        </div>
-                      </CardBody>
-                    </Card>
-                  </TiltCard>
+                              {project.title}
+                            </h3>
+                            {project.externalUrl && (
+                              <ExternalLink
+                                className="w-4 h-4 flex-shrink-0 ml-auto transition-opacity duration-300
+                                           opacity-30 group-hover:opacity-70"
+                                style={{ color: 'var(--color-accent)' }}
+                              />
+                            )}
+                          </div>
+                        </CardHeader>
+
+                        <CardBody className="px-6 pb-6 pt-3 flex-1 flex flex-col relative z-10">
+                          <p
+                            className="text-sm md:text-base leading-relaxed mb-5 flex-1
+                                       transition-colors duration-300
+                                       group-hover:text-[var(--color-text-secondary)]"
+                            style={{ color: 'var(--color-text-muted)' }}
+                          >
+                            {project.desc}
+                          </p>
+
+                          <div className="flex flex-wrap gap-2 mt-auto">
+                            {project.tech.map((tag) => (
+                              <Chip
+                                key={tag}
+                                size="sm"
+                                variant="flat"
+                                className="border transition-all duration-300 px-3
+                                           group-hover:text-[var(--color-accent-2)]
+                                           group-hover:bg-[var(--color-surface-hover)]
+                                           group-hover:border-[var(--color-border)]"
+                                style={{
+                                  backgroundColor: 'var(--color-bg-surface)',
+                                  borderColor:     'var(--color-border-subtle)',
+                                  color:           'var(--color-text-secondary)',
+                                }}
+                              >
+                                {tag}
+                              </Chip>
+                            ))}
+                          </div>
+                        </CardBody>
+                      </Card>
+                    </TiltCard>
+                  </SpotlightWrapper>
                 </motion.div>
               );
             })}

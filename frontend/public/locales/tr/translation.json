@@ -9,32 +9,33 @@
   "home": {
     "availableForWork": "Yeni fırsatlara açık",
     "heroTitle": "Merhaba, ben {{name}}",
-    "heroSubtitle": "Elektrik-Elektronik Mühendisi",
+    "heroSubtitle": "Yazılım Geliştirici",
+    "and": "ve",
     "specializedPrefix": "Uzmanlık",
-    "skill1": "Makine Öğrenmesi",
-    "skill2": "Bilgisayarlı Görü",
-    "heroFooter": "<0>Makine Öğrenmesi</0> ve <0>Bilgisayarlı Görü</0> alanlarında uzmanım. <1>Yüksek performans</1> ile <2>rafine estetik</2> buluşturan dijital deneyimler tasarlıyorum.",
-    "skills": ["Web Geliştirme", "Makine Öğrenmesi", "Veri Bilimi", "Bilgisayarlı Görü"]
+    "skill1": "React & Modern Frontend",
+    "skill2": "UI/UX Mühendisliği",
+    "heroFooter": "<0>React & Modern Frontend</0> ve <0>UI/UX Mühendisliği</0> alanlarında uzmanım. <1>Yüksek performans</1> ile <2>rafine estetik</2> buluşturan dijital deneyimler tasarlıyorum.",
+    "skills": ["React 19", "TypeScript", "Tailwind v4", "UI/UX Mühendisliği", "Framer Motion"]
   },
   "about": {
     "titlePart1": "Kodu",
     "titlePart2": "Aşan",
-    "subtitle": "Elektrik-Elektronik Mühendisi ve Yazılım Tutkunu.",
+    "subtitle": "Yazılım Geliştirici & Arayüz/Deneyim Mühendisi.",
     "dnaTitle": "Mühendislik DNA'm",
     "engineeredLine": "Mühendislik Çözümleri ve Etkileşimli Deneyimler",
     "competenciesTitle": "Temel Yetenekler"
     ,
-    "bioParagraph1": "Ben bir <strong>Elektrik-Elektronik Mühendisiyim</strong> ve yazılımın modern mühendislik sorunlarını çözmede en güçlü araç olduğuna inanıyorum. Arka planım yalnızca kodla sınırlı değil; <strong>metal işleri, kaynak</strong> ve <strong>3B baskı</strong> ile ilgileniyorum.",
-    "bioParagraph2": "Gerçek zamanlı <strong>Yüz Tanıma</strong> sistemleri geliştirmekten Raspberry Pi üzerinde LightGBM gibi <strong>Makine Öğrenmesi</strong> modellerini optimize etmeye kadar, pratik ve veri odaklı çözümler inşa etmeye odaklanıyorum.",
+    "bioParagraph1": "Ben bir <strong>Yazılım Geliştiricisiyim</strong> ve tarayıcının modern ürün sorunlarını çözmek için en güçlü tuval olduğuna inanıyorum. Temelim; katı mühendislik mantığı, sistem düşüncesi ve <strong>performans, erişilebilirlik</strong> ile <strong>görsel ustalık</strong> konusundaki gerçek bir tutkuyu kapsar.",
+    "bioParagraph2": "Katı mühendislik titizliği ile <strong>yaratıcı, yüksek performanslı UI/UX</strong> arasındaki boşluğu dolduruyorum. Token tabanlı tema sistemleriyle <strong>polimorfik tasarım sistemleri</strong> mimarlemekten <strong>React 19 ve Tailwind v4</strong> ile piksel mükemmeliyetinde etkileşimler inşa etmeye kadar — tarayıcıyı tuvalim, performansı ise sonradan düşünülen bir şey değil, birincil özelliğim olarak görüyorum.",
     "comp": {
-      "aiTitle": "AI ve Veri Bilimi",
-      "aiDesc": "Python, ML, Bilgisayarlı Görü",
-      "toolsTitle": "Mühendislik Araçları",
-      "toolsDesc": "3B Modelleme (CATIA, Solidworks), SQL, Git",
+      "aiTitle": "Frontend Mimarisi",
+      "aiDesc": "React 19, Tailwind v4, Framer Motion, Vite",
+      "toolsTitle": "UI/UX Mühendisliği",
+      "toolsDesc": "Tasarım Sistemleri, Polimorfik Tema, Glassmorphism, Canvas/WebGL",
       "intlTitle": "Uluslararası Deneyim",
-      "intlDesc": "Çalışma ve Seyahat (TN, ABD) - İngilizce Yetkinliği"
+      "intlDesc": "Çalışma ve Seyahat (TN, ABD) — İngilizce Yetkinliği"
     },
-    "skills": ["Python", "PyTorch", "LightGBM", "Raspberry Pi", "React", "YOLO", "OpenCV"]
+    "skills": ["React 19", "TypeScript", "Tailwind v4", "Framer Motion", "Node.js", "i18next", "Vite"]
   },
   "projects": {
     "titlePart1": "Projelerim",

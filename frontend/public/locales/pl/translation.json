@@ -9,32 +9,32 @@
   "home": {
     "availableForWork": "Dostępny do nowych projektów",
     "heroTitle": "Cześć, jestem {{name}}",
-    "heroSubtitle": "Inżynier Elektryk i Elektronik",
+    "heroSubtitle": "Programista / Inżynier UI",
     "specializedPrefix": "Specjalizacja:",
-    "skill1": "Machine Learning",
-    "skill2": "Computer Vision",
+    "skill1": "React & Nowoczesny Frontend",
+    "skill2": "Inżynieria UI/UX",
     "and": "i",
-    "heroFooter": "Specjalizuję się w <0>Uczeniu maszynowym i widzeniu komputerowym</0>. Tworzę doświadczenia cyfrowe, w których <1>wysoka wydajność</1> łączy się z <2>wyrafinowaną estetyką</2>.",
-    "skills": ["Web Development", "Machine Learning", "Data Science", "Computer Vision"]
+    "heroFooter": "Specjalizuję się w <0>React i nowoczesnym frontendie</0>. Tworzę doświadczenia cyfrowe, w których <1>wysoka wydajność</1> łączy się z <2>wyrafinowaną estetyką</2>.",
+    "skills": ["React 19", "TypeScript", "Tailwind v4", "Inżynieria UI/UX", "Framer Motion"]
   },
   "about": {
     "titlePart1": "Więcej niż",
     "titlePart2": "Kod",
-    "subtitle": "Inżynier Elektryk i Elektronik oraz pasjonat programowania.",
+    "subtitle": "Programista & Inżynier UI/UX.",
     "dnaTitle": "Moje inżynierskie DNA",
     "engineeredLine": "Inżynieryjne rozwiązania i interaktywne doświadczenia",
     "competenciesTitle": "Kluczowe kompetencje",
-    "bioParagraph1": "Jestem <strong>Inżynierem Elektrykiem i Elektronikiem</strong>, który wierzy, że oprogramowanie jest najpotężniejszym narzędziem do rozwiązywania współczesnych wyzwań inżynieryjnych. Moje doświadczenie nie ogranicza się tylko do kodu; pasjonuję się <strong>obróbką metali, spawaniem</strong> oraz <strong>drukiem 3D</strong>.",
-    "bioParagraph2": "Od tworzenia systemów <strong>rozpoznawania twarzy</strong> w czasie rzeczywistym na Raspberry Pi po optymalizację modeli <strong>Machine Learning</strong>, takich jak LightGBM – koncentruję się na budowaniu praktycznych rozwiązań opartych na danych.",
+    "bioParagraph1": "Jestem <strong>Programistą</strong>, który wierzy, że przeglądarka to najpotężniejsze płótno do rozwiązywania współczesnych wyzwań produktowych. Moje fundamenty obejmują ścisłą logikę inżynieryjną, myślenie systemowe oraz prawdziwą obsesję na punkcie <strong>wydajności, dostępności</strong> i <strong>wizualnego rzemiosła</strong>.",
+    "bioParagraph2": "Łączę ścisłą precyzję inżynieryjną z <strong>kreatywnym, wysoko wydajnym UI/UX</strong>. Od projektowania <strong>polimorficznych systemów designu</strong> z tokenami tematycznymi, po budowanie perfekcyjnych interakcji z <strong>React 19 i Tailwind v4</strong> — traktuję przeglądarkę jako płótno, a wydajność jako cechę pierwszoplanową.",
     "comp": {
-      "aiTitle": "AI & Data Science",
-      "aiDesc": "Python, ML, Computer Vision",
-      "toolsTitle": "Narzędzia inżynierskie",
-      "toolsDesc": "Modelowanie 3D (CATIA, Solidworks), SQL, Git",
+      "aiTitle": "Architektura Frontend",
+      "aiDesc": "React 19, Tailwind v4, Framer Motion, Vite",
+      "toolsTitle": "Inżynieria UI/UX",
+      "toolsDesc": "Systemy designu, Tematyzacja polimorficzna, Glassmorphism, Canvas/WebGL",
       "intlTitle": "Doświadczenie międzynarodowe",
-      "intlDesc": "Work and Travel (TN, USA) - Biegłość w języku angielskim"
+      "intlDesc": "Work and Travel (TN, USA) — Biegłość w języku angielskim"
     },
-    "skills": ["Python", "PyTorch", "LightGBM", "Raspberry Pi", "React", "YOLO", "OpenCV"]
+    "skills": ["React 19", "TypeScript", "Tailwind v4", "Framer Motion", "Node.js", "i18next", "Vite"]
   },
   "projects": {
     "titlePart1": "Moje",

@@ -170,27 +170,31 @@ export default function FloatingDock() {
 
   return (
     <>
-      {/* ── Language picker popover ── */}
+      {/* ── Language picker — horizontal glassmorphic pill ── */}
       <AnimatePresence>
         {langOpen && (
           <motion.div
             ref={langPanelRef}
             key="lang-panel"
-            initial={{ opacity: 0, y: 10, scale: 0.93 }}
-            animate={{ opacity: 1, y: 0,  scale: 1    }}
-            exit={{ opacity: 0,    y: 10, scale: 0.93 }}
-            transition={{ duration: 0.18, ease: [0.2, 0, 0.2, 1] }}
-            className="fixed z-[1001] flex flex-col gap-0.5 p-1.5 rounded-xl min-w-[9.5rem]"
+            initial={{ opacity: 0, y: 8, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1    }}
+            exit={{    opacity: 0, y: 8, scale: 0.92 }}
+            transition={{ duration: 0.16, ease: [0.2, 0, 0.2, 1] }}
+            className="fixed z-[1001] flex flex-row gap-1 p-1.5 rounded-2xl"
             style={{
-              bottom:          'calc(var(--dock-height) + 1.5rem)',
-              left:            '50%',
-              transform:       'translateX(-50%)',
-              // Glassmorphism — matches dock but sharper border
-              backgroundColor: 'color-mix(in srgb, var(--color-bg-overlay) 92%, transparent)',
-              backdropFilter:  'blur(28px)',
+              bottom:               'calc(var(--dock-height) + 1.1rem)',
+              left:                 '50%',
+              transform:            'translateX(-50%)',
+              /* Exact same glass recipe as the dock bar */
+              backgroundColor:      'var(--color-bg-dock)',
+              backdropFilter:       'blur(28px)',
               WebkitBackdropFilter: 'blur(28px)',
-              border:          '1px solid var(--color-border)',
-              boxShadow:       '0 8px 36px rgba(0,0,0,0.55), 0 1px 0 color-mix(in srgb, white 6%, transparent) inset',
+              border:               '1px solid var(--color-border-subtle)',
+              boxShadow: [
+                '0 8px 40px rgba(0,0,0,0.55)',
+                '0 1px 0 color-mix(in srgb, white 7%, transparent) inset',
+                '0 0 0 1px color-mix(in srgb, var(--color-accent) 4%, transparent)',
+              ].join(', '),
             }}
           >
             {langs.map((l) => {
@@ -200,23 +204,33 @@ export default function FloatingDock() {
                 <button
                   key={l.code}
                   onClick={() => changeLang(l.code)}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg
-                             text-sm font-medium transition-colors duration-150 text-left"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-xl
+                             text-xs font-semibold tracking-wide transition-all duration-150"
                   style={{
-                    color:           active ? 'var(--color-accent)'          : 'var(--color-text-secondary)',
-                    backgroundColor: active ? 'color-mix(in srgb, var(--color-accent) 10%, transparent)' : 'transparent',
+                    color:           active ? 'var(--color-accent)'   : 'var(--color-text-muted)',
+                    backgroundColor: active
+                      ? 'color-mix(in srgb, var(--color-accent) 13%, transparent)'
+                      : 'transparent',
+                    boxShadow: active
+                      ? '0 0 14px color-mix(in srgb, var(--color-accent) 22%, transparent)'
+                      : 'none',
                   }}
-                  onMouseEnter={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)'; }}
-                  onMouseLeave={(e) => { if (!active) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                  onMouseEnter={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.color           = 'var(--color-text-secondary)';
+                      e.currentTarget.style.backgroundColor = 'var(--color-surface-hover)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) {
+                      e.currentTarget.style.color           = 'var(--color-text-muted)';
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                    }
+                  }}
+                  aria-pressed={active}
                 >
-                  <ItemFlag className="w-5 h-[15px] rounded-sm flex-shrink-0" aria-hidden="true" />
-                  <span>{l.label}</span>
-                  {active && (
-                    <span
-                      className="ml-auto w-1.5 h-1.5 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: 'var(--color-accent)' }}
-                    />
-                  )}
+                  <ItemFlag className="w-4 h-[11px] rounded-[2px] flex-shrink-0" aria-hidden="true" />
+                  <span>{l.code.toUpperCase()}</span>
                 </button>
               );
             })}

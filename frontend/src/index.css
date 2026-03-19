@@ -7,6 +7,7 @@
 @theme {
   --animate-morph: morph 8s ease-in-out infinite;
   --animate-bounce-slow: bounce-slow 3s infinite;
+  --animate-gradient-shift: gradient-shift 5s ease infinite;
 
   @keyframes morph {
     0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
@@ -16,6 +17,12 @@
   @keyframes bounce-slow {
     0%, 100% { transform: translateY(-5%); }
     50%       { transform: translateY(0); }
+  }
+
+  @keyframes gradient-shift {
+    0%   { background-position: 0%   50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0%   50%; }
   }
 }
 
@@ -71,10 +78,85 @@
   --ps-open-delay: 60ms;
 }
 
-/* Future theme stubs — extend when new skins ship:
-[data-theme="liquid-glass"] { --color-bg-base: ...; --color-accent: ...; }
-[data-theme="retro-rpg"]    { --color-bg-base: ...; --color-accent: ...; }
-*/
+/* ─────────────────────────────────────────────────────────────────────────────
+   THEME: Neon Monochrome — Hacker / Terminal vibe
+   Deep pitch-black base · Neon-cyan / matrix-green accents
+   ───────────────────────────────────────────────────────────────────────────── */
+[data-theme="neon-monochrome"] {
+  --navbar-height: 0rem;
+  --dock-height:   5rem;
+
+  --color-bg-base:    #000000;
+  --color-bg-surface: rgba(0, 255, 65, 0.04);
+  --color-bg-overlay: rgba(0, 8, 0, 0.97);
+
+  --color-bg-dock:       rgba(0, 8, 0, 0.80);
+  --color-bg-card:       rgba(0, 18, 2, 0.75);
+  --color-bg-card-solid: #020d02;
+  --color-image-overlay: rgba(0, 8, 0, 0.65);
+  --color-surface-hover: rgba(0, 217, 128, 0.07);
+
+  --color-border:        rgba(0, 217, 128, 0.22);
+  --color-border-subtle: rgba(0, 217, 128, 0.09);
+
+  --color-text-primary:   #d4fde4;
+  --color-text-secondary: #7dffb3;
+  --color-text-muted:     #3a7a50;
+
+  --color-accent:   #00d980;   /* Matrix green     */
+  --color-accent-2: #00ffea;   /* Neon cyan        */
+
+  --blob-primary:        rgba(0, 217, 128, 0.10);
+  --blob-primary-fade:   rgba(0, 217, 128, 0.01);
+  --blob-secondary:      rgba(0, 255, 234, 0.08);
+  --blob-secondary-fade: rgba(0, 255, 234, 0.01);
+  --blob-blur:           110px;
+  --blob-blur-mobile:    55px;
+
+  --ps-duration:   220ms;
+  --ps-easing:     cubic-bezier(0.16, 0.84, 0.24, 1);
+  --ps-open-delay: 60ms;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   THEME: Sunset Glass — Warm atmospheric tones
+   Deep-dark-purple base · Fiery orange / neon-pink accents
+   ───────────────────────────────────────────────────────────────────────────── */
+[data-theme="sunset-glass"] {
+  --navbar-height: 0rem;
+  --dock-height:   5rem;
+
+  --color-bg-base:    #0d0814;
+  --color-bg-surface: rgba(40, 12, 35, 0.60);
+  --color-bg-overlay: rgba(13, 8, 20, 0.97);
+
+  --color-bg-dock:       rgba(13, 8, 20, 0.78);
+  --color-bg-card:       rgba(30, 10, 28, 0.70);
+  --color-bg-card-solid: #190b18;
+  --color-image-overlay: rgba(13, 8, 20, 0.65);
+  --color-surface-hover: rgba(255, 107, 53, 0.07);
+
+  --color-border:        rgba(255, 107, 53, 0.22);
+  --color-border-subtle: rgba(255, 107, 53, 0.09);
+
+  --color-text-primary:   #fdeee8;
+  --color-text-secondary: #ffb8a0;
+  --color-text-muted:     #7a4a38;
+
+  --color-accent:   #ff6b35;   /* Fiery orange     */
+  --color-accent-2: #ff3cac;   /* Neon pink        */
+
+  --blob-primary:        rgba(255, 107, 53, 0.11);
+  --blob-primary-fade:   rgba(255, 107, 53, 0.01);
+  --blob-secondary:      rgba(255, 60, 172, 0.09);
+  --blob-secondary-fade: rgba(255, 60, 172, 0.01);
+  --blob-blur:           110px;
+  --blob-blur-mobile:    55px;
+
+  --ps-duration:   220ms;
+  --ps-easing:     cubic-bezier(0.16, 0.84, 0.24, 1);
+  --ps-open-delay: 60ms;
+}
 
 /* ============================================================
    VIEW TRANSITION API — Theme-switch animation
@@ -123,10 +205,12 @@ html, body {
 }
 
 #root {
-  @apply w-full min-h-screen;
+  @apply w-full;
+  min-height: 100vh;        /* legacy fallback  */
+  min-height: 100dvh;       /* modern: excludes mobile browser chrome */
   isolation: isolate;
   /* Ensure no page content hides beneath the fixed floating dock */
-  padding-bottom: calc(var(--dock-height) + 2.5rem);
+  padding-bottom: calc(var(--dock-height) + 2rem);
 }
 
 h1 {
