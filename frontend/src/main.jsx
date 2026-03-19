@@ -6,11 +6,13 @@ import App from './App.jsx'
 import './i18n'
 import { ThemeProvider } from './context/ThemeContext';
 import { EngineerModeProvider } from './context/EngineerModeContext';
+import { SoundProvider } from './context/SoundContext';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <ThemeProvider>
       <EngineerModeProvider>
+        <SoundProvider>
         <HeroUIProvider>
           <Suspense fallback={
             <div
@@ -25,6 +27,7 @@ createRoot(document.getElementById('root')).render(
             </main>
           </Suspense>
         </HeroUIProvider>
+        </SoundProvider>
       </EngineerModeProvider>
     </ThemeProvider>
   </StrictMode>,

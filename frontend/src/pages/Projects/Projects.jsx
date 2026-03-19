@@ -13,7 +13,8 @@ import {
   PlaneTakeoff, CheckSquare, FileQuestion,
   Gamepad2, Calculator, ExternalLink,
 } from 'lucide-react';
-import TiltCard from '../../components/TiltCard/TiltCard';
+import TiltCard  from '../../components/TiltCard/TiltCard';
+import { useSound } from '../../context/SoundContext';
 
 // ── Asymmetrical Bento grid placement ────────────────────────────────────────
 // 3-column layout on large screens:
@@ -53,6 +54,7 @@ const itemVariants = {
 function SpotlightWrapper({ children }) {
   const cardRef   = useRef(null);
   const spotRef   = useRef(null);
+  const { playTick } = useSound();
 
   const onMove = useCallback((e) => {
     const card = cardRef.current;
@@ -74,6 +76,7 @@ function SpotlightWrapper({ children }) {
     <div
       ref={cardRef}
       className="relative h-full"
+      onMouseEnter={playTick}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >

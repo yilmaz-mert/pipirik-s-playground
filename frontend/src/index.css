@@ -8,6 +8,7 @@
   --animate-morph: morph 8s ease-in-out infinite;
   --animate-bounce-slow: bounce-slow 3s infinite;
   --animate-gradient-shift: gradient-shift 5s ease infinite;
+  --animate-badge-pulse: badge-pulse 2.8s ease-in-out infinite;
 
   @keyframes morph {
     0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
@@ -23,6 +24,14 @@
     0%   { background-position: 0%   50%; }
     50%  { background-position: 100% 50%; }
     100% { background-position: 0%   50%; }
+  }
+
+  /* Availability badge — soft breathing glow.
+     Uses color-mix so it inherits the active theme's accent automatically. */
+  @keyframes badge-pulse {
+    0%, 100% { box-shadow: 0 0  0px color-mix(in srgb, var(--color-accent)  0%, transparent); }
+    50%       { box-shadow: 0 0 18px color-mix(in srgb, var(--color-accent) 38%, transparent),
+                            0 0  6px color-mix(in srgb, var(--color-accent) 18%, transparent) inset; }
   }
 }
 
@@ -194,11 +203,13 @@
    GLOBAL HTML & BODY STYLES
    ============================================================ */
 html, body {
-  /* min-h-full instead of h-full — allows pages taller than 100vh to scroll
-     naturally without content being clipped by a hard height constraint.
-     overflow-x-hidden stays to suppress horizontal bleed from blob animations. */
-  @apply antialiased overflow-x-hidden;
-  min-height: 100%;
+  /* No explicit height — let #root (min-height: 100dvh) own the stretch.
+     Removing min-height: 100% here eliminates the nested scroll-container
+     that forces a premature overflow-y scrollbar on short viewports.
+     overflow-x: clip (not hidden) avoids creating an unwanted block formatting
+     context that can swallow the document scroll axis. */
+  @apply antialiased;
+  overflow-x: clip;
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--color-text-primary);
   background-color: var(--color-bg-base);
@@ -211,6 +222,41 @@ html, body {
   isolation: isolate;
   /* Ensure no page content hides beneath the fixed floating dock */
   padding-bottom: calc(var(--dock-height) + 2rem);
+}
+
+/* ============================================================
+   CUSTOM SCROLLBAR — adapts to active theme via CSS tokens
+   Webkit-only (Firefox uses scrollbar-color as a progressive
+   enhancement below). Kept minimal so it never distracts.
+   ============================================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--color-accent),
+    var(--color-accent-2)
+  );
+  border-radius: 99px;
+  border: 2px solid var(--color-bg-base);   /* Creates breathing room around thumb */
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-accent)   100%, white 12%),
+    color-mix(in srgb, var(--color-accent-2) 100%, white 12%)
+  );
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 55%, transparent);
+}
+/* Firefox progressive enhancement */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) var(--color-bg-base);
 }
 
 h1 {

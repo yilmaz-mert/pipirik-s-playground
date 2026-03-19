@@ -23,9 +23,10 @@ import {
 } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { Home, User, LayoutGrid, Palette, Code2, Globe } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme }        from '../../context/ThemeContext';
 import { useEngineerMode } from '../../context/EngineerModeContext';
-import { langs } from '../../constants/langs';
+import { useSound }        from '../../context/SoundContext';
+import { langs }           from '../../constants/langs';
 import { useClickOutside } from '../../hooks/useClickOutside';
 
 // ── Fisheye spring ────────────────────────────────────────────────────────────
@@ -38,7 +39,7 @@ const TIP_VARIANTS = {
 };
 
 // ── MagnifiableItem ──────────────────────────────────────────────────────────
-function MagnifiableItem({ mouseX, label, base, peak, radius, children }) {
+function MagnifiableItem({ mouseX, label, base, peak, radius, onHoverSound, children }) {
   const ref = useRef(null);
   const [hovered, setHovered] = useState(false);
 
@@ -59,7 +60,7 @@ function MagnifiableItem({ mouseX, label, base, peak, radius, children }) {
   return (
     <div
       className="relative flex flex-col items-center justify-end"
-      onMouseEnter={() => setHovered(true)}
+      onMouseEnter={() => { setHovered(true); onHoverSound?.(); }}
       onMouseLeave={() => setHovered(false)}
     >
       <AnimatePresence>
@@ -98,9 +99,9 @@ function MagnifiableItem({ mouseX, label, base, peak, radius, children }) {
 }
 
 // ── NavItem ──────────────────────────────────────────────────────────────────
-function NavItem({ mouseX, to, icon: Icon, label, base, peak, radius }) {
+function NavItem({ mouseX, to, icon: Icon, label, base, peak, radius, onHoverSound }) {
   return (
-    <MagnifiableItem mouseX={mouseX} label={label} base={base} peak={peak} radius={radius}>
+    <MagnifiableItem mouseX={mouseX} label={label} base={base} peak={peak} radius={radius} onHoverSound={onHoverSound}>
       <NavLink to={to} end={to === '/'} className="w-full h-full block">
         {({ isActive }) => (
           <div
@@ -142,6 +143,7 @@ export default function FloatingDock() {
   const { t, i18n }                          = useTranslation();
   const { cycleTheme, theme }                = useTheme();
   const { active: engineerOn, toggle: toggleEngineer } = useEngineerMode();
+  const { playTick, playWhoosh }             = useSound();
 
   // Language popover
   const [langOpen, setLangOpen]   = useState(false);
@@ -260,9 +262,9 @@ export default function FloatingDock() {
         onMouseLeave={() => mouseX.set(Infinity)}
       >
         {/* Navigation items */}
-        <NavItem mouseX={mouseX} to="/"         icon={Home}       label={t('nav.home')}     base={dockBase} peak={dockPeak} radius={dockRadius} />
-        <NavItem mouseX={mouseX} to="/about"    icon={User}       label={t('nav.about')}    base={dockBase} peak={dockPeak} radius={dockRadius} />
-        <NavItem mouseX={mouseX} to="/projects" icon={LayoutGrid} label={t('nav.projects')} base={dockBase} peak={dockPeak} radius={dockRadius} />
+        <NavItem mouseX={mouseX} to="/"         icon={Home}       label={t('nav.home')}     base={dockBase} peak={dockPeak} radius={dockRadius} onHoverSound={playTick} />
+        <NavItem mouseX={mouseX} to="/about"    icon={User}       label={t('nav.about')}    base={dockBase} peak={dockPeak} radius={dockRadius} onHoverSound={playTick} />
+        <NavItem mouseX={mouseX} to="/projects" icon={LayoutGrid} label={t('nav.projects')} base={dockBase} peak={dockPeak} radius={dockRadius} onHoverSound={playTick} />
 
         <DockDivider base={dockBase} />
 
@@ -273,6 +275,7 @@ export default function FloatingDock() {
           base={dockBase}
           peak={dockPeak}
           radius={dockRadius}
+          onHoverSound={playTick}
         >
           <button
             ref={langTriggerRef}
@@ -299,9 +302,10 @@ export default function FloatingDock() {
           base={dockBase}
           peak={dockPeak}
           radius={dockRadius}
+          onHoverSound={playTick}
         >
           <button
-            onClick={cycleTheme}
+            onClick={() => { cycleTheme(); playWhoosh(); }}
             className="w-full h-full flex items-center justify-center rounded-[10px]
                        transition-colors duration-200"
             style={{ color: 'var(--color-text-muted)' }}
@@ -320,6 +324,7 @@ export default function FloatingDock() {
           base={dockBase}
           peak={dockPeak}
           radius={dockRadius}
+          onHoverSound={playTick}
         >
           <button
             onClick={toggleEngineer}

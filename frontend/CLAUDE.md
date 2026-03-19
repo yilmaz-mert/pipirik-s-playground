@@ -9,6 +9,7 @@ A polymorphic, highly scalable personal portfolio website showcasing engineering
 - **Animations:** Framer Motion (Advanced hooks: useSpring, useTransform for 3D/Fisheye) & Native View Transitions
 - **Graphics:** Canvas/WebGL for background simulations
 - **Internationalization:** i18next
+- **Sensory & OS UI:** `use-sound` (for Sonic UI), `cmdk` (for Command Palette).
 
 ## Base Commands
 - **Development Server:** `npm run dev`
@@ -27,3 +28,8 @@ A polymorphic, highly scalable personal portfolio website showcasing engineering
    - Aim for 60fps; use GPU-accelerated CSS properties (`transform`, `opacity`).
 4. **Engineer Mode:**
    - A global toggle that adds technical metadata to the UI using CSS pseudo-elements (do NOT bloat the DOM with extra wrapper divs for this mode).
+5. **The Sensory Layer (Sonic UI):**
+   - UI sounds must be extremely subtle (short decay, low volume). Never block the main thread.
+   - Respect browser auto-play policies (sounds trigger on interaction only).
+6. **Command Palette (CMDK):**
+   - The shortcut `CMD+K` (or `CTRL+K`) is globally reserved. The palette must adhere to the current active Theme Tokens (glassmorphism, `--color-bg-overlay`).

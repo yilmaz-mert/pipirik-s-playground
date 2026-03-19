@@ -5,6 +5,7 @@ import { Card, CardHeader, CardBody, Chip } from '@heroui/react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import { Fingerprint, Cpu, Wrench, Globe, Sparkles } from "lucide-react";
+import ContributionHeatmap from '../components/ContributionHeatmap/ContributionHeatmap';
 
 const About = () => {
   const { t } = useTranslation();
@@ -107,6 +108,7 @@ const About = () => {
                     { Icon: Cpu,    key: 'ai',    hue: 'var(--color-accent)'   },
                     { Icon: Wrench, key: 'tools', hue: 'var(--color-accent-2)' },
                     { Icon: Globe,  key: 'intl',  hue: 'var(--color-accent)'   },
+                  // eslint-disable-next-line no-unused-vars
                   ].map(({ Icon, key, hue }) => (
                     <li key={key} className="flex gap-4 items-start">
                       <div className="mt-1"><Icon className="w-5 h-5" style={{ color: hue }} /></div>
@@ -138,6 +140,19 @@ const About = () => {
               </CardBody>
             </Card>
           </motion.div>
+        </motion.div>
+
+        {/* ── Contribution Heatmap ── */}
+        <motion.div
+          variants={itemVariants}
+          className="mt-8 p-6 rounded-2xl border"
+          style={{
+            backgroundColor: 'var(--color-bg-card)',
+            borderColor:     'var(--color-border-subtle)',
+            backdropFilter:  'blur(12px)',
+          }}
+        >
+          <ContributionHeatmap />
         </motion.div>
       </div>
     </main>

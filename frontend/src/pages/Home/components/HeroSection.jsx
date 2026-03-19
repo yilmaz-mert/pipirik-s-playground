@@ -1,28 +1,24 @@
 // src/pages/Home/components/HeroSection.jsx
 import { useState, useEffect, useRef } from 'react';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 // ── Text Scramble / Decode ────────────────────────────────────────────────────
-// Characters sampled during the scramble phase.
 const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$@#%&!?';
 const rnd = () => CHARSET[Math.floor(Math.random() * CHARSET.length)];
 
 /**
  * Scrambles `target` on mount, then resolves character-by-character.
  * Uses rAF + performance.now() so it's frame-rate independent.
- * @param {string} target   - The final string to decode into.
- * @param {number} duration - Total decode time in ms.
- * @param {number} delay    - How long to wait before starting (ms).
  */
 function useScramble(target, duration = 900, delay = 0) {
   const scrambled = target.split('').map(c => (c === ' ' ? ' ' : rnd())).join('');
   const [display, setDisplay] = useState(scrambled);
-  // Avoid re-running the animation when the component re-renders mid-scramble
   const targetRef = useRef(target);
 
   useEffect(() => {
     targetRef.current = target;
-    // Immediately snapshot a new scrambled start whenever the target changes
     setDisplay(target.split('').map(c => (c === ' ' ? ' ' : rnd())).join(''));
 
     let raf;
@@ -56,15 +52,17 @@ export default function HeroSection() {
   const heroName = t('home.heroTitle', { name: 'Mert' });
   const heroRole = t('home.heroSubtitle');
 
-  // Name decodes fast with no delay; role starts after name is mostly resolved.
   const displayName = useScramble(heroName, 850, 80);
   const displayRole = useScramble(heroRole, 700, 520);
 
   return (
-    <header data-comp="HeroSection" className="space-y-1 md:space-y-3">
-      {/* Availability badge — technical monospaced pill */}
+    <header
+      data-comp="HeroSection"
+      className="flex flex-col items-center md:items-start gap-1 md:gap-3"
+    >
+      {/* ── Availability badge — pulsing glow via CSS token animation ── */}
       <div
-        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full w-fit border"
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full w-fit border animate-badge-pulse"
         style={{
           backgroundColor: 'color-mix(in srgb, var(--color-accent) 8%, transparent)',
           borderColor:     'color-mix(in srgb, var(--color-accent) 22%, transparent)',
@@ -89,9 +87,9 @@ export default function HeroSection() {
         </span>
       </div>
 
-      {/* Hero name — scramble decode on mount */}
+      {/* ── Hero name — scramble decode on mount ── */}
       <h1
-        className="text-5xl md:text-8xl font-black tracking-tighter leading-none"
+        className="text-5xl md:text-8xl font-black tracking-tighter leading-none text-center md:text-left"
         style={{
           color:      'var(--color-text-primary)',
           fontFamily: "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace",
@@ -100,21 +98,36 @@ export default function HeroSection() {
         {displayName}
       </h1>
 
-      {/* Role — animated gradient + scramble decode */}
-      <h2
-        className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent"
+      {/* ── Role — animated gradient + scramble decode + letter-spacing hover ── */}
+      <motion.h2
+        className="text-2xl md:text-4xl font-bold bg-clip-text text-transparent text-center md:text-left"
         style={{
-          backgroundImage:    'linear-gradient(90deg, var(--color-accent), var(--color-accent-2), var(--color-accent))',
-          backgroundSize:     '200% 100%',
-          animation:          'gradient-shift 4s ease infinite',
-          fontFamily:         "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace",
+          backgroundImage: 'linear-gradient(90deg, var(--color-accent), var(--color-accent-2), var(--color-accent))',
+          backgroundSize:  '200% 100%',
+          animation:       'gradient-shift 4s ease infinite',
+          fontFamily:      "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace",
+          letterSpacing:   '0em',
         }}
+        whileHover={{ letterSpacing: '0.06em' }}
+        transition={{ duration: 0.45, ease: 'easeOut' }}
       >
         {displayRole}
-      </h2>
+        {/* Blinking terminal cursor — colour override escapes the parent's
+            text-transparent so the _ renders in the accent colour, not clear. */}
+        <motion.span
+          aria-hidden="true"
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.8, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
+          style={{ color: 'var(--color-accent)', backgroundClip: 'unset', WebkitBackgroundClip: 'unset' }}
+        >_</motion.span>
+      </motion.h2>
 
-      {/* Bio paragraph */}
-      <p className="text-base md:text-xl leading-snug max-w-xl font-medium pt-2" style={{ color: 'var(--color-text-muted)' }}>
+      {/* ── Bio paragraph — centered on mobile, left on desktop ── */}
+      <p
+        className="text-base md:text-xl leading-snug max-w-xl font-medium pt-2
+                   text-center md:text-left mx-auto md:mx-0"
+        style={{ color: 'var(--color-text-muted)' }}
+      >
         {t('home.specializedPrefix')}{' '}
         <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>{t('home.skill1')}</span>
         {' '}{t('home.and', { defaultValue: '&' })}{' '}
