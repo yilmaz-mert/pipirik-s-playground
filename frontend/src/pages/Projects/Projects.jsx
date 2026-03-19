@@ -143,6 +143,7 @@ const Projects = () => {
               return (
                 <motion.div
                   key={project.id}
+                  data-comp={project.id}
                   variants={itemVariants}
                   className={`${GRID_CLASSES[project.id]} min-h-0`}
                 >

@@ -5,8 +5,11 @@ import { Chip } from "@heroui/react";
 import { useTranslation } from 'react-i18next';
 
 export default function SkillsList() {
-  const { t } = useTranslation();
-  const skills = t('home.skills', { returnObjects: true }) || [];
+  const { t, i18n } = useTranslation();
+  // Guard against the translation key being returned as a string when the
+  // new locale hasn't finished loading yet (race condition on lang switch).
+  const raw    = t('home.skills', { returnObjects: true });
+  const skills = Array.isArray(raw) ? raw : [];
 
   const container = {
     hidden:  { opacity: 0 },
@@ -20,6 +23,9 @@ export default function SkillsList() {
 
   return (
     <motion.div
+      // key forces a full remount (and re-animation) whenever the active
+      // language changes, so chips always reflect the current locale.
+      key={i18n.language}
       data-comp="SkillsList"
       variants={container}
       initial="hidden"

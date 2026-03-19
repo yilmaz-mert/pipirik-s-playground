@@ -14,11 +14,12 @@ export default function ProfileSection() {
     >
       <div className="relative w-36 h-36 md:w-104 md:h-104 group">
 
-        {/* Ambient glow — accent gradient */}
+        {/* Ambient aura — large, very subtle radial glow so it doesn't overpower the image */}
         <div
-          className="hidden md:block absolute inset-0 opacity-20 blur-[80px] group-hover:opacity-40 transition-opacity duration-700 bg-linear-to-tr"
+          className="hidden md:block absolute -inset-10 opacity-[0.08] group-hover:opacity-[0.15] transition-opacity duration-1000 pointer-events-none"
           style={{
-            backgroundImage: 'linear-gradient(to top right, var(--color-accent), var(--color-accent-2))',
+            backgroundImage: 'radial-gradient(ellipse at center, var(--color-accent) 0%, var(--color-accent-2) 35%, transparent 68%)',
+            filter:          'blur(160px)',
           }}
         />
 
@@ -44,26 +45,38 @@ export default function ProfileSection() {
           />
         </div>
 
-        {/* Status badge */}
+        {/* Status badge — technical monospaced pill */}
         <div
-          className="absolute -bottom-2 -right-2 backdrop-blur-xl p-4 rounded-2xl hidden md:flex items-center gap-3 shadow-2xl animate-bounce-slow border"
+          className="absolute -bottom-2 -right-2 backdrop-blur-xl px-3 py-2 rounded-xl hidden md:flex items-center gap-2 shadow-2xl animate-bounce-slow border"
           style={{
             backgroundColor: 'var(--color-bg-overlay)',
             borderColor:     'var(--color-border)',
+            fontFamily:      "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace",
           }}
         >
-          <div className="flex flex-col">
+          {/* Blinking active dot */}
+          <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
             <span
-              className="text-[10px] uppercase tracking-widest font-bold"
+              className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            />
+            <span
+              className="relative inline-flex rounded-full h-1.5 w-1.5"
+              style={{ backgroundColor: 'var(--color-accent)' }}
+            />
+          </span>
+          <div className="flex flex-col leading-none">
+            <span
+              className="text-[9px] uppercase tracking-[0.15em] font-bold"
               style={{ color: 'var(--color-text-muted)' }}
             >
-              Status
+              status
             </span>
             <span
-              className="text-sm font-bold"
+              className="text-xs font-bold mt-0.5"
               style={{ color: 'var(--color-text-primary)' }}
             >
-              Developing... 🚀
+              Developing...
             </span>
           </div>
         </div>

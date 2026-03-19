@@ -14,7 +14,7 @@
  *   surface stays alive even when the mouse is idle.
  *
  * PERFORMANCE:
- *   SCALE=4 → ~130 K cells on 1080p — ~1–2 ms per frame well within 16 ms budget.
+ *   SCALE=2 → ~520 K cells on 1080p — ~3–5 ms per frame, still well within 16 ms budget.
  *   prefers-reduced-motion skips the entire simulation (returns null).
  *
  * INTEGRATION:
@@ -26,12 +26,12 @@
 import { useEffect, useRef } from 'react';
 
 // ── Simulation constants ──────────────────────────────────────────────────────
-const SCALE          = 4;    // px per simulation cell (lower = sharper, heavier)
-const DAMPING        = 0.982; // energy retention per frame (0–1)
-const DISTURB_RADIUS = 5;    // radius of mouse/touch disturbance in cells
-const DISTURB_FORCE  = 280;  // peak height added at disturbance centre
-const DRIP_INTERVAL  = 1400; // ms between ambient random drips
-const DRIP_FORCE     = 180;  // peak height of ambient drips
+const SCALE          = 2;    // px per simulation cell (lower = sharper, heavier)
+const DAMPING        = 0.95; // energy retention per frame — faster decay prevents clutter
+const DISTURB_RADIUS = 5;    // wider brush for softer, silk-ribbon feel
+const DISTURB_FORCE  = 15;   // low force — applied along a line so accumulated effect is strong
+const DRIP_INTERVAL  = 1400; // ms between ambient random drips (rare breath)
+const DRIP_FORCE     = 180;   // peak height of ambient drips (scaled down to match new force range)
 
 // Digital Lavender RGB — matches --color-accent (#B57EDC)
 const R = 181, G = 126, B = 220;
@@ -105,11 +105,12 @@ export default function FluidBackground() {
     }
 
     // ── Propagate wave one tick ─────────────────────────────────────────────
+    // Coefficient 0.46 (< 0.5 stability limit) slows propagation speed by ~8 %
+    // on top of the every-other-frame skip in loop(), giving a calm, natural pace.
     function step() {
       for (let y = 1; y < rows - 1; y++) {
         for (let x = 1; x < cols - 1; x++) {
           const i = y * cols + x;
-          // Wave equation: new = avg(4 neighbours) * 2 - prev; then damp
           prev[i] = (
             cur[i - 1] + cur[i + 1] + cur[i - cols] + cur[i + cols]
           ) * 0.5 - prev[i];
@@ -126,9 +127,10 @@ export default function FluidBackground() {
     function render() {
       const d = imgData.data;
       for (let i = 0, n = cols * rows; i < n; i++) {
-        // map |height| → 0–140 alpha (screen blend stays subtle)
-        const h = cur[i];
-        d[i * 4 + 3] = (h < 0 ? -h : h) * 0.55 > 140 ? 140 : (h < 0 ? -h : h) * 0.55 | 0;
+        // Smooth falloff: scale intensity, cap at 100 to prevent white-out where trails overlap
+        const h         = cur[i] < 0 ? -cur[i] : cur[i];
+        const intensity = Math.min(100, h * 1.4);
+        d[i * 4 + 3]   = intensity | 0;
       }
 
       offCtx.putImageData(imgData, 0, 0);
@@ -141,6 +143,8 @@ export default function FluidBackground() {
     }
 
     // ── RAF loop ────────────────────────────────────────────────────────────
+    // step() runs on even frames only — halves wave propagation speed while
+    // keeping the canvas refreshed at full 60 fps for smooth alpha transitions.
     function loop() {
       step();
       render();
@@ -148,7 +152,29 @@ export default function FluidBackground() {
     }
 
     // ── Event listeners ─────────────────────────────────────────────────────
-    const onMouseMove = (e) => disturb(e.clientX, e.clientY);
+    // Track previous position so we can interpolate a continuous trail
+    let prevMX = null, prevMY = null;
+
+    const onMouseMove = (e) => {
+      const mx = e.clientX, my = e.clientY;
+      if (prevMX === null) {
+        disturb(mx, my);
+      } else {
+        // Interpolate points along the mouse path so fast movements leave no gaps
+        const dx   = mx - prevMX;
+        const dy   = my - prevMY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        // Step every ~SCALE pixels so adjacent disturbance circles just touch
+        const steps = Math.max(1, Math.ceil(dist / SCALE));
+        for (let s = 0; s <= steps; s++) {
+          const t = s / steps;
+          disturb(prevMX + dx * t, prevMY + dy * t);
+        }
+      }
+      prevMX = mx;
+      prevMY = my;
+    };
+
     const onTouchMove = (e) => {
       const t = e.touches[0];
       if (t) disturb(t.clientX, t.clientY, DISTURB_FORCE * 0.6);

@@ -8,13 +8,32 @@ export default function HeroSection() {
 
   return (
     <header data-comp="HeroSection" className="space-y-1 md:space-y-3">
-      {/* Availability badge — semantic blue kept intentionally (status indicator, not theme color) */}
-      <div className="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs md:text-sm font-medium w-fit">
-        <span className="relative flex h-2 w-2 mr-2">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500" />
+      {/* Availability badge — technical monospaced pill */}
+      <div
+        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full w-fit border"
+        style={{
+          backgroundColor: 'color-mix(in srgb, var(--color-accent) 8%, transparent)',
+          borderColor:     'color-mix(in srgb, var(--color-accent) 22%, transparent)',
+          fontFamily:      "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace",
+        }}
+      >
+        {/* Blinking active dot */}
+        <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
+          <span
+            className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+            style={{ backgroundColor: 'var(--color-accent)' }}
+          />
+          <span
+            className="relative inline-flex rounded-full h-1.5 w-1.5"
+            style={{ backgroundColor: 'var(--color-accent)' }}
+          />
         </span>
-        {t('home.availableForWork')}
+        <span
+          className="text-[11px] font-semibold tracking-wider uppercase"
+          style={{ color: 'var(--color-accent)' }}
+        >
+          {t('home.availableForWork')}
+        </span>
       </div>
 
       {/* Hero name — text-[var] overrides the global h1 gradient so the name stays solid */}

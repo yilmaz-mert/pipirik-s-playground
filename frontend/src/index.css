@@ -112,7 +112,11 @@
    GLOBAL HTML & BODY STYLES
    ============================================================ */
 html, body {
-  @apply h-full antialiased overflow-x-hidden;
+  /* min-h-full instead of h-full — allows pages taller than 100vh to scroll
+     naturally without content being clipped by a hard height constraint.
+     overflow-x-hidden stays to suppress horizontal bleed from blob animations. */
+  @apply antialiased overflow-x-hidden;
+  min-height: 100%;
   font-family: 'Inter', system-ui, sans-serif;
   color: var(--color-text-primary);
   background-color: var(--color-bg-base);
@@ -270,4 +274,10 @@ body.flash-incorrect { @apply bg-red-500/15!;   transition: background-color 0.3
 [data-engineer-mode] .project-sandbox [data-comp]::before,
 [data-engineer-mode] .project-sandbox [data-comp]::after {
   display: none;
+}
+
+/* The FloatingDock is position:fixed — engineer mode's position:relative must
+   not override it or the dock will lose its centred layout and snap to the left. */
+[data-engineer-mode] [data-comp="FloatingDock"] {
+  position: fixed;
 }

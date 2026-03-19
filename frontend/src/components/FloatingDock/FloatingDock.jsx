@@ -7,8 +7,13 @@
  *   that to a size using useTransform + useSpring for physics-based scaling.
  *   Items grow upward (items-end) just like the real macOS Dock.
  *
+ * RESPONSIVE:
+ *   On screens < 640 px (sm breakpoint) BASE/PEAK/RADIUS shrink so the dock
+ *   fits comfortably without covering page content. The values are computed
+ *   once at mount — the dock is never conditionally rendered.
+ *
  * SECTIONS:
- *   [ Home | About | Projects ]  ──  [ Lang | Theme | Engineer ]
+ *   [ Home | About | Projects ]  ──  [ Globe(Lang) | Theme | Engineer ]
  */
 import { useRef, useState } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -17,41 +22,36 @@ import {
   useMotionValue, useTransform, useSpring,
 } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { Home, User, LayoutGrid, Palette, Code2 } from 'lucide-react';
+import { Home, User, LayoutGrid, Palette, Code2, Globe } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useEngineerMode } from '../../context/EngineerModeContext';
 import { langs } from '../../constants/langs';
 import { useClickOutside } from '../../hooks/useClickOutside';
 
-// ── Fisheye constants ────────────────────────────────────────────────────────
-const BASE   = 44;   // px — resting container size
-const PEAK   = 72;   // px — maximum size directly under cursor
-const RADIUS = 128;  // px — half-width of the magnification influence zone
+// ── Fisheye spring ────────────────────────────────────────────────────────────
 const SPRING = { mass: 0.08, stiffness: 220, damping: 16 };
 
-// ── Tooltip spring (subtle bounce) ──────────────────────────────────────────
+// ── Tooltip spring ────────────────────────────────────────────────────────────
 const TIP_VARIANTS = {
   hidden: { opacity: 0, y: 6,  scale: 0.88 },
   show:   { opacity: 1, y: 0,  scale: 1    },
 };
 
 // ── MagnifiableItem ──────────────────────────────────────────────────────────
-// Wraps any dock slot with fisheye magnification + a floating label tooltip.
-function MagnifiableItem({ mouseX, label, children }) {
+function MagnifiableItem({ mouseX, label, base, peak, radius, children }) {
   const ref = useRef(null);
   const [hovered, setHovered] = useState(false);
 
-  // Distance between cursor and the horizontal centre of this item
   const distance = useTransform(mouseX, (x) => {
-    if (x === Infinity) return RADIUS + 1; // cursor outside dock → base size
+    if (x === Infinity) return radius + 1;
     const b = ref.current?.getBoundingClientRect();
-    return b ? x - (b.left + b.width / 2) : RADIUS + 1;
+    return b ? x - (b.left + b.width / 2) : radius + 1;
   });
 
   const rawSize = useTransform(
     distance,
-    [-RADIUS, 0, RADIUS],
-    [BASE, PEAK, BASE],
+    [-radius, 0, radius],
+    [base, peak, base],
     { clamp: true },
   );
   const size = useSpring(rawSize, SPRING);
@@ -62,7 +62,6 @@ function MagnifiableItem({ mouseX, label, children }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Label chip — floats above the item */}
       <AnimatePresence>
         {hovered && (
           <motion.span
@@ -87,7 +86,6 @@ function MagnifiableItem({ mouseX, label, children }) {
         )}
       </AnimatePresence>
 
-      {/* The magnifiable container — grows upward via items-end on parent */}
       <motion.div
         ref={ref}
         style={{ width: size, height: size }}
@@ -100,11 +98,9 @@ function MagnifiableItem({ mouseX, label, children }) {
 }
 
 // ── NavItem ──────────────────────────────────────────────────────────────────
-// Router-aware dock icon that lights up on the active route.
-function NavItem({ mouseX, to, icon: Icon, label }) {
+function NavItem({ mouseX, to, icon: Icon, label, base, peak, radius }) {
   return (
-    <MagnifiableItem mouseX={mouseX} label={label}>
-      {/* NavLink render-prop form so isActive flows into both colour + shadow */}
+    <MagnifiableItem mouseX={mouseX} label={label} base={base} peak={peak} radius={radius}>
       <NavLink to={to} end={to === '/'} className="w-full h-full block">
         {({ isActive }) => (
           <div
@@ -114,15 +110,12 @@ function NavItem({ mouseX, to, icon: Icon, label }) {
               backgroundColor: isActive
                 ? 'color-mix(in srgb, var(--color-accent) 13%, transparent)'
                 : 'transparent',
-              boxShadow:       isActive
+              boxShadow: isActive
                 ? '0 0 18px color-mix(in srgb, var(--color-accent) 28%, transparent)'
                 : 'none',
             }}
           >
-            <Icon
-              className="w-[52%] h-[52%]"
-              strokeWidth={isActive ? 2 : 1.6}
-            />
+            <Icon className="w-[52%] h-[52%]" strokeWidth={isActive ? 2 : 1.6} />
           </div>
         )}
       </NavLink>
@@ -130,14 +123,14 @@ function NavItem({ mouseX, to, icon: Icon, label }) {
   );
 }
 
-// ── DockDivider ──────────────────────────────────────────────────────────────
-function DockDivider() {
+// ── DockDivider ───────────────────────────────────────────────────────────────
+function DockDivider({ base }) {
   return (
     <div
       className="w-px mx-1 flex-shrink-0 self-end rounded-full"
       style={{
-        height:          BASE * 0.68 + 'px',
-        marginBottom:    BASE * 0.16 + 'px',
+        height:          base * 0.68 + 'px',
+        marginBottom:    base * 0.16 + 'px',
         backgroundColor: 'var(--color-border)',
       }}
     />
@@ -150,22 +143,27 @@ export default function FloatingDock() {
   const { cycleTheme, theme }                = useTheme();
   const { active: engineerOn, toggle: toggleEngineer } = useEngineerMode();
 
-  // Language popover state
+  // Language popover
   const [langOpen, setLangOpen]   = useState(false);
   const langPanelRef              = useRef(null);
   const langTriggerRef            = useRef(null);
   useClickOutside(langPanelRef, () => setLangOpen(false), [langTriggerRef]);
 
-  // mouseX drives every fisheye calculation
+  // Responsive dock sizing — computed once at mount
+  const isMobile  = useRef(typeof window !== 'undefined' && window.innerWidth < 640).current;
+  const dockBase   = isMobile ? 36 : 44;
+  const dockPeak   = isMobile ? 58 : 72;
+  const dockRadius = isMobile ? 100 : 128;
+
+  // mouseX sentinel: Infinity means cursor is outside the dock → all items at base size
   const mouseX = useMotionValue(Infinity);
 
   const currentLang = langs.find(
     (l) => l.code === ((i18n.language || 'en').split('-')[0])
   ) || langs[0];
-  const CurrentFlag = currentLang.Flag;
 
   const changeLang = (code) => {
-    try { localStorage.setItem('i18nextLng', code); } catch { /* */ }
+    try { localStorage.setItem('i18nextLng', code); } catch { /* quota */ }
     i18n.changeLanguage(code);
     setLangOpen(false);
   };
@@ -182,15 +180,17 @@ export default function FloatingDock() {
             animate={{ opacity: 1, y: 0,  scale: 1    }}
             exit={{ opacity: 0,    y: 10, scale: 0.93 }}
             transition={{ duration: 0.18, ease: [0.2, 0, 0.2, 1] }}
-            className="fixed z-[1001] flex flex-col gap-0.5 p-1.5 rounded-xl
-                       min-w-[9.5rem] backdrop-blur-2xl"
+            className="fixed z-[1001] flex flex-col gap-0.5 p-1.5 rounded-xl min-w-[9.5rem]"
             style={{
               bottom:          'calc(var(--dock-height) + 1.5rem)',
               left:            '50%',
               transform:       'translateX(-50%)',
-              backgroundColor: 'var(--color-bg-overlay)',
+              // Glassmorphism — matches dock but sharper border
+              backgroundColor: 'color-mix(in srgb, var(--color-bg-overlay) 92%, transparent)',
+              backdropFilter:  'blur(28px)',
+              WebkitBackdropFilter: 'blur(28px)',
               border:          '1px solid var(--color-border)',
-              boxShadow:       '0 8px 36px rgba(0,0,0,0.55)',
+              boxShadow:       '0 8px 36px rgba(0,0,0,0.55), 0 1px 0 color-mix(in srgb, white 6%, transparent) inset',
             }}
           >
             {langs.map((l) => {
@@ -228,7 +228,8 @@ export default function FloatingDock() {
       <motion.nav
         data-comp="FloatingDock"
         aria-label="Main navigation"
-        className="fixed z-[1000] flex items-end gap-1.5 px-3 py-2.5 rounded-2xl backdrop-blur-2xl"
+        className={`fixed z-[1000] flex items-end backdrop-blur-2xl
+                    ${isMobile ? 'gap-1 px-2 py-2 rounded-xl' : 'gap-1.5 px-3 py-2.5 rounded-2xl'}`}
         style={{
           bottom:          '1.25rem',
           left:            '50%',
@@ -244,17 +245,20 @@ export default function FloatingDock() {
         onMouseMove={(e) => mouseX.set(e.clientX)}
         onMouseLeave={() => mouseX.set(Infinity)}
       >
-        {/* Navigation */}
-        <NavItem mouseX={mouseX} to="/"        icon={Home}       label={t('nav.home')} />
-        <NavItem mouseX={mouseX} to="/about"   icon={User}       label={t('nav.about')} />
-        <NavItem mouseX={mouseX} to="/projects" icon={LayoutGrid} label={t('nav.projects')} />
+        {/* Navigation items */}
+        <NavItem mouseX={mouseX} to="/"         icon={Home}       label={t('nav.home')}     base={dockBase} peak={dockPeak} radius={dockRadius} />
+        <NavItem mouseX={mouseX} to="/about"    icon={User}       label={t('nav.about')}    base={dockBase} peak={dockPeak} radius={dockRadius} />
+        <NavItem mouseX={mouseX} to="/projects" icon={LayoutGrid} label={t('nav.projects')} base={dockBase} peak={dockPeak} radius={dockRadius} />
 
-        <DockDivider />
+        <DockDivider base={dockBase} />
 
-        {/* Language switcher — shows current flag, opens picker on click */}
+        {/* Language switcher — Globe icon opens picker */}
         <MagnifiableItem
           mouseX={mouseX}
           label={t('dock.language', 'Language')}
+          base={dockBase}
+          peak={dockPeak}
+          radius={dockRadius}
         >
           <button
             ref={langTriggerRef}
@@ -270,14 +274,17 @@ export default function FloatingDock() {
             aria-label="Switch language"
             aria-expanded={langOpen}
           >
-            <CurrentFlag className="w-[50%] h-[38%] rounded-[3px]" aria-hidden="true" />
+            <Globe className="w-[52%] h-[52%]" strokeWidth={1.6} />
           </button>
         </MagnifiableItem>
 
-        {/* Theme cycler — visual cue; cycles THEMES array in ThemeContext */}
+        {/* Theme cycler */}
         <MagnifiableItem
           mouseX={mouseX}
           label={`${t('dock.theme', 'Theme')}: ${theme}`}
+          base={dockBase}
+          peak={dockPeak}
+          radius={dockRadius}
         >
           <button
             onClick={cycleTheme}
@@ -296,6 +303,9 @@ export default function FloatingDock() {
         <MagnifiableItem
           mouseX={mouseX}
           label={engineerOn ? 'Engineer Mode ON  (Alt+E)' : 'Engineer Mode (Alt+E)'}
+          base={dockBase}
+          peak={dockPeak}
+          radius={dockRadius}
         >
           <button
             onClick={toggleEngineer}
@@ -306,17 +316,14 @@ export default function FloatingDock() {
               backgroundColor: engineerOn
                 ? 'color-mix(in srgb, var(--color-accent) 12%, transparent)'
                 : 'transparent',
-              boxShadow:       engineerOn
+              boxShadow: engineerOn
                 ? '0 0 16px color-mix(in srgb, var(--color-accent) 32%, transparent)'
                 : 'none',
             }}
             aria-label="Toggle engineer mode"
             aria-pressed={engineerOn}
           >
-            <Code2
-              className="w-[52%] h-[52%]"
-              strokeWidth={engineerOn ? 2.1 : 1.6}
-            />
+            <Code2 className="w-[52%] h-[52%]" strokeWidth={engineerOn ? 2.1 : 1.6} />
           </button>
         </MagnifiableItem>
       </motion.nav>
