@@ -225,6 +225,7 @@ html, body {
   @apply w-full;
   min-height: 100vh;        /* legacy fallback  */
   min-height: 100dvh;       /* modern: excludes mobile browser chrome */
+  box-sizing: border-box;
   isolation: isolate;
   /* Ensure no page content hides beneath the fixed floating dock */
   padding-bottom: calc(var(--dock-height) + 2rem);

@@ -22,7 +22,7 @@ createRoot(document.getElementById('root')).render(
               Loading...
             </div>
           }>
-            <main className="dark text-foreground min-h-screen">
+            <main className="dark text-foreground ">
               <App />
             </main>
           </Suspense>
