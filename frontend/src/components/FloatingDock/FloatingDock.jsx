@@ -38,24 +38,42 @@ const TIP_VARIANTS = {
   show:   { opacity: 1, y: 0,  scale: 1    },
 };
 
+// Detect touch once at module level — stable across all component instances
+const IS_TOUCH = typeof window !== 'undefined' &&
+  ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
 // ── MagnifiableItem ──────────────────────────────────────────────────────────
 function MagnifiableItem({ mouseX, label, base, peak, radius, onHoverSound, children }) {
   const ref = useRef(null);
   const [hovered, setHovered] = useState(false);
 
+  // Fisheye magnification — only on pointer (mouse) devices
   const distance = useTransform(mouseX, (x) => {
-    if (x === Infinity) return radius + 1;
+    if (IS_TOUCH || x === Infinity) return radius + 1;
     const b = ref.current?.getBoundingClientRect();
     return b ? x - (b.left + b.width / 2) : radius + 1;
   });
-
   const rawSize = useTransform(
     distance,
     [-radius, 0, radius],
-    [base, peak, base],
+    [base, IS_TOUCH ? base : peak, base],
     { clamp: true },
   );
   const size = useSpring(rawSize, SPRING);
+
+  // On touch: compact static pill item with tap feedback, no tooltip/hover
+  if (IS_TOUCH) {
+    return (
+      <motion.div
+        whileTap={{ scale: 0.85 }}
+        transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        style={{ width: base, height: base }}
+        className="flex items-center justify-center"
+      >
+        {children}
+      </motion.div>
+    );
+  }
 
   return (
     <div
@@ -160,10 +178,13 @@ export default function FloatingDock() {
   // mouseX sentinel: Infinity means cursor is outside the dock → all items at base size
   const mouseX = useMotionValue(Infinity);
 
-  // ── Magnetic pull — dock gently drifts toward the cursor ─────────────────
+  // ── Magnetic pull — dock gently drifts toward the cursor (mouse only) ───────
   const dockRef     = useRef(null);
   const magnetState = useRef({ x: 0, y: 0, tx: 0, ty: 0, raf: null });
   useEffect(() => {
+    // Touch devices have no cursor — skip the RAF loop entirely to save battery
+    if (IS_TOUCH) return;
+
     const m = magnetState.current;
     const ATTRACTION_RADIUS = 220;
     const MAX_PULL          = 7;
@@ -356,8 +377,8 @@ export default function FloatingDock() {
             className="w-full h-full flex items-center justify-center rounded-[10px]
                        transition-colors duration-200"
             style={{ color: 'var(--color-text-muted)' }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--color-accent)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--color-text-muted)'; }}
+            onMouseEnter={IS_TOUCH ? undefined : (e) => { e.currentTarget.style.color = 'var(--color-accent)'; }}
+            onMouseLeave={IS_TOUCH ? undefined : (e) => { e.currentTarget.style.color = 'var(--color-text-muted)'; }}
             aria-label="Cycle theme"
           >
             <Palette className="w-[52%] h-[52%]" strokeWidth={1.6} />

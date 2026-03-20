@@ -6,6 +6,7 @@ import { AnimatePresence } from 'framer-motion';
 import { motion } from 'framer-motion';
 import FloatingDock    from './components/FloatingDock/FloatingDock';
 import ThemeAssetLoader from './context/ThemeAssetLoader';
+import { PrecisionShieldProvider } from './context/PrecisionShieldContext';
 import EngineerHUD     from './components/EngineerHUD/EngineerHUD';
 import CommandPalette  from './components/CommandPalette/CommandPalette';
 import MatrixRain      from './components/MatrixRain/MatrixRain';
@@ -111,7 +112,9 @@ function AppInner() {
 function App() {
   return (
     <Router>
-      <AppInner />
+      <PrecisionShieldProvider>
+        <AppInner />
+      </PrecisionShieldProvider>
     </Router>
   );
 }

@@ -21,7 +21,7 @@
  * The shimmer overlay is absolutely-positioned on top of children with
  * pointer-events: none so it never blocks clicks.
  */
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
   motion,
   useMotionValue, useTransform, useSpring,
@@ -48,6 +48,15 @@ export default function TiltCard({
       : false
   ).current;
 
+  // Detect touch/mobile once at mount
+  const isTouch = useRef(
+    typeof window !== 'undefined' &&
+    ('ontouchstart' in window || navigator.maxTouchPoints > 0)
+  ).current;
+
+  // True once DeviceOrientation starts delivering real data
+  const [gyroActive, setGyroActive] = useState(false);
+
   // ── Raw motion values ────────────────────────────────────────────────────
   const rotX    = useMotionValue(0);
   const rotY    = useMotionValue(0);
@@ -69,6 +78,53 @@ export default function TiltCard({
     ([x, y]) =>
       `radial-gradient(circle at ${x}% ${y}%, rgba(181,126,220,0.16) 0%, rgba(212,168,240,0.06) 40%, transparent 65%)`,
   );
+
+  // ── Gyroscope (DeviceOrientation) — mobile 3D tilt ──────────────────────
+  useEffect(() => {
+    if (!isTouch || reducedMotion) return;
+
+    const onOrientation = (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      // gamma: left/right tilt (-90..90), beta: front/back tilt (-180..180)
+      // Typical phone held upright: beta ≈ 45°. Subtract that as baseline.
+      const nx = Math.max(-1, Math.min(1, e.gamma / 30));
+      const ny = Math.max(-1, Math.min(1, ((e.beta ?? 45) - 45) / 30));
+      rotY.set(nx * maxTilt);
+      rotX.set(-ny * maxTilt);
+      if (!gyroActive) setGyroActive(true);
+    };
+
+    const startGyro = () => {
+      window.addEventListener('deviceorientation', onOrientation);
+      return () => window.removeEventListener('deviceorientation', onOrientation);
+    };
+
+    // iOS 13+ requires explicit user-gesture permission
+    if (
+      typeof DeviceOrientationEvent !== 'undefined' &&
+      typeof DeviceOrientationEvent.requestPermission === 'function'
+    ) {
+      let cancelGyro = () => {};
+      const onTap = () => {
+        DeviceOrientationEvent.requestPermission()
+          .then((state) => { if (state === 'granted') cancelGyro = startGyro(); })
+          .catch(() => {/* denied — breathing animation fallback stays active */});
+      };
+      const el = ref.current;
+      el?.addEventListener('touchend', onTap, { once: true });
+      return () => {
+        el?.removeEventListener('touchend', onTap);
+        cancelGyro();
+      };
+    }
+
+    // Android + iOS < 13 — direct access, no permission needed
+    if (typeof window.DeviceOrientationEvent !== 'undefined') {
+      return startGyro();
+    }
+  // rotX, rotY, maxTilt are stable refs — safe to omit from deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isTouch, reducedMotion]);
 
   // ── Event handlers ───────────────────────────────────────────────────────
   const onMouseMove = (e) => {
@@ -105,20 +161,30 @@ export default function TiltCard({
     return <div className={`relative w-full h-full ${className}`}>{children}</div>;
   }
 
+  // Breathing animation for touch devices when gyroscope is unavailable / denied
+  const breatheAnimate = isTouch && !gyroActive && !reducedMotion
+    ? { rotateX: [0, 2.5, 0, -2.5, 0], rotateY: [0, -2, 0, 2, 0] }
+    : undefined;
+  const breatheTransition = breatheAnimate
+    ? { duration: 5, repeat: Infinity, ease: 'easeInOut' }
+    : undefined;
+
   return (
     <motion.div
       ref={ref}
       className={`relative w-full h-full ${className}`}
       style={{
-        rotateX:              springRotX,
-        rotateY:              springRotY,
+        rotateX:              gyroActive || !isTouch ? springRotX : undefined,
+        rotateY:              gyroActive || !isTouch ? springRotY : undefined,
         scale:                springScale,
         transformPerspective: perspective,
         transformStyle:       'preserve-3d',
         willChange:           'transform',
       }}
-      onMouseMove={onMouseMove}
-      onMouseEnter={onMouseEnter}
+      animate={breatheAnimate}
+      transition={breatheTransition}
+      onMouseMove={isTouch ? undefined : onMouseMove}
+      onMouseEnter={isTouch ? undefined : onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
       {children}

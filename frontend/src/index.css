@@ -420,27 +420,13 @@ body.flash-incorrect { @apply bg-red-500/15!;   transition: background-color 0.3
 }
 
 /* ============================================================
-   RESPONSIVE CANVAS BACKGROUND MASK
-   Applied as a class to FluidBackground + NeonAscii canvases.
-   Radial ellipse anchored at 20% 50% (left column) keeps the
-   hero text area transparent while canvas effects are visible
-   on the right half. Percentage units make it fully responsive.
-   Mobile: mask off — content stacks full-width, canvas is
-   decorative enough without masking at that scale.
+   CANVAS BACKGROUND MASK
+   Phase 12: gradient masks replaced by PrecisionShieldProvider.
+   A dynamic DOM-geometry backdrop (z-index 4) tracks the exact
+   bounding box of the content grid via ResizeObserver, blocking
+   the canvas effects precisely without any static gradient rules.
    ============================================================ */
-.canvas-bg-mask {
-  mask-image: radial-gradient(ellipse 80% 60% at 20% 50%, transparent 0%, transparent 35%, black 65%);
-  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 20% 50%, transparent 0%, transparent 35%, black 65%);
-}
-
 @media (max-width: 768px) {
-  .canvas-bg-mask {
-    /* On mobile the grid is single-column — the mask isn't needed
-       and would clip the canvas on the wrong axis. Just let it show. */
-    mask-image: none;
-    -webkit-mask-image: none;
-  }
-
   /* Sunset decoder is cursor-based — useless and confusing on touch screens */
   .sunset-decoder-layer {
     display: none;

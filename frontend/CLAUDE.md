@@ -36,9 +36,10 @@ A polymorphic, highly scalable personal portfolio website showcasing engineering
    - When rendering large grids (like GitHub Heatmaps), NEVER animate hundreds of individual DOM nodes simultaneously with Framer Motion. This causes severe FPS drops.
    - **Rule:** Animate containers (stagger columns/rows) or use SVG/Canvas for massive data plots. 
 
-4. **Responsive Masking & Readability Priority:**
-   - Background effects (Fluid, X-Ray) MUST NEVER overwhelm text. 
-   - **Rule:** Background masks (`mask-image`) must always use flexible percentages (`%` or `vw/vh`) or responsive `radial-gradient` anchoring. NEVER hardcode mask dimensions in `px`, as it breaks readability on window resize.
+4. **Dynamic Component Masking (The "Swiss Cheese" Rule):**
+   - Background effects MUST NEVER render behind key UI components (Hero, Profile, Skills, etc.).
+   - **RULE:** Do NOT use physical overlay divs for shielding. This kills glassmorphism and shadows. 
+   - **Solution:** Use the `mask-image` property on the canvas elements. Generate a dynamic SVG mask that contains "holes" (black rectangles) exactly at the coordinates of the registered UI components. This creates a "Swiss Cheese" effect where the background simulation is visible everywhere EXCEPT behind the UI.
 
 5. **Raycast-Style CMDK (Command Palette):**
    - Command palettes must NOT look like generic web dropdowns. 
