@@ -1,7 +1,7 @@
 # Pipirik's Playground - Master Architecture & Portfolio Guide
 
 ## Project Overview
-A polymorphic, highly scalable personal portfolio website showcasing engineering projects. Currently evolving into Phase 4: "Cyber-Naturalism" & Digital OS Experience.
+A polymorphic, highly scalable personal portfolio website showcasing engineering projects. Currently evolving into Phase 10: "Performance Optimization & The Living UI".
 
 ## Tech Stack
 - **Framework:** React 19 (using Vite)
@@ -9,7 +9,13 @@ A polymorphic, highly scalable personal portfolio website showcasing engineering
 - **Animations:** Framer Motion (Advanced hooks: useSpring, useTransform for 3D/Fisheye) & Native View Transitions
 - **Graphics:** Canvas/WebGL for background simulations
 - **Internationalization:** i18next
-- **Sensory & OS UI:** `use-sound` (for Sonic UI), `cmdk` (for Command Palette).
+- **Sensory & OS UI:** `use-sound` (for Sonic UI), `cmdk` (for Command Palette)
+
+## Visual Truth (Design Tokens)
+- **Base/Background:** Deep Charcoal Grey (`#0A0A0B`)
+- **Surface:** Dark Slate (`#161618`)
+- **Accent:** Digital Lavender (`#B57EDC`)
+- **UI Paradigms:** Bottom Floating Dock (macOS fisheye style), Extreme Glassmorphism (`backdrop-blur-3xl`), 3D Perspective Tilt on cards.
 
 ## Base Commands
 - **Development Server:** `npm run dev`
@@ -17,26 +23,34 @@ A polymorphic, highly scalable personal portfolio website showcasing engineering
 - **Lint Check:** `npm run lint`
 
 ## CRITICAL ARCHITECTURE RULES (DO NOT VIOLATE)
+
 1. **The "My Projects" Sanctuary:**
-   - Folder: `src/pages/Projects/` (except `Projects.jsx` listing logic).
+   - Folder: `src/pages/Projects/` (except the `Projects.jsx` listing logic).
    - **RULE:** NEVER modify the internal logic, state, or styling of individual projects (e.g., Hangman, FlightTracker, Exam). They are completely isolated.
-2. **Polymorphic UI & Cyber-Naturalism:**
-   - Base tokens: Deep Charcoal Grey (`#0A0A0B`), Dark Slate Surface (`#161618`), Digital Lavender Accent (`#B57EDC`).
-   - UI Paradigms: Bottom Floating Dock (macOS fisheye style), Glassmorphism, 3D Perspective Tilt on cards.
-3. **Performance & Asset Management:**
-   - Heavy assets (like Canvas Fluid Simulations) MUST be lazy-loaded via `Suspense` and `React.lazy`.
-   - Aim for 60fps; use GPU-accelerated CSS properties (`transform`, `opacity`).
-4. **Engineer Mode:**
-   - A global toggle that adds technical metadata to the UI using CSS pseudo-elements (do NOT bloat the DOM with extra wrapper divs for this mode).
-5. **The Sensory Layer (Sonic UI):**
+
+2. **Performance & Asset Management:**
+   - Heavy assets (like Canvas Fluid Simulations) MUST be lazy-loaded via `Suspense` and `React.lazy` and restricted to specific routes (e.g., `/` only) using `useLocation`.
+   - Aim for strict 60fps. Always use GPU-accelerated CSS properties (`transform`, `opacity`).
+
+3. **Data Visualization Performance (Grid/Heatmaps):**
+   - When rendering large grids (like GitHub Heatmaps), NEVER animate hundreds of individual DOM nodes simultaneously with Framer Motion. This causes severe FPS drops.
+   - **Rule:** Animate containers (stagger columns/rows) or use SVG/Canvas for massive data plots. 
+
+4. **Responsive Masking & Readability Priority:**
+   - Background effects (Fluid, X-Ray) MUST NEVER overwhelm text. 
+   - **Rule:** Background masks (`mask-image`) must always use flexible percentages (`%` or `vw/vh`) or responsive `radial-gradient` anchoring. NEVER hardcode mask dimensions in `px`, as it breaks readability on window resize.
+
+5. **Raycast-Style CMDK (Command Palette):**
+   - Command palettes must NOT look like generic web dropdowns. 
+   - They must resemble native OS apps (like Raycast): massive padding, 3xl blur, invisible inputs, typography-driven UI, and zero clunky background fills. Globally reserved shortcut: `CMD+K` / `CTRL+K`.
+
+6. **The Sensory Layer (Sonic UI):**
    - UI sounds must be extremely subtle (short decay, low volume). Never block the main thread.
    - Respect browser auto-play policies (sounds trigger on interaction only).
-6. **Command Palette (CMDK):**
-   - The shortcut `CMD+K` (or `CTRL+K`) is globally reserved. The palette must adhere to the current active Theme Tokens (glassmorphism, `--color-bg-overlay`).
+
 7. **External APIs & Data Fetching:**
-   - When fetching live data (e.g., GitHub contributions), ALWAYS use a robust public proxy to bypass CORS/Auth limitations.
-   - Always implement elegant loading states (skeletons) and graceful fallbacks if the API fails, ensuring the UI never breaks.
-8. **Readability & Contrast Priority:**
-   - Background effects (Fluid, X-Ray) MUST NEVER overwhelm text. Always use subtle glassmorphic underlays, text-shadows, or radial masking behind text layers to preserve legibility.
-9. **Raycast-Style CMDK:**
-   - Command palettes must NOT look like generic web dropdowns. They must resemble native OS apps (like Raycast): massive padding, 3xl blur, invisible inputs, and typography-driven UI.
+   - When fetching live data (e.g., GitHub contributions), ALWAYS use a robust public proxy (like Deno proxies) to bypass CORS/Auth limitations.
+   - Parse schemas strictly. Always implement elegant loading states (skeletons) and graceful fallbacks if the API fails, ensuring the UI never breaks.
+
+8. **Engineer Mode:**
+   - A global toggle that adds technical metadata to the UI using CSS pseudo-elements (do NOT bloat the DOM with extra wrapper divs for this mode). Must apply to all routes and sub-components.

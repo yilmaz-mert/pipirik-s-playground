@@ -211,6 +211,7 @@ export default function FluidBackground() {
     <canvas
       ref={canvasRef}
       aria-hidden="true"
+      className="canvas-bg-mask"
       style={{
         position:      'fixed',
         inset:         0,
@@ -221,9 +222,7 @@ export default function FluidBackground() {
         zIndex:        0,
         // Screen blend: lavender ripples lighten the dark base without washing it out
         mixBlendMode:  'screen',
-        // Fade the left ~40% to transparent so the canvas never obscures Hero text
-        maskImage:            'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%)',
-        WebkitMaskImage:      'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%)',
+        // Responsive mask via CSS class .canvas-bg-mask (index.css)
       }}
     />
   );

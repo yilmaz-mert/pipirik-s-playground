@@ -112,13 +112,13 @@ export default function NeonAscii() {
       window.removeEventListener('mousemove', onMove);
       window.removeEventListener('resize',    onResize);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
       aria-hidden="true"
+      className="canvas-bg-mask"
       style={{
         position:      'fixed',
         inset:         0,
@@ -126,9 +126,7 @@ export default function NeonAscii() {
         height:        '100%',
         pointerEvents: 'none',
         zIndex:        0,
-        // Fade left ~40% so the canvas never obscures Hero text
-        maskImage:            'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%)',
-        WebkitMaskImage:      'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%)',
+        // Responsive mask via CSS class .canvas-bg-mask (index.css)
       }}
     />
   );

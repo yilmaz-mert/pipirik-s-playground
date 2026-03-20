@@ -61,8 +61,10 @@ export default function HeroSection() {
   const heroName = t('home.heroTitle', { name: 'Mert' });
   const heroRole = t('home.heroSubtitle');
 
-  const displayName = useScramble(heroName, 850, 80);
-  const displayRole = useScramble(heroRole, 700, 520);
+  const displayName = useScramble(heroName, 900, 80);
+  // Role decodes over 1 500 ms (starts after name begins) — finishes at ~1 900 ms total,
+  // which gates the SkillsList stagger (delay: 1 000 ms) and SocialLinks (delay: 1 350 ms)
+  const displayRole = useScramble(heroRole, 1500, 400);
 
   return (
     <header

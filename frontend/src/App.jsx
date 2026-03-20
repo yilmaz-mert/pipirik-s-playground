@@ -10,6 +10,7 @@ import EngineerHUD     from './components/EngineerHUD/EngineerHUD';
 import CommandPalette  from './components/CommandPalette/CommandPalette';
 import MatrixRain      from './components/MatrixRain/MatrixRain';
 import SunsetDecoder   from './components/SunsetDecoder/SunsetDecoder';
+import CustomCursor    from './components/CustomCursor/CustomCursor';
 import { useBrowserState }    from './hooks/useBrowserState';
 import { useTheme }           from './context/ThemeContext';
 import { useLocation }        from 'react-router-dom';
@@ -67,6 +68,7 @@ function AppInner() {
       {theme === 'sunset-glass' && pathname === '/' && <SunsetDecoder />}
 
       {/* ── Global OS-layer UI ── */}
+      <CustomCursor />
       <EngineerHUD />
       <CommandPalette onMatrixRain={() => setMatrixActive(true)} />
 

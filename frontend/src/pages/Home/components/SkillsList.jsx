@@ -13,12 +13,13 @@ export default function SkillsList() {
 
   const container = {
     hidden:  { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.3 } },
+    // delayChildren: 1.0s lets the Hero name + role scramble finish before chips appear
+    visible: { opacity: 1, transition: { staggerChildren: 0.07, delayChildren: 1.0 } },
   };
 
   const item = {
-    hidden:  { opacity: 0, scale: 0.8 },
-    visible: { opacity: 1, scale: 1 },
+    hidden:  { opacity: 0, y: 14, scale: 0.88 },
+    visible: { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.38, ease: [0.2, 0, 0.2, 1] } },
   };
 
   return (

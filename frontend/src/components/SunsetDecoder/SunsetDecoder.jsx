@@ -75,6 +75,7 @@ export default function SunsetDecoder() {
     <pre
       ref={layerRef}
       aria-hidden="true"
+      className="sunset-decoder-layer"
       style={{
         position:             'fixed',
         inset:                0,
@@ -91,13 +92,14 @@ export default function SunsetDecoder() {
         whiteSpace:           'pre',
         userSelect:           'none',
         // Dual mask via mask-composite: intersect —
-        //   Layer 1 (left-fade): permanently hides the left ~40% so decoder text
-        //             never occludes the Hero text column, regardless of cursor.
-        //   Layer 2 (cursor-reveal): radial window that follows the mouse.
-        //   intersect = only pixels opaque in BOTH layers are visible, so the
-        //               left zone is always dark, right zone reveals at cursor.
-        maskImage:            'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%), radial-gradient(circle 160px at var(--x, -9999px) var(--y, -9999px), black 0%, transparent 100%)',
-        WebkitMaskImage:      'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%), radial-gradient(circle 160px at var(--x, -9999px) var(--y, -9999px), black 0%, transparent 100%)',
+        //   Layer 1 (area-shield): responsive radial ellipse anchored at 20% 50%
+        //             permanently hides the left hero-text column regardless of
+        //             cursor position. % units = auto-responsive on resize.
+        //   Layer 2 (cursor-reveal): radial spotlight that follows the mouse.
+        //   intersect = only pixels opaque in BOTH layers are shown, so the
+        //               left zone is always invisible, right zone reveals at cursor.
+        maskImage:            'radial-gradient(ellipse 80% 60% at 20% 50%, transparent 0%, transparent 35%, black 65%), radial-gradient(circle 160px at var(--x, -9999px) var(--y, -9999px), black 0%, transparent 100%)',
+        WebkitMaskImage:      'radial-gradient(ellipse 80% 60% at 20% 50%, transparent 0%, transparent 35%, black 65%), radial-gradient(circle 160px at var(--x, -9999px) var(--y, -9999px), black 0%, transparent 100%)',
         maskComposite:        'intersect',
         WebkitMaskComposite:  'source-in',
       }}

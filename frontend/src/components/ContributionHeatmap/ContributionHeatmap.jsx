@@ -2,8 +2,17 @@
  * ContributionHeatmap — GitHub activity grid backed by live API data.
  *
  * Data source: https://github-contributions-api.deno.dev/yilmaz-mert.json
- * States: loading (skeleton) → success (stagger-animated live grid) → error (clean message).
- * No mock/random fallback — if the API fails the user sees an honest error state.
+ * States: loading (skeleton) → success (single fade-in, responsive grid) → error.
+ *
+ * PERFORMANCE NOTE:
+ *   Animating individual motion.divs (364+ nodes) causes major FPS drops.
+ *   Fix: the entire grid fades in as ONE motion element — a single opacity
+ *   animation on one DOM node instead of hundreds.
+ *
+ * LAYOUT:
+ *   Week columns use flex:1 so they stretch to fill the container.
+ *   Cells use width:100% + aspectRatio:1 so they stay square at any size.
+ *   On narrow viewports, overflow-x:auto provides horizontal scroll (like GitHub).
  */
 import { useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
@@ -14,7 +23,6 @@ const GITHUB_API = 'https://github-contributions-api.deno.dev/yilmaz-mert.json';
 
 // ── Build 52×7 grid from an array of { date, count } objects ─────────────────
 function buildGrid(contributions) {
-  // date string → count lookup
   const map = {};
   for (const item of contributions) {
     const key   = item.date   || item.DATE   || '';
@@ -65,19 +73,10 @@ function cellColor(lvl) {
   return `color-mix(in srgb, var(--color-accent) ${Math.round(opacities[lvl] * 100)}%, var(--color-bg-surface))`;
 }
 
-const CELL = 11;
-const GAP  = 3;
-const MONO = "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace";
-
-// ── Framer Motion stagger variants ────────────────────────────────────────────
-const gridContainer = {
-  hidden:  {},
-  visible: { transition: { staggerChildren: 0.012, delayChildren: 0.04 } },
-};
-const weekColumn = {
-  hidden:  { opacity: 0, scaleY: 0.25 },
-  visible: { opacity: 1, scaleY: 1, transition: { duration: 0.26, ease: [0.2, 0, 0.2, 1] } },
-};
+const MIN_CELL = 11;  // px — minimum cell size; columns expand beyond this on wide screens
+const GAP      = 3;
+const MONO     = "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace";
+const DAY_W    = 17; // px — fixed day-label column width
 
 // ── Skeleton cell ─────────────────────────────────────────────────────────────
 function SkeletonCell() {
@@ -85,7 +84,7 @@ function SkeletonCell() {
     <div
       aria-hidden="true"
       style={{
-        width: CELL, height: CELL, borderRadius: '2px', flexShrink: 0,
+        width: '100%', aspectRatio: '1', borderRadius: '2px', flexShrink: 0,
         backgroundColor: 'var(--color-bg-surface)',
         border: `1px solid color-mix(in srgb, var(--color-border-subtle) 40%, transparent)`,
         animation: 'skeleton-pulse 1.5s ease-in-out infinite',
@@ -97,7 +96,6 @@ function SkeletonCell() {
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function ContributionHeatmap() {
   const [tooltip, setTooltip] = useState(null);
-  // status: 'loading' | 'success' | 'error'
   const [status, setStatus]   = useState('loading');
   const [grid, setGrid]       = useState(null);
   const [total, setTotal]     = useState(0);
@@ -131,6 +129,9 @@ export default function ContributionHeatmap() {
     return () => { cancelled = true; };
   }, []);
 
+  // Shared row layout: fixed day-label column + 52 flex-1 week columns
+  const rowStyle = { display: 'flex', gap: `${GAP}px`, width: '100%' };
+
   return (
     <div data-comp="ContributionHeatmap" className="relative">
       {/* Header */}
@@ -163,81 +164,88 @@ export default function ContributionHeatmap() {
       {/* Grid (skeleton while loading, live data when ready) */}
       {status !== 'error' && (
         <div className="overflow-x-auto pb-1">
-          <div style={{ position: 'relative', display: 'inline-block' }}>
+          <div style={{ position: 'relative', display: 'inline-block', width: '100%', minWidth: `${DAY_W + GAP + 52 * (MIN_CELL + GAP)}px` }}>
 
-            {/* Month labels */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: `20px repeat(52, ${CELL}px)`,
-              gap: `0 ${GAP}px`, marginBottom: '4px',
-              fontFamily: MONO, fontSize: '10px', color: 'var(--color-text-muted)',
-            }}>
-              <div />
+            {/* Month labels — aligned with week columns via matching flex layout */}
+            <div style={{ ...rowStyle, marginBottom: '4px', fontFamily: MONO, fontSize: '10px', color: 'var(--color-text-muted)' }}>
+              <div style={{ width: DAY_W, flexShrink: 0 }} />
               {Array.from({ length: 52 }, (_, w) => {
                 const lbl = MONTH_LABELS.find(m => m.w === w);
-                return <div key={w} style={{ whiteSpace: 'nowrap', overflow: 'visible' }}>{lbl?.name ?? ''}</div>;
+                return (
+                  <div key={w} style={{ flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', minWidth: MIN_CELL }}>
+                    {lbl?.name ?? ''}
+                  </div>
+                );
               })}
             </div>
 
             {/* Day labels + week columns */}
-            <div style={{ display: 'flex', gap: `${GAP}px` }}>
-              {/* Day labels */}
-              <div style={{
-                display: 'flex', flexDirection: 'column', gap: `${GAP}px`,
-                fontFamily: MONO, fontSize: '10px', color: 'var(--color-text-muted)',
-                width: '17px', flexShrink: 0,
-              }}>
-                {DAY_LABELS.map((lbl, i) => (
-                  <div key={i} style={{ height: CELL, lineHeight: `${CELL}px`, textAlign: 'right' }}>{lbl}</div>
-                ))}
-              </div>
-
-              {/* Columns */}
-              {status === 'loading' ? (
-                // Skeleton — 52 placeholder columns
-                Array.from({ length: 52 }, (_, w) => (
-                  <div key={w} style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px` }}>
+            {status === 'loading' ? (
+              // Skeleton — static, no animation overhead
+              <div style={rowStyle}>
+                <div style={{
+                  display: 'flex', flexDirection: 'column', gap: `${GAP}px`,
+                  fontFamily: MONO, fontSize: '10px', color: 'var(--color-text-muted)',
+                  width: DAY_W, flexShrink: 0,
+                }}>
+                  {DAY_LABELS.map((lbl, i) => (
+                    <div key={i} style={{ aspectRatio: '1', lineHeight: `${MIN_CELL}px`, textAlign: 'right', minWidth: 0 }}>{lbl}</div>
+                  ))}
+                </div>
+                {Array.from({ length: 52 }, (_, w) => (
+                  <div key={w} style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: `${GAP}px`, minWidth: MIN_CELL }}>
                     {Array.from({ length: 7 }, (_, d) => <SkeletonCell key={d} />)}
                   </div>
-                ))
-              ) : (
-                // Live data with stagger animation
-                <motion.div
-                  style={{ display: 'flex', gap: `${GAP}px` }}
-                  variants={gridContainer}
-                  initial="hidden"
-                  animate="visible"
-                >
-                  {grid.map((week, w) => (
-                    <motion.div
-                      key={w}
-                      variants={weekColumn}
-                      style={{ display: 'flex', flexDirection: 'column', gap: `${GAP}px`, originY: 1 }}
-                    >
-                      {week.map((count, d) => (
-                        <div
-                          key={d}
-                          onMouseEnter={e => {
-                            const r = e.currentTarget.getBoundingClientRect();
-                            setTooltip({ x: r.left + r.width / 2, y: r.top, count });
-                          }}
-                          onMouseLeave={() => setTooltip(null)}
-                          onMouseOver={e  => { e.currentTarget.style.transform = 'scale(1.35)'; }}
-                          onMouseOut={e   => { e.currentTarget.style.transform = 'scale(1)'; }}
-                          style={{
-                            width: CELL, height: CELL, borderRadius: '2px', flexShrink: 0,
-                            backgroundColor: cellColor(level(count)),
-                            border: `1px solid color-mix(in srgb, var(--color-border-subtle) 60%, transparent)`,
-                            transition: 'background-color 0.3s, transform 0.15s',
-                            cursor: 'default',
-                          }}
-                        />
-                      ))}
-                    </motion.div>
+                ))}
+              </div>
+            ) : (
+              // Live data — SINGLE container fade-in (one animation, not 364+)
+              <motion.div
+                style={rowStyle}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.55, ease: 'easeOut' }}
+              >
+                {/* Day labels */}
+                <div style={{
+                  display: 'flex', flexDirection: 'column', gap: `${GAP}px`,
+                  fontFamily: MONO, fontSize: '10px', color: 'var(--color-text-muted)',
+                  width: DAY_W, flexShrink: 0,
+                }}>
+                  {DAY_LABELS.map((lbl, i) => (
+                    <div key={i} style={{ aspectRatio: '1', lineHeight: `${MIN_CELL}px`, textAlign: 'right' }}>{lbl}</div>
                   ))}
-                </motion.div>
-              )}
-            </div>
+                </div>
+
+                {/* Week columns — flex:1 so they expand to fill the container */}
+                {grid.map((week, w) => (
+                  <div
+                    key={w}
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: `${GAP}px`, minWidth: MIN_CELL }}
+                  >
+                    {week.map((count, d) => (
+                      <div
+                        key={d}
+                        onMouseEnter={e => {
+                          const r = e.currentTarget.getBoundingClientRect();
+                          setTooltip({ x: r.left + r.width / 2, y: r.top, count });
+                        }}
+                        onMouseLeave={() => setTooltip(null)}
+                        onMouseOver={e  => { e.currentTarget.style.transform = 'scale(1.35)'; }}
+                        onMouseOut={e   => { e.currentTarget.style.transform = 'scale(1)'; }}
+                        style={{
+                          width: '100%', aspectRatio: '1', borderRadius: '2px', flexShrink: 0,
+                          backgroundColor: cellColor(level(count)),
+                          border: `1px solid color-mix(in srgb, var(--color-border-subtle) 60%, transparent)`,
+                          transition: 'background-color 0.3s, transform 0.15s',
+                          cursor: 'default',
+                        }}
+                      />
+                    ))}
+                  </div>
+                ))}
+              </motion.div>
+            )}
 
             {/* Legend */}
             <div className="flex items-center gap-1.5 mt-3 justify-end"
@@ -245,7 +253,7 @@ export default function ContributionHeatmap() {
               <span>Less</span>
               {[0, 1, 2, 3, 4].map(lvl => (
                 <div key={lvl} style={{
-                  width: CELL, height: CELL, borderRadius: '2px', flexShrink: 0,
+                  width: MIN_CELL, height: MIN_CELL, borderRadius: '2px', flexShrink: 0,
                   backgroundColor: cellColor(lvl),
                   border: `1px solid color-mix(in srgb, var(--color-border-subtle) 60%, transparent)`,
                 }} />
