@@ -18,8 +18,8 @@
     "skills": ["React 19", "TypeScript", "Tailwind v4", "UI/UX Mühendisliği", "Framer Motion"]
   },
   "about": {
-    "titlePart1": "Kodu",
-    "titlePart2": "Aşan",
+    "titlePart1": "Dijital Alemi",
+    "titlePart2": "İnşa Ediyorum.",
     "subtitle": "Yazılım Geliştirici & Arayüz/Deneyim Mühendisi.",
     "dnaTitle": "Mühendislik DNA'm",
     "engineeredLine": "Mühendislik Çözümleri ve Etkileşimli Deneyimler",
@@ -38,8 +38,8 @@
     "skills": ["React 19", "TypeScript", "Tailwind v4", "Framer Motion", "Node.js", "i18next", "Vite"]
   },
   "projects": {
-    "titlePart1": "Projelerim",
-    "titlePart2": "",
+    "titlePart1": "Canlı",
+    "titlePart2": "Ekosistemler.",
     "subtitle": "Mühendislik Çözümleri ve Etkileşimli Deneyimler",
     "featured": "Öne Çıkan Proje",
     "hangman": "Adam Asmaca",

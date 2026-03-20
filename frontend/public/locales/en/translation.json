@@ -18,8 +18,8 @@
     "skills": ["React 19", "TypeScript", "Tailwind v4", "UI/UX Engineering", "Framer Motion"]
   },
   "about": {
-    "titlePart1": "Beyond the",
-    "titlePart2": "Code",
+    "titlePart1": "Architecting the Digital",
+    "titlePart2": "Realm.",
     "subtitle": "Software Developer & UI/UX Engineer.",
     "dnaTitle": "My Engineering DNA",
     "engineeredLine": "Engineered Solutions & Interactive Experiences",
@@ -38,8 +38,8 @@
     "skills": ["React 19", "TypeScript", "Tailwind v4", "Framer Motion", "Node.js", "i18next", "Vite"]
   },
   "projects": {
-    "titlePart1": "My",
-    "titlePart2": "Projects",
+    "titlePart1": "Deployed",
+    "titlePart2": "Ecosystems.",
     "subtitle": "Engineered Solutions & Interactive Experiences",
     "featured": "Featured Project",
     "hangman": "Hangman Game",

@@ -1,4 +1,5 @@
 import { Suspense, lazy } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from './ThemeContext';
 
 /**
@@ -20,6 +21,7 @@ import { useTheme } from './ThemeContext';
  */
 const THEME_ASSETS = {
   'cyber-naturalism': lazy(() => import('../themes/cyber-naturalism/FluidBackground')),
+  'neon-monochrome':  lazy(() => import('../themes/neon-monochrome/NeonAscii')),
   // 'liquid-glass': lazy(() => import('../themes/liquid-glass/LiquidGlassAssets')),
   // 'retro-rpg':    lazy(() => import('../themes/retro-rpg/RetroRpgAssets')),
 };
@@ -36,10 +38,13 @@ const THEME_ASSETS = {
  *   fully interactive while the asset chunk downloads.
  */
 export default function ThemeAssetLoader() {
-  const { theme } = useTheme();
-  const ThemeAssets = THEME_ASSETS[theme];
+  const { theme }      = useTheme();
+  const { pathname }   = useLocation();
+  const ThemeAssets    = THEME_ASSETS[theme];
 
-  if (!ThemeAssets) return null;
+  // Heavy canvas effects only run on the Home page — they're visually
+  // irrelevant on Projects/About and waste GPU on pages that don't use them.
+  if (!ThemeAssets || pathname !== '/') return null;
 
   return (
     <Suspense fallback={null}>

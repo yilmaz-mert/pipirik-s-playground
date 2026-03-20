@@ -33,3 +33,10 @@ A polymorphic, highly scalable personal portfolio website showcasing engineering
    - Respect browser auto-play policies (sounds trigger on interaction only).
 6. **Command Palette (CMDK):**
    - The shortcut `CMD+K` (or `CTRL+K`) is globally reserved. The palette must adhere to the current active Theme Tokens (glassmorphism, `--color-bg-overlay`).
+7. **External APIs & Data Fetching:**
+   - When fetching live data (e.g., GitHub contributions), ALWAYS use a robust public proxy to bypass CORS/Auth limitations.
+   - Always implement elegant loading states (skeletons) and graceful fallbacks if the API fails, ensuring the UI never breaks.
+8. **Readability & Contrast Priority:**
+   - Background effects (Fluid, X-Ray) MUST NEVER overwhelm text. Always use subtle glassmorphic underlays, text-shadows, or radial masking behind text layers to preserve legibility.
+9. **Raycast-Style CMDK:**
+   - Command palettes must NOT look like generic web dropdowns. They must resemble native OS apps (like Raycast): massive padding, 3xl blur, invisible inputs, and typography-driven UI.

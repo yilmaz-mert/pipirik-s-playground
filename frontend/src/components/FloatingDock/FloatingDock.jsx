@@ -15,7 +15,7 @@
  * SECTIONS:
  *   [ Home | About | Projects ]  ──  [ Globe(Lang) | Theme | Engineer ]
  */
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   motion, AnimatePresence,
@@ -160,6 +160,52 @@ export default function FloatingDock() {
   // mouseX sentinel: Infinity means cursor is outside the dock → all items at base size
   const mouseX = useMotionValue(Infinity);
 
+  // ── Magnetic pull — dock gently drifts toward the cursor ─────────────────
+  const dockRef     = useRef(null);
+  const magnetState = useRef({ x: 0, y: 0, tx: 0, ty: 0, raf: null });
+  useEffect(() => {
+    const m = magnetState.current;
+    const ATTRACTION_RADIUS = 220;
+    const MAX_PULL          = 7;
+    const LERP              = 0.1; // spring-like smoothing each frame
+
+    const onMove = (e) => {
+      const dock = dockRef.current;
+      if (!dock) return;
+      const rect = dock.getBoundingClientRect();
+      const cx   = rect.left + rect.width  / 2;
+      const cy   = rect.top  + rect.height / 2;
+      const dx   = e.clientX - cx;
+      const dy   = e.clientY - cy;
+      const dist = Math.hypot(dx, dy);
+      if (dist < ATTRACTION_RADIUS && dist > 0) {
+        const strength = ((1 - dist / ATTRACTION_RADIUS) ** 2) * MAX_PULL;
+        m.tx = (dx / dist) * strength;
+        m.ty = (dy / dist) * strength;
+      } else {
+        m.tx = 0;
+        m.ty = 0;
+      }
+    };
+
+    const tick = () => {
+      m.x += (m.tx - m.x) * LERP;
+      m.y += (m.ty - m.y) * LERP;
+      if (dockRef.current) {
+        // CSS `translate` composes additively with `transform: translateX(-50%)`
+        dockRef.current.style.translate = `${m.x.toFixed(2)}px ${m.y.toFixed(2)}px`;
+      }
+      m.raf = requestAnimationFrame(tick);
+    };
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+    m.raf = requestAnimationFrame(tick);
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(m.raf);
+    };
+  }, []);
+
   const currentLang = langs.find(
     (l) => l.code === ((i18n.language || 'en').split('-')[0])
   ) || langs[0];
@@ -184,7 +230,7 @@ export default function FloatingDock() {
             transition={{ duration: 0.16, ease: [0.2, 0, 0.2, 1] }}
             className="fixed z-[1001] flex flex-row gap-1 p-1.5 rounded-2xl"
             style={{
-              bottom:               'calc(var(--dock-height) + 1.1rem)',
+              bottom:               'calc(var(--dock-height) + 2.75rem)',
               left:                 '50%',
               transform:            'translateX(-50%)',
               /* Exact same glass recipe as the dock bar */
@@ -242,6 +288,7 @@ export default function FloatingDock() {
 
       {/* ── Dock bar ── */}
       <motion.nav
+        ref={dockRef}
         data-comp="FloatingDock"
         aria-label="Main navigation"
         className={`fixed z-[1000] flex items-end backdrop-blur-2xl

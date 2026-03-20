@@ -1,26 +1,26 @@
 /**
  * CommandPalette — Global CMD+K / CTRL+K launcher.
  *
- * A custom Framer Motion implementation that matches the existing design system:
- *   - Same backdropFilter + color tokens as the Floating Dock
- *   - Grouped commands with header labels
- *   - Arrow-key navigation + Enter to execute
- *   - Escape / backdrop click to close
+ * DESIGN: "Raycast / macOS Spotlight" aesthetic —
+ *   - Enormous backdrop blur (64px), near-black transparent glass panel
+ *   - Large xl input with no visible chrome, just a clean caret
+ *   - No border (or barely-there hairline), zero visual weight
+ *   - Item rows: generous height, icon + label, subtle accent-bar on active
+ *   - Group headers: ultra-small, letter-spaced, barely visible
+ *   - Minimal footer with keyboard hints only
  *
  * Commands: Navigation · System (theme, engineer, mute) · Language · Danger Zone
- *
- * Props:
- *   onMatrixRain() — callback to trigger the Easter egg canvas
  */
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { AnimatePresence } from 'framer-motion';
 // eslint-disable-next-line no-unused-vars
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   Home, User, LayoutGrid,
   Palette, Code2, Globe,
   Volume2, VolumeX, Terminal,
-  ChevronRight,
+  ArrowRight,
 } from 'lucide-react';
 import { useTheme }        from '../../context/ThemeContext';
 import { useEngineerMode } from '../../context/EngineerModeContext';
@@ -30,7 +30,6 @@ import { langs }           from '../../constants/langs';
 
 const MONO = "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, monospace";
 
-// ── Command Palette component ─────────────────────────────────────────────────
 export default function CommandPalette({ onMatrixRain }) {
   const [open,   setOpen]   = useState(false);
   const [query,  setQuery]  = useState('');
@@ -50,7 +49,7 @@ export default function CommandPalette({ onMatrixRain }) {
     setCursor(0);
   }, []);
 
-  // ── CMD+K global shortcut + custom event ────────────────────────────────────
+  // CMD+K / CTRL+K global shortcut + custom event
   useEffect(() => {
     const onKey = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
@@ -68,55 +67,17 @@ export default function CommandPalette({ onMatrixRain }) {
     };
   }, [open, close]);
 
-  // Focus input after open
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 40);
   }, [open]);
 
-  // ── Command list (rebuilt when reactive values change) ──────────────────────
   const commands = useMemo(() => [
-    {
-      id: 'home',
-      icon: Home,
-      label: 'Go to Home',
-      group: 'Navigation',
-      action: () => { navigate('/');        close(); },
-    },
-    {
-      id: 'about',
-      icon: User,
-      label: 'Go to About',
-      group: 'Navigation',
-      action: () => { navigate('/about');   close(); },
-    },
-    {
-      id: 'projects',
-      icon: LayoutGrid,
-      label: 'Go to Projects',
-      group: 'Navigation',
-      action: () => { navigate('/projects'); close(); },
-    },
-    {
-      id: 'theme',
-      icon: Palette,
-      label: `Cycle Theme  ›  ${theme}`,
-      group: 'System',
-      action: () => { cycleTheme(); close(); },
-    },
-    {
-      id: 'engineer',
-      icon: Code2,
-      label: engineerOn ? 'Disable Engineer Mode' : 'Enable Engineer Mode',
-      group: 'System',
-      action: () => { toggleEngineer(); close(); },
-    },
-    {
-      id: 'mute',
-      icon: muted ? Volume2 : VolumeX,
-      label: muted ? 'Unmute Sounds' : 'Mute Sounds',
-      group: 'System',
-      action: () => { toggleMute(); close(); },
-    },
+    { id: 'home',     icon: Home,       label: 'Go to Home',           group: 'Navigation', action: () => { navigate('/');         close(); } },
+    { id: 'about',    icon: User,       label: 'Go to About',          group: 'Navigation', action: () => { navigate('/about');    close(); } },
+    { id: 'projects', icon: LayoutGrid, label: 'Go to Projects',       group: 'Navigation', action: () => { navigate('/projects'); close(); } },
+    { id: 'theme',    icon: Palette,    label: `Cycle Theme  ›  ${theme}`, group: 'System', action: () => { cycleTheme(); close(); } },
+    { id: 'engineer', icon: Code2,      label: engineerOn ? 'Disable Engineer Mode' : 'Enable Engineer Mode', group: 'System', action: () => { toggleEngineer(); close(); } },
+    { id: 'mute',     icon: muted ? Volume2 : VolumeX, label: muted ? 'Unmute Sounds' : 'Mute Sounds', group: 'System', action: () => { toggleMute(); close(); } },
     ...langs.map(l => ({
       id:     `lang-${l.code}`,
       icon:   Globe,
@@ -124,17 +85,10 @@ export default function CommandPalette({ onMatrixRain }) {
       group:  'Language',
       action: () => { i18n.changeLanguage(l.code); close(); },
     })),
-    {
-      id: 'matrix',
-      icon: Terminal,
-      label: 'Execute Matrix Protocol',
-      group: '⚠ Danger Zone',
-      action: () => { onMatrixRain?.(); close(); },
-    },
+    { id: 'matrix', icon: Terminal, label: 'Execute Matrix Protocol', group: '⚠ Danger Zone', action: () => { onMatrixRain?.(); close(); } },
   // eslint-disable-next-line react-hooks/exhaustive-deps
   ], [theme, engineerOn, muted, i18n.language, navigate, cycleTheme, toggleEngineer, toggleMute, close, onMatrixRain]);
 
-  // ── Filter + group ──────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return q ? commands.filter(c => c.label.toLowerCase().includes(q)) : commands;
@@ -147,104 +101,93 @@ export default function CommandPalette({ onMatrixRain }) {
     }, {}),
   [filtered]);
 
-  // ── Arrow key / Enter navigation ────────────────────────────────────────────
   const onKeyDown = (e) => {
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      setCursor(v => Math.min(v + 1, filtered.length - 1));
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setCursor(v => Math.max(v - 1, 0));
-    } else if (e.key === 'Enter') {
-      filtered[cursor]?.action();
-    }
+    if (e.key === 'ArrowDown')  { e.preventDefault(); setCursor(v => Math.min(v + 1, filtered.length - 1)); }
+    else if (e.key === 'ArrowUp')  { e.preventDefault(); setCursor(v => Math.max(v - 1, 0)); }
+    else if (e.key === 'Enter')    { filtered[cursor]?.action(); }
   };
 
-  // Reset cursor when filter changes
   useEffect(() => setCursor(0), [query]);
-
-  // Scroll active item into view
   useEffect(() => {
-    const el = listRef.current?.querySelector('[data-active="true"]');
-    el?.scrollIntoView({ block: 'nearest' });
+    listRef.current?.querySelector('[data-active="true"]')?.scrollIntoView({ block: 'nearest' });
   }, [cursor]);
 
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* ── Backdrop ── */}
+          {/* ── Backdrop — deep tinted blur ── */}
           <motion.div
             key="cp-bg"
             className="fixed inset-0 z-[2000]"
-            style={{ backgroundColor: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+            style={{ backgroundColor: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)', WebkitBackdropFilter: 'blur(6px)' }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{    opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            transition={{ duration: 0.12 }}
             onClick={close}
           />
 
-          {/* ── Panel ── */}
+          {/* ── Panel — Raycast glass ── */}
           <motion.div
             key="cp-panel"
-            className="fixed z-[2001] left-1/2 top-[18vh] w-[calc(100%-2rem)] max-w-[520px]
+            className="fixed z-[2001] left-1/2 top-[13vh] w-[calc(100%-2rem)] max-w-[600px]
                        -translate-x-1/2 rounded-2xl overflow-hidden"
             style={{
-              backgroundColor:      'var(--color-bg-overlay)',
-              border:               '1px solid var(--color-border)',
-              backdropFilter:       'blur(36px)',
-              WebkitBackdropFilter: 'blur(36px)',
-              boxShadow: [
-                '0 28px 80px rgba(0,0,0,0.70)',
-                '0 1px 0 color-mix(in srgb, white 8%, transparent) inset',
-              ].join(', '),
+              backgroundColor:      'rgba(8, 8, 10, 0.82)',
+              border:               '1px solid rgba(255,255,255,0.06)',
+              backdropFilter:       'blur(64px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(64px) saturate(180%)',
+              boxShadow: '0 32px 96px rgba(0,0,0,0.80), 0 1px 0 rgba(255,255,255,0.05) inset',
             }}
-            initial={{ opacity: 0, y: -18, scale: 0.97 }}
+            initial={{ opacity: 0, y: -24, scale: 0.96 }}
             animate={{ opacity: 1, y: 0,   scale: 1    }}
-            exit={{    opacity: 0, y: -12, scale: 0.97 }}
-            transition={{ duration: 0.18, ease: [0.2, 0, 0.2, 1] }}
-            // Prevent backdrop click firing through the panel
-            onClick={(e) => e.stopPropagation()}
+            exit={{    opacity: 0, y: -16, scale: 0.97 }}
+            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+            onClick={e => e.stopPropagation()}
           >
-            {/* Search row */}
-            <div
-              className="flex items-center gap-3 px-4 py-3.5"
-              style={{ borderBottom: '1px solid var(--color-border-subtle)' }}
-            >
-              <Terminal className="w-4 h-4 flex-shrink-0" style={{ color: 'var(--color-accent)' }} />
+            {/* ── Search input — large & unadorned ── */}
+            <div className="flex items-center px-5 py-4" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
               <input
                 ref={inputRef}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Type a command..."
-                className="flex-1 bg-transparent outline-none text-sm"
-                style={{ color: 'var(--color-text-primary)', caretColor: 'var(--color-accent)', fontFamily: MONO }}
+                placeholder="Search commands…"
+                className="flex-1 bg-transparent outline-none"
+                style={{
+                  fontSize:    '1.2rem',
+                  fontWeight:  500,
+                  fontFamily:  MONO,
+                  color:       'var(--color-text-primary)',
+                  caretColor:  'var(--color-accent)',
+                  letterSpacing: '0.01em',
+                }}
+                autoComplete="off"
+                spellCheck={false}
               />
               <kbd
-                className="text-[10px] px-1.5 py-0.5 rounded font-mono opacity-50 flex-shrink-0"
+                className="text-[10px] px-2 py-0.5 rounded font-mono opacity-30 flex-shrink-0 ml-3"
                 style={{
-                  backgroundColor: 'var(--color-bg-surface)',
-                  border:          '1px solid var(--color-border-subtle)',
-                  color:           'var(--color-text-muted)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  color:  'var(--color-text-muted)',
                 }}
               >ESC</kbd>
             </div>
 
-            {/* Command list */}
-            <div ref={listRef} className="overflow-y-auto py-1.5" style={{ maxHeight: '320px' }}>
+            {/* ── Command list ── */}
+            <div ref={listRef} className="overflow-y-auto" style={{ maxHeight: '380px' }}>
               {Object.entries(groups).map(([group, cmds]) => (
                 <div key={group}>
-                  {/* Group label */}
+                  {/* Group label — barely visible */}
                   <div
-                    className="px-4 pt-2.5 pb-1 text-[10px] font-semibold uppercase tracking-widest"
-                    style={{ color: 'var(--color-text-muted)', fontFamily: MONO }}
+                    className="px-5 pt-3 pb-1 text-[9px] font-semibold uppercase tracking-[0.14em]"
+                    style={{ color: 'rgba(255,255,255,0.22)', fontFamily: MONO }}
                   >
                     {group}
                   </div>
 
-                  {cmds.map((cmd) => {
+                  {cmds.map(cmd => {
                     const Icon     = cmd.icon;
                     const idx      = filtered.indexOf(cmd);
                     const isActive = idx === cursor;
@@ -253,27 +196,31 @@ export default function CommandPalette({ onMatrixRain }) {
                       <button
                         key={cmd.id}
                         data-active={isActive}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-colors duration-100"
+                        className="w-full flex items-center gap-3.5 px-5 py-3 text-left
+                                   transition-colors duration-75 relative"
                         style={{
-                          backgroundColor: isActive
-                            ? 'color-mix(in srgb, var(--color-accent) 10%, transparent)'
-                            : 'transparent',
-                          color: isActive
-                            ? 'var(--color-text-primary)'
-                            : 'var(--color-text-secondary)',
+                          backgroundColor: isActive ? 'rgba(255,255,255,0.06)' : 'transparent',
+                          color: isActive ? 'var(--color-text-primary)' : 'rgba(255,255,255,0.55)',
                         }}
                         onMouseEnter={() => { setCursor(idx); playTick(); }}
                         onClick={cmd.action}
                       >
-                        <Icon
-                          className="w-4 h-4 flex-shrink-0"
-                          style={{ color: isActive ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
-                        />
-                        <span className="flex-1">{cmd.label}</span>
+                        {/* Active accent bar */}
                         {isActive && (
-                          <ChevronRight
-                            className="w-3.5 h-3.5 flex-shrink-0 opacity-60"
-                            style={{ color: 'var(--color-accent)' }}
+                          <span
+                            className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] rounded-full"
+                            style={{ height: '60%', backgroundColor: 'var(--color-accent)' }}
+                          />
+                        )}
+                        <Icon
+                          className="w-[18px] h-[18px] flex-shrink-0"
+                          style={{ color: isActive ? 'var(--color-accent)' : 'rgba(255,255,255,0.3)' }}
+                        />
+                        <span className="flex-1 text-[0.95rem] font-medium">{cmd.label}</span>
+                        {isActive && (
+                          <ArrowRight
+                            className="w-4 h-4 flex-shrink-0"
+                            style={{ color: 'var(--color-accent)', opacity: 0.7 }}
                           />
                         )}
                       </button>
@@ -284,27 +231,27 @@ export default function CommandPalette({ onMatrixRain }) {
 
               {filtered.length === 0 && (
                 <div
-                  className="px-4 py-10 text-center text-sm"
-                  style={{ color: 'var(--color-text-muted)', fontFamily: MONO }}
+                  className="px-5 py-12 text-center"
+                  style={{ color: 'rgba(255,255,255,0.22)', fontFamily: MONO, fontSize: '13px' }}
                 >
-                  No commands match &quot;{query}&quot;
+                  No results for &quot;{query}&quot;
                 </div>
               )}
             </div>
 
-            {/* Footer */}
+            {/* ── Footer — minimal keyboard hints ── */}
             <div
-              className="flex gap-4 px-4 py-2 text-[10px]"
+              className="flex items-center gap-5 px-5 py-2.5 text-[10px]"
               style={{
-                borderTop:  '1px solid var(--color-border-subtle)',
-                color:      'var(--color-text-muted)',
+                borderTop: '1px solid rgba(255,255,255,0.05)',
+                color: 'rgba(255,255,255,0.22)',
                 fontFamily: MONO,
               }}
             >
-              <span><kbd className="opacity-70">↑↓</kbd> navigate</span>
-              <span><kbd className="opacity-70">↵</kbd> select</span>
-              <span><kbd className="opacity-70">ESC</kbd> close</span>
-              <span className="ml-auto opacity-50">⌘K</span>
+              <span><kbd>↑↓</kbd> navigate</span>
+              <span><kbd>↵</kbd> run</span>
+              <span><kbd>ESC</kbd> close</span>
+              <span className="ml-auto">⌘K</span>
             </div>
           </motion.div>
         </>

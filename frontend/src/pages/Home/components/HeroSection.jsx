@@ -4,6 +4,15 @@ import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
+// ── Time-based greeting ───────────────────────────────────────────────────────
+function getTimeGreeting() {
+  const h = new Date().getHours();
+  if (h >= 5  && h < 12) return 'Good morning ☀️';
+  if (h >= 12 && h < 17) return 'Afternoon vibes 🌇';
+  if (h >= 17 && h < 22) return 'Evening session 🌆';
+  return 'Late night coding? 🌙';
+}
+
 // ── Text Scramble / Decode ────────────────────────────────────────────────────
 const CHARSET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$@#%&!?';
 const rnd = () => CHARSET[Math.floor(Math.random() * CHARSET.length)];
@@ -87,6 +96,22 @@ export default function HeroSection() {
         </span>
       </div>
 
+      {/* ── Terminal time greeting — sits directly above the name ── */}
+      <div
+        className="flex items-center gap-1.5 font-mono text-[11px] md:text-[13px] select-none"
+        style={{ color: 'var(--color-text-muted)', opacity: 0.6 }}
+        aria-label={getTimeGreeting()}
+      >
+        <span style={{ color: 'var(--color-accent)', opacity: 0.8 }}>&gt;</span>
+        <span>sys.time:<span className="ml-1" style={{ color: 'var(--color-text-secondary)' }}>{getTimeGreeting()}</span></span>
+        <motion.span
+          aria-hidden="true"
+          animate={{ opacity: [1, 0] }}
+          transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse', ease: 'linear' }}
+          style={{ color: 'var(--color-accent)' }}
+        >_</motion.span>
+      </div>
+
       {/* ── Hero name — scramble decode on mount ── */}
       <h1
         className="text-5xl md:text-8xl font-black tracking-tighter leading-none text-center md:text-left"
@@ -135,6 +160,35 @@ export default function HeroSection() {
         <br className="hidden md:block" />
         <span className="opacity-80 italic text-lg"> Crafting digital experiences where performance meets aesthetics.</span>
       </p>
+
+      {/* ── CMD+K hint — triggers the Command Palette ── */}
+      <button
+        onClick={() => window.dispatchEvent(new Event('cmd-palette-toggle'))}
+        className="inline-flex items-center gap-1.5 mt-1 px-3 py-1.5 rounded-lg
+                   text-[11px] font-mono border transition-all duration-200
+                   hover:scale-105 active:scale-95 w-fit
+                   text-center md:text-left mx-auto md:mx-0"
+        style={{
+          color:           'var(--color-text-muted)',
+          borderColor:     'var(--color-border-subtle)',
+          backgroundColor: 'var(--color-bg-surface)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor     = 'var(--color-border)';
+          e.currentTarget.style.color           = 'var(--color-accent)';
+          e.currentTarget.style.backgroundColor = 'color-mix(in srgb, var(--color-accent) 8%, transparent)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor     = 'var(--color-border-subtle)';
+          e.currentTarget.style.color           = 'var(--color-text-muted)';
+          e.currentTarget.style.backgroundColor = 'var(--color-bg-surface)';
+        }}
+        aria-label="Open command palette"
+      >
+        <kbd className="opacity-80">⌘</kbd>
+        <span>K</span>
+        <span className="opacity-50 ml-0.5">— command palette</span>
+      </button>
     </header>
   );
 }

@@ -221,6 +221,9 @@ export default function FluidBackground() {
         zIndex:        0,
         // Screen blend: lavender ripples lighten the dark base without washing it out
         mixBlendMode:  'screen',
+        // Fade the left ~40% to transparent so the canvas never obscures Hero text
+        maskImage:            'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%)',
+        WebkitMaskImage:      'linear-gradient(to right, transparent 0%, transparent 8%, black 42%, black 100%)',
       }}
     />
   );

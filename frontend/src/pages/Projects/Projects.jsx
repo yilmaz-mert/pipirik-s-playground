@@ -3,7 +3,7 @@
 // LIST VIEW ONLY — the <Outlet /> branch renders isolated mini-apps untouched.
 // DO NOT modify anything inside src/pages/Projects/[ProjectName]/.
 // ─────────────────────────────────────────────────────────────────────────────
-import React, { useRef, useCallback } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { Link as RouterLink, Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardBody, Chip } from '@heroui/react';
@@ -51,6 +51,13 @@ const itemVariants = {
 // ── Magnetic Spotlight Card ───────────────────────────────────────────────────
 // Tracks cursor position relative to the card and paints a radial-gradient
 // spotlight directly on the DOM node — zero React state re-renders on mousemove.
+//
+// SPOTLIGHT FIX: The glow layer extends 18px BEYOND the card edges (negative
+// inset) so it acts as a backdrop *behind* the glass card. When TiltCard
+// rotates in 3D, the glow bleeds naturally around the lifted edges rather than
+// clipping flush at the card boundary.
+const SPOT_EXTEND = 18; // px beyond card edges
+
 function SpotlightWrapper({ children }) {
   const cardRef   = useRef(null);
   const spotRef   = useRef(null);
@@ -61,9 +68,10 @@ function SpotlightWrapper({ children }) {
     const spot = spotRef.current;
     if (!card || !spot) return;
     const rect = card.getBoundingClientRect();
-    const x    = e.clientX - rect.left;
-    const y    = e.clientY - rect.top;
-    spot.style.background = `radial-gradient(480px circle at ${x}px ${y}px, var(--spotlight-color, rgba(181,126,220,0.13)), transparent 65%)`;
+    // Offset by SPOT_EXTEND — the spotlight origin sits SPOT_EXTEND px before the card
+    const x = e.clientX - rect.left + SPOT_EXTEND;
+    const y = e.clientY - rect.top  + SPOT_EXTEND;
+    spot.style.background = `radial-gradient(580px circle at ${x}px ${y}px, var(--spotlight-color, rgba(181,126,220,0.20)), transparent 65%)`;
     spot.style.opacity    = '1';
   }, []);
 
@@ -80,11 +88,13 @@ function SpotlightWrapper({ children }) {
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
-      {/* Spotlight layer — clipped by Card's overflow-hidden via stacking context */}
+      {/* Spotlight glow — extends BEYOND card edges (negative inset) so it        */}
+      {/* bleeds naturally when the card tilts in 3D, instead of clipping flush.   */}
+      {/* z-0 keeps it behind the card; rounded-3xl softens the halo shape.        */}
       <div
         ref={spotRef}
-        className="pointer-events-none absolute inset-0 z-[2] rounded-[inherit] transition-opacity duration-300"
-        style={{ opacity: 0 }}
+        className="pointer-events-none absolute z-0 rounded-3xl transition-opacity duration-300"
+        style={{ opacity: 0, inset: `-${SPOT_EXTEND}px` }}
         aria-hidden="true"
       />
       {children}
@@ -94,8 +104,10 @@ function SpotlightWrapper({ children }) {
 
 // ── Projects ─────────────────────────────────────────────────────────────────
 const Projects = () => {
-  const location = useLocation();
-  const { t }    = useTranslation();
+  const location  = useLocation();
+  const { t }     = useTranslation();
+  // Focus Mode — tracks which card is hovered; others dim + desaturate
+  const [focusId, setFocusId] = useState(null);
 
   const isListView = location.pathname === '/projects';
 
@@ -190,12 +202,22 @@ const Projects = () => {
             {projectList.map((project) => {
               const Icon = project.icon;
 
+              // Focus Mode: dim + desaturate any card that is NOT the hovered one
+              const isDimmed = focusId !== null && focusId !== project.id;
+
               return (
                 <motion.div
                   key={project.id}
                   data-comp={project.id}
                   variants={itemVariants}
                   className={`${GRID_CLASSES[project.id]} min-h-0`}
+                  onMouseEnter={() => setFocusId(project.id)}
+                  onMouseLeave={() => setFocusId(null)}
+                  style={{
+                    transition: 'opacity 0.35s ease, filter 0.35s ease',
+                    opacity:    isDimmed ? 0.40 : 1,
+                    filter:     isDimmed ? 'saturate(0.2) brightness(0.75)' : 'saturate(1) brightness(1)',
+                  }}
                 >
                   <SpotlightWrapper>
                     <TiltCard>

@@ -26,6 +26,12 @@
     100% { background-position: 0%   50%; }
   }
 
+  /* Skeleton loading shimmer for heatmap cells */
+  @keyframes skeleton-pulse {
+    0%, 100% { opacity: 0.35; }
+    50%       { opacity: 0.65; }
+  }
+
   /* Availability badge — soft breathing glow.
      Uses color-mix so it inherits the active theme's accent automatically. */
   @keyframes badge-pulse {

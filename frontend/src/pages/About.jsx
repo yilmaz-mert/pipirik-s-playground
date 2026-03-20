@@ -52,7 +52,7 @@ const About = () => {
           className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-stretch"
         >
           {/* Card 1: DNA / Biography */}
-          <motion.div variants={itemVariants} className="h-full">
+          <motion.div variants={itemVariants} className="h-full" data-comp="DnaCard">
             <Card
               className="group relative h-full flex flex-col overflow-hidden backdrop-blur-xl border hover:border-white/10 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-[var(--color-accent)]/10"
               style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border-subtle)' }}
@@ -85,7 +85,7 @@ const About = () => {
           </motion.div>
 
           {/* Card 2: Competencies */}
-          <motion.div variants={itemVariants} className="h-full">
+          <motion.div variants={itemVariants} className="h-full" data-comp="CompetenciesCard">
             <Card
               className="group relative h-full flex flex-col overflow-hidden backdrop-blur-xl border hover:border-white/10 transition-all duration-500 hover:-translate-y-1 shadow-lg hover:shadow-2xl hover:shadow-[var(--color-accent-2)]/10"
               style={{ backgroundColor: 'var(--color-bg-card)', borderColor: 'var(--color-border-subtle)' }}
@@ -145,6 +145,7 @@ const About = () => {
         {/* ── Contribution Heatmap ── */}
         <motion.div
           variants={itemVariants}
+          data-comp="HeatmapPanel"
           className="mt-8 p-6 rounded-2xl border"
           style={{
             backgroundColor: 'var(--color-bg-card)',

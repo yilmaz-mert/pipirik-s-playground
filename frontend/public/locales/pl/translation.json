@@ -18,8 +18,8 @@
     "skills": ["React 19", "TypeScript", "Tailwind v4", "Inżynieria UI/UX", "Framer Motion"]
   },
   "about": {
-    "titlePart1": "Więcej niż",
-    "titlePart2": "Kod",
+    "titlePart1": "Projektuję Cyfrowe",
+    "titlePart2": "Królestwo.",
     "subtitle": "Programista & Inżynier UI/UX.",
     "dnaTitle": "Moje inżynierskie DNA",
     "engineeredLine": "Inżynieryjne rozwiązania i interaktywne doświadczenia",
@@ -37,8 +37,8 @@
     "skills": ["React 19", "TypeScript", "Tailwind v4", "Framer Motion", "Node.js", "i18next", "Vite"]
   },
   "projects": {
-    "titlePart1": "Moje",
-    "titlePart2": "Projekty",
+    "titlePart1": "Wdrożone",
+    "titlePart2": "Ekosystemy.",
     "subtitle": "Inżynieryjne rozwiązania i interaktywne doświadczenia",
     "featured": "Wyróżniony projekt",
     "hangman": "Wisielec",
