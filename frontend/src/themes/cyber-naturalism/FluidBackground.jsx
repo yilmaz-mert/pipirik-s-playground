@@ -24,7 +24,6 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { usePrecisionShield } from '../../context/PrecisionShieldContext';
 
 // ── Simulation constants ──────────────────────────────────────────────────────
 const SCALE          = 2;    // px per simulation cell (lower = sharper, heavier)
@@ -40,11 +39,6 @@ const R = 181, G = 126, B = 220;
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function FluidBackground() {
   const canvasRef = useRef(null);
-  const { registerCanvas } = usePrecisionShield();
-
-  // Register this canvas to receive the Swiss Cheese mask from PrecisionShieldContext.
-  // Separate effect so mask registration is independent of the simulation lifecycle.
-  useEffect(() => registerCanvas(canvasRef), [registerCanvas]);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -223,11 +217,8 @@ export default function FluidBackground() {
         width:         '100%',
         height:        '100%',
         pointerEvents: 'none',
-        // Sits above the CSS blob layer (z:-1) but below all page content (z:10+)
-        zIndex:        0,
-        // Screen blend: lavender ripples lighten the dark base without washing it out
         mixBlendMode:  'screen',
-        // Swiss Cheese mask applied directly via registerCanvas() — no shield div needed
+        zIndex:        0,
       }}
     />
   );

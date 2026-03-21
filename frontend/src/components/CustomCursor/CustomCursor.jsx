@@ -7,22 +7,19 @@
  *   card    → 52px glass ring with backdrop-blur (on Bento Grid project cards)
  *
  * PERFORMANCE:
- *   - Position: useMotionValue + useSpring — Framer Motion updates the DOM
- *     directly via WAAPI/RAF, zero React re-renders on mousemove.
+ *   - Position: useMotionValue direct (no spring) — pixel-perfect 60fps tracking,
+ *     zero React re-renders on mousemove.
  *   - Variant: React state only changes on element-type transitions (rare).
  *   - willChange: transform keeps it on the GPU compositor layer.
  *   - Only renders visuals on pointer:fine devices — no overhead on touch.
  */
 import { useEffect, useRef, useState } from 'react';
 // eslint-disable-next-line no-unused-vars
-import { motion, useMotionValue, useSpring } from 'framer-motion';
+import { motion, useMotionValue } from 'framer-motion';
 
 // Module-level constant — evaluated once at import time, no ref needed.
 // Avoids the react-hooks/refs lint error from reading .current during render.
 const IS_FINE_POINTER = typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches;
-
-// ── Spring config — fast but visibly trailing ─────────────────────────────────
-const SPRING = { damping: 28, stiffness: 600, mass: 0.5 };
 
 // ── Cursor variant styles ─────────────────────────────────────────────────────
 const VARIANTS = {
@@ -69,10 +66,9 @@ const CARD_SEL = [
 
 export default function CustomCursor() {
   // All hooks MUST be called unconditionally — pointer check is deferred to render
-  const mouseX  = useMotionValue(-200);
-  const mouseY  = useMotionValue(-200);
-  const cursorX = useSpring(mouseX, SPRING);
-  const cursorY = useSpring(mouseY, SPRING);
+  // Direct MotionValues — no spring on position = zero lag, pixel-perfect 60fps tracking
+  const mouseX = useMotionValue(-200);
+  const mouseY = useMotionValue(-200);
 
   const [variant, setVariant] = useState('default');
   const stateRef = useRef('default');
@@ -121,8 +117,8 @@ export default function CustomCursor() {
       transition={{ type: 'spring', stiffness: 380, damping: 22, mass: 0.6 }}
       style={{
         position:      'fixed',
-        left:          cursorX,
-        top:           cursorY,
+        left:          mouseX,
+        top:           mouseY,
         borderRadius:  '50%',
         borderStyle:   'solid',
         pointerEvents: 'none',

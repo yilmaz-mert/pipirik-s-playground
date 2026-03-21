@@ -94,6 +94,40 @@ export function SoundProvider({ children }) {
     } catch { /* silently skip */ }
   }, [muted, getAC]);
 
+  /**
+   * High-passed noise transient — mechanical keyboard click.
+   * 12ms burst, high-pass filtered at 2800 Hz for bright "click" character.
+   * Volume 0.10 — extremely subtle, satisfying, non-intrusive.
+   */
+  const playClick = useCallback(() => {
+    if (muted) return;
+    try {
+      const ac  = getAC();
+      if (!ac) return;
+      const dur = 0.012;
+      const sz  = Math.floor(ac.sampleRate * dur);
+      const buf = ac.createBuffer(1, sz, ac.sampleRate);
+      const dat = buf.getChannelData(0);
+      // Decaying noise burst: sharp attack, quadratic decay
+      for (let i = 0; i < sz; i++) dat[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / sz, 2);
+
+      const src = ac.createBufferSource();
+      src.buffer = buf;
+
+      const hpf           = ac.createBiquadFilter();
+      hpf.type            = 'highpass';
+      hpf.frequency.value = 2800; // strips low rumble → crisp click character
+
+      const gain = ac.createGain();
+      gain.gain.setValueAtTime(0.10, ac.currentTime);
+
+      src.connect(hpf);
+      hpf.connect(gain);
+      gain.connect(ac.destination);
+      src.start(ac.currentTime);
+    } catch { /* silently skip */ }
+  }, [muted, getAC]);
+
   const toggleMute = useCallback(() => {
     setMuted(prev => {
       const next = !prev;
@@ -103,7 +137,7 @@ export function SoundProvider({ children }) {
   }, []);
 
   return (
-    <SoundContext.Provider value={{ muted, toggleMute, playTick, playWhoosh }}>
+    <SoundContext.Provider value={{ muted, toggleMute, playTick, playWhoosh, playClick }}>
       {children}
     </SoundContext.Provider>
   );

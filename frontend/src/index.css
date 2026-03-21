@@ -173,6 +173,48 @@
   --ps-open-delay: 60ms;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   THEME: Cyber-Paper — E-Ink light mode
+   Off-white base · Pure black accent · No heavy canvas effects
+   Evokes a high-contrast printed schematic or e-ink display.
+   ───────────────────────────────────────────────────────────────────────────── */
+[data-theme="cyber-paper"] {
+  --navbar-height: 0rem;
+  --dock-height:   5rem;
+
+  --color-bg-base:    #F4F4F5;
+  --color-bg-surface: rgba(228, 228, 231, 0.80);
+  --color-bg-overlay: rgba(244, 244, 245, 0.97);
+
+  --color-bg-dock:       rgba(228, 228, 231, 0.88);
+  --color-bg-card:       rgba(212, 212, 216, 0.70);
+  --color-bg-card-solid: #E4E4E7;
+  --color-image-overlay: rgba(244, 244, 245, 0.60);
+  --color-surface-hover: rgba(9, 9, 11, 0.04);
+
+  --color-border:        rgba(9, 9, 11, 0.16);
+  --color-border-subtle: rgba(9, 9, 11, 0.07);
+
+  --color-text-primary:   #09090B;  /* sharp black        */
+  --color-text-secondary: #27272A;  /* near-black         */
+  --color-text-muted:     #71717A;  /* zinc grey          */
+
+  --color-accent:   #09090B;   /* pure black (primary)   */
+  --color-accent-2: #52525B;   /* dark zinc  (secondary) */
+
+  /* Near-invisible blobs — subtle depth without colour noise */
+  --blob-primary:        rgba(9, 9, 11, 0.03);
+  --blob-primary-fade:   rgba(9, 9, 11, 0.00);
+  --blob-secondary:      rgba(63, 63, 70, 0.02);
+  --blob-secondary-fade: rgba(63, 63, 70, 0.00);
+  --blob-blur:           80px;
+  --blob-blur-mobile:    40px;
+
+  --ps-duration:   220ms;
+  --ps-easing:     cubic-bezier(0.16, 0.84, 0.24, 1);
+  --ps-open-delay: 60ms;
+}
+
 /* ============================================================
    VIEW TRANSITION API — Theme-switch animation
    Runs when document.startViewTransition() is called.
@@ -419,13 +461,6 @@ body.flash-incorrect { @apply bg-red-500/15!;   transition: background-color 0.3
   position: fixed;
 }
 
-/* ============================================================
-   CANVAS BACKGROUND MASK
-   Phase 12: gradient masks replaced by PrecisionShieldProvider.
-   A dynamic DOM-geometry backdrop (z-index 4) tracks the exact
-   bounding box of the content grid via ResizeObserver, blocking
-   the canvas effects precisely without any static gradient rules.
-   ============================================================ */
 @media (max-width: 768px) {
   /* Sunset decoder is cursor-based — useless and confusing on touch screens */
   .sunset-decoder-layer {

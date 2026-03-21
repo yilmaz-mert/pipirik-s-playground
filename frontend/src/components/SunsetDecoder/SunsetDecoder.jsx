@@ -1,32 +1,24 @@
 /**
- * SunsetDecoder — "X-Ray / Decoder" background for the Sunset Glass theme.
+ * SunsetDecoder — X-Ray / flashlight background for the Sunset Glass theme.
  *
- * A fixed layer filled with matrix-like schematic text that is ONLY visible
- * exactly where the user's mouse is, via CSS mask-image with a tight radial
- * gradient. It feels like the cursor is "parting" the sunset glass to reveal
- * the code-layer behind reality.
+ * A fixed <pre> filled with matrix-like schematic text that is ONLY visible
+ * where the mouse is, via a single CSS mask-image radial-gradient (alpha mode).
+ * Feels like shining a flashlight onto hidden code behind the glass.
  *
- * Masking strategy (Phase 12.1 — Swiss Cheese):
- *   mask-image has two groups of layers, combined with mask-composite:
- *     Layer 0 (top):   SVG data-URI from PrecisionShieldContext
- *                       mask-mode: luminance — white=show, black=hide (content holes)
- *     Layers 1…N:      cursor + burst radial-gradients
- *                       mask-mode: alpha — black circle = reveal
- *   mask-composite[0]: intersect (source-in for WebKit)
- *                       → decoder visible only where cursor/burst reveals AND NOT in content area
- *   mask-composite[1…]: add (source-over for WebKit)
- *                       → bursts union with cursor
+ * Mask strategy (simple & robust):
+ *   mask-image: cursor circle + burst circles
+ *   mask-mode:  alpha  (black = reveal, transparent = hide)
+ *   mask-composite: add (union — bursts union with cursor)
+ *   No SVG compositing, no luminance mode, no intersect — zero browser-compat risk.
  *
  * Performance:
- *   --x / --y CSS variables are written once per rAF tick (never on every
- *   mousemove event), keeping the main thread free and the effect at 60fps.
- *   The text content is generated once with a seeded RNG — fully stable.
- *   The layer is only mounted when the active theme is "sunset-glass".
+ *   CSS mask is written once per rAF tick (not on every mousemove), keeping
+ *   the main thread free and the effect at 60fps.
+ *   Decoder text is generated once with a seeded RNG — fully stable across renders.
  */
-import { useEffect, useLayoutEffect, useRef, useMemo } from 'react';
-import { usePrecisionShield } from '../../context/PrecisionShieldContext';
+import { useEffect, useRef, useMemo } from 'react';
 
-// ── Decoder charset — binary, hex, and katakana for the "code behind reality" feel
+// ── Decoder charset ────────────────────────────────────────────────────────────
 const CHARS = '01010110アイウエオカキ<>{}[]()=+-*/01101100#@!;:/\\|~^%$&ABCDEFabcdef0123456789байтCODE';
 
 function seededRand(seed) {
@@ -39,81 +31,16 @@ function seededRand(seed) {
   };
 }
 
-// ── Mask building ──────────────────────────────────────────────────────────────
-// Combines the Swiss Cheese SVG URI (luminance mode, blocks content areas) with
-// cursor + burst reveal gradients (alpha mode) using mask-composite: intersect.
-// Result: decoder is only visible where cursor/burst reveals AND not in content area.
-
-function buildMask(mx, my, bursts, swissUri) {
-  const cursor = `radial-gradient(circle 160px at ${mx}px ${my}px, black 0%, transparent 100%)`;
-
-  // Gradient layers: cursor + each burst (all alpha mode, union via add)
-  const gradLayers = [cursor];
-  const gradComps  = [];
-  const gradModes  = ['alpha'];
-
-  for (const b of bursts) {
-    gradLayers.push(
-      `radial-gradient(circle ${b.r | 0}px at ${b.x}px ${b.y}px, black 0%, transparent 100%)`
-    );
-    gradComps.push('add');
-    gradModes.push('alpha');
-  }
-
-  if (!swissUri) {
-    // No SVG yet — fallback to cursor+bursts only (first few frames before context initialises)
-    const allLayers = gradLayers.join(', ');
-    const stdComp   = gradComps.length ? gradComps.join(', ') : 'add';
-    const wkComp    = gradComps.length ? gradComps.map(() => 'source-over').join(', ') : 'source-over';
-    return {
-      maskImage:           allLayers,
-      WebkitMaskImage:     allLayers,
-      maskMode:            gradModes.join(', '),
-      WebkitMaskMode:      gradModes.join(', '),
-      maskComposite:       stdComp,
-      WebkitMaskComposite: wkComp,
-    };
-  }
-
-  // Full combined mask:
-  //   [swissUri, cursor, burst1, burst2, ...]
-  //   mask-composite: [intersect, add, add, ...]
-  //   mask-mode:      [luminance, alpha, alpha, ...]
-  const allLayers = [swissUri, ...gradLayers].join(', ');
-  const allModes  = ['luminance', ...gradModes].join(', ');
-  const stdComps  = ['intersect', ...gradComps].join(', ');
-  const wkComps   = ['source-in',  ...gradComps.map(() => 'source-over')].join(', ');
-
-  return {
-    maskImage:           allLayers,
-    WebkitMaskImage:     allLayers,
-    maskMode:            allModes,
-    WebkitMaskMode:      allModes,
-    maskComposite:       stdComps,
-    WebkitMaskComposite: wkComps,
-  };
-}
-
 export default function SunsetDecoder() {
   const layerRef = useRef(null);
-  const { getMaskUri } = usePrecisionShield();
-  // Capture in a ref so the RAF closure always reads the latest value
-  // without needing to re-run the effect when getMaskUri identity changes.
-  const getMaskUriRef = useRef(getMaskUri);
-  // Sync the ref before the browser paints — useLayoutEffect avoids a stale
-  // value on the very first RAF tick while keeping the mutation out of render.
-  useLayoutEffect(() => { getMaskUriRef.current = getMaskUri; }, [getMaskUri]);
 
-  // Generate stable decoder text once — seeded so it never changes between renders
+  // Stable decoder text — seeded so it never changes between renders
   const decoderText = useMemo(() => {
     const rng  = seededRand(0xCAFEBABE);
     const rows = 65;
     const cols = 220;
     return Array.from({ length: rows }, () =>
-      Array.from({ length: cols }, () => {
-        const idx = Math.floor(rng() * CHARS.length);
-        return CHARS[idx];
-      }).join('')
+      Array.from({ length: cols }, () => CHARS[Math.floor(rng() * CHARS.length)]).join('')
     ).join('\n');
   }, []);
 
@@ -127,33 +54,24 @@ export default function SunsetDecoder() {
 
     const onMove = (e) => { mx = e.clientX; my = e.clientY; };
 
-    // ── Data Bursts — autonomous ambient reveals ───────────────────────────
-    // Each burst: { x, y, maxR, startTime, endTime }
+    // ── Data Bursts — autonomous ambient reveals ───────────────────────────────
     const bursts = [];
+    let burstInterval = null;
 
     const spawnBurst = () => {
       if (bursts.length >= 3) return;
-      const W = window.innerWidth;
-      const H = window.innerHeight;
-      // Spawn only in the visible zone (past the area-shield at ~44rem = 704px)
+      const W   = window.innerWidth;
+      const H   = window.innerHeight;
       const minX = Math.max(W * 0.55, 720);
-      const x    = minX + Math.random() * (W - minX - 80);
-      const y    = 60   + Math.random() * (H - 120);
-      const dur  = 2200 + Math.random() * 800; // 2.2–3 s lifetime
-      bursts.push({
-        x, y,
-        maxR:      70 + Math.random() * 60,
-        startTime: Date.now(),
-        endTime:   Date.now() + dur,
-      });
+      const x   = minX + Math.random() * (W - minX - 80);
+      const y   = 60   + Math.random() * (H - 120);
+      const dur = 2200 + Math.random() * 800;
+      bursts.push({ x, y, maxR: 70 + Math.random() * 60, startTime: Date.now(), endTime: Date.now() + dur });
     };
 
-    // First burst after 2s; then every ~3s
     const burstTimer = setTimeout(() => {
       spawnBurst();
-      const interval = setInterval(spawnBurst, 2800 + Math.random() * 600);
-      // Store cleanup on the timeout ref for teardown
-      burstTimer._interval = interval;
+      burstInterval = setInterval(spawnBurst, 2800 + Math.random() * 600);
     }, 2000);
 
     const tick = () => {
@@ -164,21 +82,28 @@ export default function SunsetDecoder() {
         if (now >= bursts[i].endTime) bursts.splice(i, 1);
       }
 
-      // Compute current burst radii (sine curve: grows → peaks → shrinks)
-      const activeBursts = bursts.map((b) => {
-        const t = (now - b.startTime) / (b.endTime - b.startTime); // 0…1
-        const r = b.maxR * Math.sin(t * Math.PI);                  // sine envelope
-        return { x: b.x, y: b.y, r };
-      });
+      // Build mask layers: cursor circle + one circle per active burst
+      const layers = [
+        `radial-gradient(circle 160px at ${mx}px ${my}px, black 0%, transparent 100%)`,
+      ];
+      for (const b of bursts) {
+        const t = (now - b.startTime) / (b.endTime - b.startTime);
+        const r = b.maxR * Math.sin(t * Math.PI); // sine envelope: grows → peaks → shrinks
+        layers.push(`radial-gradient(circle ${r | 0}px at ${b.x}px ${b.y}px, black 0%, transparent 100%)`);
+      }
 
-      // Build combined mask: Swiss Cheese SVG intersect (cursor + burst reveals)
-      const masks = buildMask(mx, my, activeBursts, getMaskUriRef.current());
-      layer.style.maskImage           = masks.maskImage;
-      layer.style.webkitMaskImage     = masks.WebkitMaskImage;
-      layer.style.maskMode            = masks.maskMode || '';
-      layer.style.webkitMaskMode      = masks.WebkitMaskMode || '';
-      layer.style.maskComposite       = masks.maskComposite;
-      layer.style.webkitMaskComposite = masks.WebkitMaskComposite;
+      const n         = layers.length;
+      const maskValue = layers.join(', ');
+      const modeStr   = Array(n).fill('alpha').join(', ');
+      const compStd   = Array(n).fill('add').join(', ');
+      const compWk    = Array(n).fill('source-over').join(', ');
+
+      layer.style.maskImage           = maskValue;
+      layer.style.webkitMaskImage     = maskValue;
+      layer.style.maskMode            = modeStr;
+      layer.style.webkitMaskMode      = modeStr;
+      layer.style.maskComposite       = compStd;
+      layer.style.webkitMaskComposite = compWk;
 
       rafId = requestAnimationFrame(tick);
     };
@@ -190,7 +115,7 @@ export default function SunsetDecoder() {
       window.removeEventListener('mousemove', onMove);
       cancelAnimationFrame(rafId);
       clearTimeout(burstTimer);
-      clearInterval(burstTimer._interval);
+      if (burstInterval) clearInterval(burstInterval);
     };
   }, []);
 
@@ -202,7 +127,6 @@ export default function SunsetDecoder() {
       style={{
         position:      'fixed',
         inset:         0,
-        zIndex:        1,
         pointerEvents: 'none',
         margin:        0,
         padding:       '10px 14px',
@@ -210,12 +134,12 @@ export default function SunsetDecoder() {
         fontSize:      '12px',
         lineHeight:    '1.48',
         letterSpacing: '0.04em',
-        color:         'rgba(255, 107, 53, 0.55)',
+        color:         'rgba(255, 107, 53, 0.92)',
         overflow:      'hidden',
         whiteSpace:    'pre',
         userSelect:    'none',
-        // Initial mask: cursor offscreen → decoder invisible until first RAF tick.
-        // The RAF tick overwrites this with the full combined mask each frame.
+        zIndex:        1,
+        // Initial mask: cursor offscreen → decoder fully hidden until first rAF tick
         maskImage:           'radial-gradient(circle 160px at -9999px -9999px, black 0%, transparent 100%)',
         WebkitMaskImage:     'radial-gradient(circle 160px at -9999px -9999px, black 0%, transparent 100%)',
         maskMode:            'alpha',

@@ -1,12 +1,11 @@
 // src/pages/Home/Home.jsx
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 import HeroSection    from './components/HeroSection';
 import SkillsList     from './components/SkillsList';
 import SocialLinks    from './components/SocialLinks';
 import ProfileSection from './components/ProfileSection';
-import { usePrecisionShield } from '../../context/PrecisionShieldContext';
 
 // ── IDE Line-Number Gutter ────────────────────────────────────────────────────
 // Fixed left-edge decoration that mimics a VS Code / terminal sidebar.
@@ -40,14 +39,6 @@ function IDEGutter() {
 
 // ── Home Page ─────────────────────────────────────────────────────────────────
 const Home = () => {
-  const gridRef = useRef(null);
-  const { register } = usePrecisionShield();
-
-  // Register the content grid as a precision-shield target.
-  // The shield backdrop will exactly cover this bounding box, preventing
-  // the canvas background effects from bleeding into the content area.
-  useEffect(() => register('home-grid', gridRef), [register]);
-
   return (
     <main
       data-comp="Home"
@@ -57,7 +48,7 @@ const Home = () => {
       <IDEGutter />
 
       <div className="mx-auto w-full px-6 sm:px-12 lg:px-16 max-w-7xl h-full flex items-center">
-        <div ref={gridRef} className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center w-full py-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 items-center w-full py-2">
 
           {/* Left column — text content */}
           <motion.div

@@ -17,7 +17,6 @@
  */
 
 import { useEffect, useRef } from 'react';
-import { usePrecisionShield } from '../../context/PrecisionShieldContext';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const CELL_SIZE    = 22;       // px between cell centres (grid pitch)
@@ -35,10 +34,6 @@ const SCAN_DURATION_MS = 2000;          // ms to sweep the full axis
 
 export default function NeonAscii() {
   const canvasRef = useRef(null);
-  const { registerCanvas } = usePrecisionShield();
-
-  // Register this canvas to receive the Swiss Cheese mask from PrecisionShieldContext.
-  useEffect(() => registerCanvas(canvasRef), [registerCanvas]);
 
   useEffect(() => {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -184,7 +179,6 @@ export default function NeonAscii() {
         height:        '100%',
         pointerEvents: 'none',
         zIndex:        0,
-        // Swiss Cheese mask applied directly via registerCanvas() — no shield div needed
       }}
     />
   );

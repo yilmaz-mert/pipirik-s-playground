@@ -1,57 +1,75 @@
 # Pipirik's Playground - Master Architecture & Portfolio Guide
 
 ## Project Overview
-A polymorphic, highly scalable personal portfolio website showcasing engineering projects. Currently evolving into Phase 10: "Performance Optimization & The Living UI".
+A polymorphic, highly scalable personal portfolio website showcasing engineering projects. Currently evolving into "Cyber-Naturalism" & Digital OS Experience.
 
 ## Tech Stack
 - **Framework:** React 19 (using Vite)
 - **Styling:** Tailwind CSS v4 (Strictly using CSS Variables/Design Tokens)
 - **Animations:** Framer Motion (Advanced hooks: useSpring, useTransform for 3D/Fisheye) & Native View Transitions
 - **Graphics:** Canvas/WebGL for background simulations
-- **Internationalization:** i18next
-- **Sensory & OS UI:** `use-sound` (for Sonic UI), `cmdk` (for Command Palette)
-
-## Visual Truth (Design Tokens)
-- **Base/Background:** Deep Charcoal Grey (`#0A0A0B`)
-- **Surface:** Dark Slate (`#161618`)
-- **Accent:** Digital Lavender (`#B57EDC`)
-- **UI Paradigms:** Bottom Floating Dock (macOS fisheye style), Extreme Glassmorphism (`backdrop-blur-3xl`), 3D Perspective Tilt on cards.
+- **Sensory & OS UI:** `use-sound` (Sonic UI), `cmdk` (Command Palette)
 
 ## Base Commands
-- **Development Server:** `npm run dev`
-- **Build Production:** `npm run build`
-- **Lint Check:** `npm run lint`
+- **Dev:** `npm run dev`
+- **Build:** `npm run build`
+- **Lint:** `npm run lint`
 
-## CRITICAL ARCHITECTURE RULES (DO NOT VIOLATE)
+---
+
+## 🧠 AUTONOMOUS AGENT BEHAVIORS (STAFF ENGINEER LEVEL)
+
+### 1. Plan Node Default
+- Enter plan mode for ANY non-trivial task (3+ steps or architectural decisions).
+- If something goes sideways, STOP and re-plan immediately - don't keep pushing.
+- Use plan mode for verification steps, not just building.
+- Write detailed specs upfront to reduce ambiguity.
+
+### 2. Subagent Strategy
+- Use subagents liberally to keep main context window clean.
+- Offload research, exploration, and parallel analysis to subagents.
+- One task per subagent for focused execution.
+
+### 3. Verification Before Done
+- Never mark a task complete without proving it works.
+- Diff behavior between main and your changes when relevant.
+- Ask yourself: "Would a staff engineer approve this?"
+- Run tests, check logs, demonstrate correctness.
+
+### 4. Demand Elegance & Simplicity
+- For non-trivial changes: pause and ask "Is there a more elegant way?"
+- If a fix feels hacky: "Knowing everything I know now, implement the elegant solution."
+- **Simplicity First:** Make every change as simple as possible. Impact minimal code. Find root causes. No temporary fixes.
+
+### 5. Task Management
+1. **Plan First:** Write plan to `tasks/todo.md` with checkable items.
+2. **Verify Plan:** Check in before starting implementation.
+3. **Track Progress:** Mark items complete as you go.
+4. **Document Results:** Add review section to `tasks/todo.md`.
+5. **Capture Lessons:** Update `tasks/lessons.md` after corrections.
+
+---
+
+## 🏗️ CRITICAL ARCHITECTURE RULES (DO NOT VIOLATE)
 
 1. **The "My Projects" Sanctuary:**
    - Folder: `src/pages/Projects/` (except the `Projects.jsx` listing logic).
-   - **RULE:** NEVER modify the internal logic, state, or styling of individual projects (e.g., Hangman, FlightTracker, Exam). They are completely isolated.
+   - NEVER modify the internal logic, state, or styling of individual projects (Hangman, FlightTracker, Exam). They are completely isolated.
 
-2. **Performance & Asset Management:**
-   - Heavy assets (like Canvas Fluid Simulations) MUST be lazy-loaded via `Suspense` and `React.lazy` and restricted to specific routes (e.g., `/` only) using `useLocation`.
-   - Aim for strict 60fps. Always use GPU-accelerated CSS properties (`transform`, `opacity`).
+2. **Data Visualization Performance (Grid/Heatmaps):**
+   - When rendering large grids, NEVER animate hundreds of individual DOM nodes simultaneously with Framer Motion. Animate containers or use SVG/Canvas.
 
-3. **Data Visualization Performance (Grid/Heatmaps):**
-   - When rendering large grids (like GitHub Heatmaps), NEVER animate hundreds of individual DOM nodes simultaneously with Framer Motion. This causes severe FPS drops.
-   - **Rule:** Animate containers (stagger columns/rows) or use SVG/Canvas for massive data plots. 
+3. **Background & Layering Strategy (No Masking):**
+   - Background effects (Fluid, X-Ray, Neon) MUST render at their native opacity in the background layer (`z-index: 0` or `1`).
+   - UI components stay on top with high-quality glassmorphism and clear contrast.
+   - Do NOT use complex CSS/SVG masks or filters for component shielding. The backgrounds must run full-screen, unfiltered.
 
-4. **Dynamic Component Masking (The "Swiss Cheese" Rule):**
-   - Background effects MUST NEVER render behind key UI components (Hero, Profile, Skills, etc.).
-   - **RULE:** Do NOT use physical overlay divs for shielding. This kills glassmorphism and shadows. 
-   - **Solution:** Use the `mask-image` property on the canvas elements. Generate a dynamic SVG mask that contains "holes" (black rectangles) exactly at the coordinates of the registered UI components. This creates a "Swiss Cheese" effect where the background simulation is visible everywhere EXCEPT behind the UI.
+4. **Raycast-Style CMDK (Command Palette):**
+   - Must resemble native OS apps (like Raycast): massive padding, 3xl blur, invisible inputs, typography-driven UI, zero clunky backgrounds.
 
-5. **Raycast-Style CMDK (Command Palette):**
-   - Command palettes must NOT look like generic web dropdowns. 
-   - They must resemble native OS apps (like Raycast): massive padding, 3xl blur, invisible inputs, typography-driven UI, and zero clunky background fills. Globally reserved shortcut: `CMD+K` / `CTRL+K`.
+5. **External APIs & Data Fetching:**
+   - ALWAYS use a robust public proxy (like Deno proxies) to bypass CORS.
+   - Implement elegant loading states (skeletons) and graceful fallbacks.
 
-6. **The Sensory Layer (Sonic UI):**
-   - UI sounds must be extremely subtle (short decay, low volume). Never block the main thread.
-   - Respect browser auto-play policies (sounds trigger on interaction only).
-
-7. **External APIs & Data Fetching:**
-   - When fetching live data (e.g., GitHub contributions), ALWAYS use a robust public proxy (like Deno proxies) to bypass CORS/Auth limitations.
-   - Parse schemas strictly. Always implement elegant loading states (skeletons) and graceful fallbacks if the API fails, ensuring the UI never breaks.
-
-8. **Engineer Mode:**
-   - A global toggle that adds technical metadata to the UI using CSS pseudo-elements (do NOT bloat the DOM with extra wrapper divs for this mode). Must apply to all routes and sub-components.
+6. **Event Listener & State Performance:**
+   - High-frequency events (mousemove, scroll) MUST NOT trigger React state updates. Use `useMotionValue` or raw DOM refs to prevent UI lagging.

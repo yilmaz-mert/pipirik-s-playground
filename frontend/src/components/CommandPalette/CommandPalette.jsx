@@ -40,7 +40,7 @@ export default function CommandPalette({ onMatrixRain }) {
   const navigate = useNavigate();
   const { cycleTheme, theme }                           = useTheme();
   const { active: engineerOn, toggle: toggleEngineer }  = useEngineerMode();
-  const { muted, toggleMute, playTick }                 = useSound();
+  const { muted, toggleMute, playTick, playClick }       = useSound();
   const { i18n }                                        = useTranslation();
 
   const close = useCallback(() => {
@@ -54,6 +54,7 @@ export default function CommandPalette({ onMatrixRain }) {
     const onKey = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
+        playClick();
         setOpen(v => !v);
       }
       if (e.key === 'Escape' && open) close();
@@ -65,7 +66,7 @@ export default function CommandPalette({ onMatrixRain }) {
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('cmd-palette-toggle', onEvt);
     };
-  }, [open, close]);
+  }, [open, close, playClick]);
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 40);
@@ -102,9 +103,17 @@ export default function CommandPalette({ onMatrixRain }) {
   [filtered]);
 
   const onKeyDown = (e) => {
-    if (e.key === 'ArrowDown')  { e.preventDefault(); setCursor(v => Math.min(v + 1, filtered.length - 1)); }
-    else if (e.key === 'ArrowUp')  { e.preventDefault(); setCursor(v => Math.max(v - 1, 0)); }
-    else if (e.key === 'Enter')    { filtered[cursor]?.action(); }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      playClick();
+      setCursor(v => Math.min(v + 1, filtered.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      playClick();
+      setCursor(v => Math.max(v - 1, 0));
+    } else if (e.key === 'Enter') {
+      filtered[cursor]?.action();
+    }
   };
 
   useEffect(() => setCursor(0), [query]);
